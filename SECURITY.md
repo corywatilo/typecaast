@@ -4,7 +4,7 @@
 
 Please report security issues **privately** — do not open a public issue.
 
-- Use [GitHub private vulnerability reporting](https://github.com/typecaast/typecaast/security/advisories/new) ("Report a vulnerability"), or
+- Use [GitHub private vulnerability reporting](https://github.com/corywatilo/typecaast/security/advisories/new) ("Report a vulnerability"), or
 - email **security@typecaast.com**.
 
 **Target first response: within 72 hours.** We will acknowledge, investigate, and coordinate a fix and disclosure timeline with you. We credit reporters who want credit.
