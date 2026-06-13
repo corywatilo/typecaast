@@ -31,7 +31,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 *Exit: `typecaast validate <config>` runs green in CI.*
 
 - [x] M0.1 Init repo (public): pnpm workspace + Turborepo + base tsconfig + ESLint/Prettier
-- [ ] M0.2 Add Changesets; configure release pipeline (dry-run)
+- [x] M0.2 Add Changesets; configure release pipeline (dry-run)
 - [ ] M0.3 GitHub Actions: install → typecheck → lint → test → build matrix
 - [ ] M0.4 Repo hygiene: per-package `LICENSE` (**Apache-2.0** runtime/skins/skin-kit/cli/capture-lib; **FSL-1.1-Apache-2.0** builder/site) + root **`LICENSING.md`** table + per-package badges; README labeled accurately; **CONTRIBUTING + CLA**, CODE_OF_CONDUCT, CODEOWNERS, SECURITY.md, TRADEMARKS.md, `LICENSING.md`, `ANALYTICS.md` stub
 - [ ] M0.4b Secrets hygiene: `.env.example`, `.gitignore` env files, GitHub **secret scanning + push protection**, gitleaks pre-commit hook (§29)
