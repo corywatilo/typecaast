@@ -4,3 +4,8 @@
 **/coverage/**
 pnpm-lock.yaml
 *.tsbuildinfo
+
+# Source-of-truth planning docs — kept verbatim
+PLAN.md
+BUILD-CHECKLIST.md
+.changeset/README.md
