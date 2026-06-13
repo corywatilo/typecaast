@@ -34,7 +34,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M0.2 Add Changesets; configure release pipeline (dry-run)
 - [x] M0.3 GitHub Actions: install → typecheck → lint → test → build matrix
 - [x] M0.4 Repo hygiene: per-package `LICENSE` (**Apache-2.0** runtime/skins/skin-kit/cli/capture-lib; **FSL-1.1-Apache-2.0** builder/site) + root **`LICENSING.md`** table + per-package badges; README labeled accurately; **CONTRIBUTING + CLA**, CODE_OF_CONDUCT, CODEOWNERS, SECURITY.md, TRADEMARKS.md, `LICENSING.md`, `ANALYTICS.md` stub
-- [ ] M0.4b Secrets hygiene: `.env.example`, `.gitignore` env files, GitHub **secret scanning + push protection**, gitleaks pre-commit hook (§29)
+- [x] M0.4b Secrets hygiene: `.env.example`, `.gitignore` env files, GitHub **secret scanning + push protection**, gitleaks pre-commit hook (§29)
 - [ ] M0.4c Provision repo/CI via GitHub MCP/CLI (branch protection, environments, Actions secrets placeholders) (§28)
 - [ ] M0.5 `@typecaast/schema`: Zod schema for `meta` (canvas, fps, fit, theme, assets, seed), `participants`, `pacing`
 - [ ] M0.6 `@typecaast/schema`: content-node registry + `ContentNode[]` (text marks + image); `text`/`images` sugar → nodes

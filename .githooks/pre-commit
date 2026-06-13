@@ -1,0 +1,20 @@
+#!/bin/sh
+# Typecaast pre-commit hook: secret scanning with gitleaks.
+# Enable once with:  git config core.hooksPath .githooks
+# (or run `pnpm run hooks:install`).
+
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --config .gitleaks.toml
+  status=$?
+  if [ $status -ne 0 ]; then
+    echo "✖ gitleaks found a potential secret in your staged changes. Commit aborted."
+    echo "  Review the finding above. If it's a false positive, allowlist it in .gitleaks.toml."
+    exit $status
+  fi
+else
+  echo "⚠ gitleaks not installed — skipping local secret scan."
+  echo "  Install it (brew install gitleaks) so secrets are caught before they leave your machine."
+  echo "  CI scans every push/PR regardless."
+fi
+
+exit 0

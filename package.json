@@ -18,6 +18,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yaml,yml}\"",
     "clean": "turbo run clean && rm -rf node_modules",
+    "hooks:install": "git config core.hooksPath .githooks",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build && changeset publish"

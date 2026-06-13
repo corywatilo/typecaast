@@ -1,0 +1,18 @@
+# gitleaks config — extends the maintained default ruleset.
+# https://github.com/gitleaks/gitleaks
+title = "Typecaast gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+  '''\.env\.example$''',
+  '''pnpm-lock\.yaml$''',
+]
+# PostHog project keys are publishable by design (phc_...) and may appear
+# in client config; they are not secrets.
+regexes = [
+  '''phc_[A-Za-z0-9]{40,}''',
+]
