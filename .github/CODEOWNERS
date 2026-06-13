@@ -1,0 +1,29 @@
+# Code ownership for review routing.
+# See https://docs.github.com/articles/about-code-owners
+
+# Default owner for everything.
+*                       @corywatilo
+
+# Engine & schema — strictest review (determinism + contract stability).
+/packages/core/         @corywatilo
+/packages/schema/       @corywatilo
+
+# Renderers.
+/packages/react/        @corywatilo
+/packages/remotion/     @corywatilo
+
+# Skins & skin-kit — may evolve faster; per-skin owners added as skins land.
+/packages/skins/        @corywatilo
+/packages/skin-kit/     @corywatilo
+
+# Capture (security-sensitive: untrusted HTML/CSS path).
+/packages/capture/      @corywatilo
+/extension/             @corywatilo
+
+# Product surface (FSL-licensed).
+/packages/builder/      @corywatilo
+/apps/site/             @corywatilo
+
+# Governance, licensing, CI.
+/.github/               @corywatilo
+*.md                    @corywatilo
