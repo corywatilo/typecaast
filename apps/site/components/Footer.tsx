@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ManageAnalyticsLink } from "../lib/analytics";
 
 export function Footer() {
   return (
@@ -63,6 +64,7 @@ export function Footer() {
             >
               Licensing
             </a>
+            <ManageAnalyticsLink className="tc-muted" />
           </div>
         </div>
       </div>

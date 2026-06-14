@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "../lib/analytics";
+import { Analytics, ConsentBanner } from "../lib/analytics";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -22,6 +22,7 @@ export default function RootLayout({
       <body>
         <Analytics />
         {children}
+        <ConsentBanner />
       </body>
     </html>
   );

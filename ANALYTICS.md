@@ -1,29 +1,56 @@
 # Analytics & Telemetry
 
-> **Stub** — the full event/property table is published as part of M4 (builder + site analytics). This file states the hard rules and the planned model so they're committed from day one.
-
 ## Hard rule: zero telemetry in shipped packages
 
-The embeddable runtime — `@typecaast/core`, `@typecaast/react`, `@typecaast/skins`, `@typecaast/skin-kit` — and `@typecaast/cli` contain **no telemetry**: no phone-home, no analytics SDK, nothing that fires from a user's embed or local render. This is enforced by a CI guard test (M4.11) that fails if any of these packages import an analytics SDK.
+The embeddable runtime — `@typecaast/core`, `@typecaast/react`, `@typecaast/skins`, `@typecaast/skin-kit`, `@typecaast/capture` — and `@typecaast/cli` contain **no telemetry**: no phone-home, no analytics SDK, nothing that fires from a user's embed or local render. This is enforced by a CI guard (`scripts/check-no-telemetry.mjs`, M4.11) that fails if any of these packages declare an analytics SDK.
 
-Instrumentation is confined to the **hosted site + builder** (and later the paid render service).
+Instrumentation is confined to the **hosted site + builder** (`apps/site`) — and later the paid render service.
 
-## Provider
+## Provider & region
 
-[PostHog](https://posthog.com), loaded via a first-party **reverse proxy** (e.g. `/ingest`) so it stays first-party and isn't blocked. The PostHog **project API key is publishable** (client-side by design); personal/admin API keys are secret and never committed.
+[PostHog](https://posthog.com), **US** region (`us.i.posthog.com`), loaded through a first-party **reverse proxy** at `/ingest` (Next.js rewrites in `apps/site/next.config.mjs`) so it stays first-party and isn't ad-blocked. The PostHog **project API key is publishable** (client-side by design); personal/admin keys are secret and never committed (kept in `.env` / `.env.local`, both gitignored).
 
 ## Consent model (content sharing is opt-in; default obfuscated)
 
-- **Opted out (default):** message text, config JSON, image bytes/data URLs, and captured DOM are **obfuscated client-side before anything is sent**. We capture only structural/behavioral events (which skin, step count, output size, which action).
-- **Opted in (explicit):** the user agrees to also send authored content (message text, config) for product improvement. Raw image bytes / captured DOM stay excluded by default; the grant is **revocable**.
-- Enforced by an **allowlisted event-property schema** + a content-field gate keyed to consent — not free-form `capture()` calls — so "opted out = no content" is a code guarantee.
-- **Session-recording masking follows the same switch:** text inputs and content-editing surfaces are masked by default; recording is consent-gated.
+Implemented in `apps/site/lib/analytics.tsx`.
 
-## Planned funnels (detail lands in M4)
+- **Opted out (default):** `mask_all_text` + `mask_all_element_attributes` are on and session recording is disabled, so message text, config JSON, and DOM content are **masked before anything is sent**. We capture only structural/behavioral events (which skin, step count, which action) and URL-only pageviews. `autocapture` is **off** — events come only from the allowlisted `track()` helper, so "opted out = no content" is a code guarantee, not a policy.
+- **Opted in (explicit):** unmasks content and enables session recording (`startSessionRecording`). The grant is stored in `localStorage` and is **revocable** anytime via the footer's “Analytics preferences” link, which re-opens the banner.
+- **Do Not Track** is always honored (`respect_dnt: true`).
 
-- **Builder funnel:** `builder_opened`, `skin_selected`, `step_added`, `timeline_edited`, `pacing_adjusted`, `theme_toggled`, `output_size_changed`, `preview_played`, `config_imported`, `embed_copied`, `json_exported`, `render_snippet_copied`, `share_link_created`.
-- **Purchase funnel (paid render service, when live):** `render_for_me_clicked` → `checkout_started` → `purchase_completed` → `render_delivered`, plus `reexport_used`. Reconciled against Stripe as source of truth.
+## Events
+
+All site/builder events are an allowlist (`TcEvent`). Builder-package events reach the site through a telemetry-free `onEvent` callback on `<Builder>` (the package ships no SDK).
+
+| Event                   | Trigger                                | Source                             |
+| ----------------------- | -------------------------------------- | ---------------------------------- |
+| `builder_opened`        | Playground/builder mounts              | `app/playground/page.tsx`          |
+| `gallery_viewed`        | Gallery page mounts                    | `app/gallery/page.tsx`             |
+| `docs_viewed`           | Docs page mounts                       | `components/DocsViewedTracker.tsx` |
+| `skin_selected`         | Skin changed (`skin_id`)               | `onChange` diff                    |
+| `step_added`            | Step added (`step_type`, `step_count`) | `onChange` diff                    |
+| `preview_played`        | Preview play pressed                   | builder `onEvent`                  |
+| `json_exported`         | JSON downloaded or copied              | builder `onEvent`                  |
+| `embed_copied`          | Embed snippet copied                   | builder `onEvent`                  |
+| `share_link_created`    | Share link copied                      | builder `onEvent`                  |
+| `render_snippet_copied` | CLI render command copied              | builder `onEvent`                  |
+
+No event carries authored content while opted out. Property values are structural (ids, counts, sizes, types) — never message text.
+
+### Purchase funnel (paid render service, when live)
+
+`render_for_me_clicked` → `checkout_started` → `purchase_completed` → `render_delivered`, plus `reexport_used`. Reconciled against Stripe as the source of truth. Lives in the private `typecaast-cloud` repo, not here.
+
+## Feature flags
+
+Read via `isFeatureEnabled(flag)` (PostHog flags), loaded by the client after init.
+
+## Retention
+
+- **Events:** PostHog project default retention (rolling; not extended for this project).
+- **Session recordings:** only captured for opted-in users; subject to PostHog's recording retention.
+- **Consent state:** stored only in the visitor's browser (`localStorage`), never server-side.
 
 ## Transparency
 
-The final version of this document lists **every event and property**, what the opt-in unlocks, the **data region** (EU or US, chosen deliberately), and **retention windows**. Consent state is visible and changeable in-product.
+This document lists every event and property, what opting in unlocks, the data region (US), and retention. Consent state is visible and changeable in-product (footer → **Analytics preferences**).

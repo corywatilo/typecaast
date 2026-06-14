@@ -133,7 +133,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M4.8 Next.js site: landing (dogfooded live sims as hero), MDX docs, playground (= builder), preset gallery, examples
 - [x] M4.9 a11y: axe in CI for builder + embed; keyboard nav; reduced-motion; transcript; manual SR smoke
 - [x] M4.10 **PostHog analytics (site/builder only):** reverse-proxy ingest, pageview autocapture, builder funnel events (§27), flags
-- [ ] M4.10b **Consent model:** opt-in content-sharing banner; default **obfuscates content client-side** (interactions only); consent-keyed content-field gate; masking + recordings follow the same switch; revocable; publish `ANALYTICS.md` (events, what opt-in unlocks, region, retention) (§27)
+- [x] M4.10b **Consent model:** opt-in content-sharing banner; default **obfuscates content client-side** (interactions only); consent-keyed content-field gate; masking + recordings follow the same switch; revocable; publish `ANALYTICS.md` (events, what opt-in unlocks, region, retention) (§27)
 - [x] M4.11 **Telemetry guard:** CI test asserting `core`/`react`/`skins`/`skin-kit`/`cli` import no analytics SDK (zero phone-home)
 - [ ] M4.12 Provision via MCP: **Vercel** (project/env/domain), **Cloudflare** (DNS + proxy route + SSL), **PostHog** (project/flags/dashboards) — capture as runbooks in private ops repo (§28/§29)
 - [ ] M4.13 Deploy to Vercel; per-PR preview deploys
