@@ -7,7 +7,7 @@
 export { Builder, type BuilderProps, type BuilderEvent } from "./Builder.js";
 export { Preview } from "./Preview.js";
 export { TimelinePanel } from "./TimelinePanel.js";
-export { Inspector } from "./Inspector.js";
+export { Modal } from "./Modal.js";
 export { StepEditor } from "./StepEditor.js";
 export { capabilityLint, type LintWarning } from "./lint.js";
 export { toJSON, embedSnippet, renderSnippet, skinVar } from "./exporting.js";

@@ -32,14 +32,18 @@ export function Preview({
   });
 
   // Preview-as-you-go: remember the scrub position and restore it whenever the
-  // engine recompiles (an edit), so editing never throws you back to t=0.
-  // Initial position is the end, so opening the builder shows the full thread.
+  // engine recompiles (an edit), so editing never throws you back to t=0. The
+  // builder opens on the **final** frame (full thread) — `posRef` starts at the
+  // end and `inited` guards the per-render capture so it isn't reset to 0 before
+  // the first seek runs.
   const posRef = useRef<number>(Number.MAX_SAFE_INTEGER);
+  const inited = useRef(false);
   useEffect(() => {
-    posRef.current = tc.currentMs;
+    if (inited.current) posRef.current = tc.currentMs;
   });
   useEffect(() => {
     tc.player.seek(Math.min(posRef.current, tc.player.durationMs));
+    inited.current = true;
   }, [tc.player]);
 
   const atEnd = tc.currentMs >= tc.duration - 1;

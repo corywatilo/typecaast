@@ -8,16 +8,29 @@ import {
 } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import type { ResolvedTheme } from "@typecaast/core";
-import { Badge, Heading, Panel, ThemeRoot } from "@typecaast/ui";
+import {
+  Badge,
+  Button,
+  Heading,
+  Panel,
+  Segmented,
+  ThemeRoot,
+} from "@typecaast/ui";
 import { Preview } from "./Preview.js";
 import { TimelinePanel } from "./TimelinePanel.js";
-import { Inspector } from "./Inspector.js";
+import { Modal } from "./Modal.js";
+import { CastPanel } from "./panels/CastPanel.js";
+import { SkinPanel } from "./panels/SkinPanel.js";
+import { OutputPanel } from "./panels/OutputPanel.js";
+import { ExportPanel } from "./panels/ExportPanel.js";
+import { ImportPanel } from "./panels/ImportPanel.js";
 import {
   addStep,
   blankStep,
   deleteStep,
   duplicateStep,
   moveStep,
+  updateStep,
 } from "./store.js";
 import { loadFromUrl, loadLocal, saveLocal, updateUrl } from "./persistence.js";
 
@@ -51,12 +64,21 @@ export interface BuilderProps {
   style?: CSSProperties;
 }
 
+type LeftTab = "timeline" | "cast";
+type RightTab = "app" | "options";
+
 const layout: CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
   width: "100%",
   overflow: "hidden",
+};
+
+const columnHeader: CSSProperties = {
+  flex: "0 0 auto",
+  padding: "10px 12px",
+  borderBottom: "1px solid var(--tc-border)",
 };
 
 export function Builder({
@@ -74,11 +96,14 @@ export function Builder({
       ? (loadFromUrl() ?? loadLocal() ?? (initialConfig as ConfigInput))
       : (initialConfig as ConfigInput),
   );
-  const [selected, setSelected] = useState<number | null>(0);
+  const [selected, setSelected] = useState<number | null>(null);
   const [previewTheme, setPreviewTheme] = useState<ThemeMode>(
     (initialConfig.meta?.theme as ThemeMode) ?? "auto",
   );
   const [loop, setLoop] = useState(false);
+  const [leftTab, setLeftTab] = useState<LeftTab>("timeline");
+  const [rightTab, setRightTab] = useState<RightTab>("app");
+  const [modal, setModal] = useState<null | "export" | "import">(null);
 
   const update = (next: ConfigInput) => {
     setConfig(next);
@@ -124,33 +149,61 @@ export function Builder({
         <span className="tc-muted" style={{ fontSize: 12 }}>
           {config.timeline.length} steps · {config.participants.length} cast
         </span>
+        <Button size="sm" variant="primary" onClick={() => setModal("export")}>
+          Export
+        </Button>
       </header>
 
       <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
         <aside
-          aria-label="Timeline"
+          aria-label="Timeline and cast"
           style={{
-            flex: "0 0 280px",
+            flex: "0 0 300px",
+            display: "flex",
+            flexDirection: "column",
             borderRight: "1px solid var(--tc-border)",
             background: "var(--tc-panel)",
             minHeight: 0,
           }}
         >
-          <TimelinePanel
-            config={config}
-            selected={selected}
-            onSelect={setSelected}
-            onAdd={(t) => {
-              update(addStep(config, blankStep(t, defaultFrom)));
-              setSelected(config.timeline.length);
-            }}
-            onDelete={(i) => {
-              update(deleteStep(config, i));
-              setSelected(null);
-            }}
-            onMove={(from, to) => update(moveStep(config, from, to))}
-            onDuplicate={(i) => update(duplicateStep(config, i))}
-          />
+          <div style={columnHeader}>
+            <Segmented<LeftTab>
+              aria-label="Left panel"
+              value={leftTab}
+              onChange={setLeftTab}
+              options={[
+                { value: "timeline", label: "Timeline" },
+                { value: "cast", label: "Cast" },
+              ]}
+            />
+          </div>
+          <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
+            {leftTab === "timeline" ? (
+              <TimelinePanel
+                config={config}
+                selected={selected}
+                onSelect={setSelected}
+                onAdd={(t) => {
+                  update(addStep(config, blankStep(t, defaultFrom)));
+                  setSelected(config.timeline.length);
+                }}
+                onDelete={(i) => {
+                  update(deleteStep(config, i));
+                  setSelected(null);
+                }}
+                onMove={(from, to) => update(moveStep(config, from, to))}
+                onDuplicate={(i) => update(duplicateStep(config, i))}
+                onUpdateStep={(i, patch) =>
+                  update(updateStep(config, i, patch as never))
+                }
+                onImport={() => setModal("import")}
+              />
+            ) : (
+              <div style={{ flex: 1, overflowY: "auto", padding: 16 }}>
+                <CastPanel config={config} onChange={update} />
+              </div>
+            )}
+          </div>
         </aside>
 
         <main style={{ flex: "1 1 auto", minWidth: 0, minHeight: 0 }}>
@@ -196,25 +249,53 @@ export function Builder({
         </main>
 
         <aside
-          aria-label="Inspector"
+          aria-label="App and options"
           style={{
             flex: "0 0 320px",
+            display: "flex",
+            flexDirection: "column",
             borderLeft: "1px solid var(--tc-border)",
             background: "var(--tc-panel)",
             minHeight: 0,
-            overflowY: "auto",
-            padding: 16,
           }}
         >
-          <Inspector
-            config={config}
-            selected={selected}
-            skins={skins}
-            onChange={update}
-            onEvent={onEvent}
-          />
+          <div style={columnHeader}>
+            <Segmented<RightTab>
+              aria-label="Right panel"
+              value={rightTab}
+              onChange={setRightTab}
+              options={[
+                { value: "app", label: "App" },
+                { value: "options", label: "Options" },
+              ]}
+            />
+          </div>
+          <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 16 }}>
+            {rightTab === "app" ? (
+              <SkinPanel config={config} skins={skins} onChange={update} />
+            ) : (
+              <OutputPanel config={config} onChange={update} />
+            )}
+          </div>
         </aside>
       </div>
+
+      {modal === "export" ? (
+        <Modal title="Export" onClose={() => setModal(null)} width={560}>
+          <ExportPanel config={config} onChange={update} onEvent={onEvent} />
+        </Modal>
+      ) : null}
+      {modal === "import" ? (
+        <Modal title="Import config" onClose={() => setModal(null)}>
+          <ImportPanel
+            onImport={(next) => {
+              update(next);
+              setSelected(0);
+              setModal(null);
+            }}
+          />
+        </Modal>
+      ) : null}
     </ThemeRoot>
   );
 }

@@ -89,22 +89,8 @@ export function ExportPanel({
   onChange: (next: ConfigInput) => void;
   onEvent?: (event: BuilderEvent) => void;
 }) {
-  const [importText, setImportText] = useState("");
-  const [importError, setImportError] = useState<string | null>(null);
-
   const embed = embedSnippet(config);
   const render = renderSnippet(config);
-
-  const doImport = () => {
-    try {
-      const parsed = JSON.parse(importText) as ConfigInput;
-      onChange(parsed);
-      setImportError(null);
-      setImportText("");
-    } catch (e) {
-      setImportError((e as Error).message);
-    }
-  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -177,38 +163,6 @@ export function ExportPanel({
           No hosted video in v1 — run the OSS CLI. (A “Render for me” service is
           planned.)
         </p>
-      </div>
-
-      <div style={{ paddingTop: 8, borderTop: "1px solid var(--tc-border)" }}>
-        <span className="tc-label">Import / paste JSON</span>
-        <textarea
-          className="tc-input"
-          style={{
-            height: 90,
-            padding: 8,
-            resize: "vertical",
-            marginTop: 6,
-            fontFamily: "var(--tc-font-mono)",
-            fontSize: 11.5,
-          }}
-          placeholder="Paste a Typecaast config…"
-          value={importText}
-          onChange={(e) => setImportText(e.currentTarget.value)}
-        />
-        {importError ? (
-          <p style={{ color: "#e5484d", fontSize: 12, marginTop: 4 }}>
-            {importError}
-          </p>
-        ) : null}
-        <div style={{ marginTop: 8 }}>
-          <Button
-            variant="outline"
-            disabled={!importText.trim()}
-            onClick={doImport}
-          >
-            Load config
-          </Button>
-        </div>
       </div>
     </div>
   );

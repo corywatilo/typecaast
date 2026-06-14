@@ -58,7 +58,7 @@ describe("Builder inspector tabs", () => {
         skins={{ slack, "claude-code": claudeCode }}
       />,
     );
-    act(() => fireEvent.click(screen.getByRole("button", { name: "Skin" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "App" })));
     // Switch to the TUI → its lint warns about the reaction step.
     const select = screen.getByDisplayValue("Slack");
     act(() => fireEvent.change(select, { target: { value: "claude-code" } }));
