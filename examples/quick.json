@@ -1,0 +1,18 @@
+{
+  "$schema": "../packages/schema/typecaast.schema.json",
+  "version": 1,
+  "meta": {
+    "canvas": { "width": 480, "height": 360 },
+    "fps": 24,
+    "skin": { "id": "slack", "options": { "channel": "#demo" } }
+  },
+  "participants": [
+    { "id": "a", "name": "Ada", "isSelf": true },
+    { "id": "b", "name": "Bo" }
+  ],
+  "timeline": [
+    { "type": "message", "from": "a", "text": "ship it?", "delay": 200 },
+    { "type": "reaction", "target": "$prev", "emoji": "🚀", "delay": 400 },
+    { "type": "message", "from": "b", "text": "shipping 🚀", "delay": 400 }
+  ]
+}
