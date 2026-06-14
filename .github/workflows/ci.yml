@@ -47,3 +47,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Validate example configs
+        run: pnpm validate:examples
