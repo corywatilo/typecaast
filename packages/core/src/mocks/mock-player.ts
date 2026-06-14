@@ -17,7 +17,8 @@ export interface MockPlayerOptions {
 
 /** A monotonic time source that doesn't break determinism of `getStateAt`. */
 function now(): number {
-  const perf = (globalThis as { performance?: { now(): number } }).performance;
+  const perf = (globalThis as unknown as { performance?: { now(): number } })
+    .performance;
   return perf ? perf.now() : Date.now();
 }
 
@@ -31,12 +32,12 @@ interface SchedulerGlobals {
 }
 
 function schedule(cb: () => void): FrameHandle {
-  const g = globalThis as SchedulerGlobals;
+  const g = globalThis as unknown as SchedulerGlobals;
   if (g.requestAnimationFrame) return g.requestAnimationFrame(() => cb());
   return g.setTimeout ? g.setTimeout(cb, 16) : 0;
 }
 function unschedule(handle: FrameHandle): void {
-  const g = globalThis as SchedulerGlobals;
+  const g = globalThis as unknown as SchedulerGlobals;
   if (g.cancelAnimationFrame) g.cancelAnimationFrame(handle);
   else if (g.clearTimeout) g.clearTimeout(handle);
 }

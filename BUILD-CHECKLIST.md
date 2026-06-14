@@ -42,7 +42,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M0.8 `@typecaast/schema`: generate JSON Schema + export inferred TS types
 - [x] M0.9 **Contracts (lock early): `SimState` type** (messages w/ reveal progress, typing, composer, scroll, duration) + **skin-prop types** + **Player interface** — the surface the UI builds against
 - [x] M0.10 **Mock-state fixtures:** hand-authored `SimState` snapshots + a scripted/faked playback stub implementing the Player interface (no real engine) for UI work
-- [ ] M0.11 `@typecaast/cli`: `validate` command with error taxonomy + exit codes
+- [x] M0.11 `@typecaast/cli`: `validate` command with error taxonomy + exit codes
 - [ ] M0.12 Example config: the Slack billing-toast thread (fixture used downstream)
 - [ ] M0.E **Exit demo:** CI validates the example config; `SimState` contract + mock fixtures + stub player ready for UI
 

@@ -13,3 +13,4 @@ export * from "./content-registry.js";
 export * from "./content-sugar.js";
 export * from "./timeline.js";
 export * from "./config.js";
+export * from "./validate.js";
