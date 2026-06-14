@@ -50,3 +50,6 @@ playwright-report
 # MCP setup-wizard scratch (vendored integration skills + one-time reports)
 .claude/skills/integration-*/
 posthog-setup-report.md
+
+# Claude Code per-user/local settings (harness-managed)
+.claude/settings.local.json
