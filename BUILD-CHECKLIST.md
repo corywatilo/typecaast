@@ -73,8 +73,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M1E.2 `core`: `compile(config)` — auto-pacing (WPM/CPS, gaps, reaction lag, jitter) + per-step overrides → absolute timeline
 - [x] M1E.3 `core`: `getStateAt(t)` pure sampler → `SimState` (matches the M0.9 contract)
 - [x] M1E.4 `core`: capability resolution (drop unsupported events/content per skin, retain in config)
-- [ ] M1E.5 `core`: real Player (play/pause/seek/scrubTo/setRate/stepNext/stepPrev/loop, tick/end) replacing the stub
-- [ ] M1E.6 `core` tests: determinism (referential stability), pacing math, capability resolution, override precedence
+- [x] M1E.5 `core`: real Player (play/pause/seek/scrubTo/setRate/stepNext/stepPrev/loop, tick/end) replacing the stub
+- [x] M1E.6 `core` tests: determinism (referential stability), pacing math, capability resolution, override precedence
 - [ ] M1E.7 Swap `react`/builder from mock to real engine; confirm zero UI changes needed (any change = a contract miss to note)
 - [ ] M1E.E **Exit demo:** billing-toast plays from a real config end-to-end, light + dark, Lato rendering
 

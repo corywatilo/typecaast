@@ -8,6 +8,11 @@ import { resolveCapabilities } from "./capabilities.js";
 
 export { compile } from "./compile.js";
 export { sampleState, createGetStateAt } from "./get-state-at.js";
+export {
+  createPlayer,
+  TimelinePlayer,
+  type PlayerOptions,
+} from "./create-player.js";
 export { createRng, withJitter } from "./rng.js";
 export { graphemeCount, typingDurationMs, readingDelayMs } from "./pacing.js";
 export {
