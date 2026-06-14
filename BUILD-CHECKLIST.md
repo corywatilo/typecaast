@@ -148,7 +148,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M5.2 **Security: sanitize allowlist** (strip scripts/handlers/iframes/js+nonimage-data URLs/CSS hazards); render template skins in shadow-DOM + **hostile-fixture CI suite** (§10). _(sandboxed-iframe + strict-CSP embed-level hardening folded into the R.4 pre-launch pentest — CSP can't bind to a shadow root)_
 - [ ] M5.2b Capture hygiene: one-time pre-share notice; safer share defaults; local-first (§18)
 - [x] M5.2c Style scoping verified on a hostile host page (zero leakage both directions)
-- [ ] M5.3 MV3 Chrome extension: element picker → capture → draft (local-only)
+- [x] M5.3 MV3 Chrome extension: element picker → capture → draft (local-only)
 - [x] M5.4 Saved-page importer (.html/.mhtml) → same distiller
 - [x] M5.5 `TemplateSkinAdapter` — captured drafts satisfy the `Skin` contract via slot filling
 - [x] M5.6 `typecaast scaffold-skin` — draft → editable template skin package

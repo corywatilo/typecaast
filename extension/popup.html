@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        width: 280px;
+        margin: 0;
+        padding: 14px;
+        font: 13px -apple-system, system-ui, sans-serif;
+        background: #fff;
+        color: #1a1a1a;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #1a1a1a;
+          color: #e8e8e8;
+        }
+      }
+      h1 {
+        font-size: 14px;
+        margin: 0 0 4px;
+      }
+      p.lede {
+        margin: 0 0 12px;
+        opacity: 0.7;
+      }
+      button {
+        display: block;
+        width: 100%;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border: 0;
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      #pick {
+        background: #5b5bd6;
+        color: #fff;
+      }
+      #download {
+        background: transparent;
+        border: 1px solid currentColor;
+        color: inherit;
+      }
+      #download:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      #status {
+        min-height: 16px;
+        margin: 4px 0 0;
+        font-size: 12px;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Typecaast Capture</h1>
+    <p class="lede">Pick a chat thread to capture as a skin draft. Stays local.</p>
+    <button id="pick">Pick &amp; capture</button>
+    <button id="download" disabled>Download last draft</button>
+    <p id="status"></p>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

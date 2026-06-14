@@ -1,0 +1,22 @@
+{
+  "name": "@typecaast/extension",
+  "version": "0.0.0",
+  "private": true,
+  "description": "MV3 Chrome extension: pick a chat UI element and capture it into a Typecaast SkinDraft (local-only).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@typecaast/capture": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.2"
+  }
+}

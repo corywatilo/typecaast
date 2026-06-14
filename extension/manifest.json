@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Typecaast Capture",
+  "version": "0.1.0",
+  "description": "Pick a chat UI on any page and capture it into a Typecaast SkinDraft. Everything stays on your machine.",
+  "permissions": ["activeTab", "scripting", "storage", "downloads"],
+  "action": {
+    "default_title": "Typecaast Capture",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {}
+}

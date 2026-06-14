@@ -1,6 +1,7 @@
 packages:
   - "packages/*"
   - "apps/*"
+  - "extension"
 allowBuilds:
   core-js: false
   esbuild: true
