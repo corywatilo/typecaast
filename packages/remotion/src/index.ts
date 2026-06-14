@@ -10,6 +10,8 @@ export {
 } from "./composition.js";
 export { frameToMs, getDurationInFrames } from "./timing.js";
 export { useRemotionFonts } from "./fonts.js";
+// Note: the Node renderer is the `@typecaast/remotion/render` subpath
+// (renderVideo) — kept separate so importing the composition stays browser-only.
 export {
   getCompositionMetadata,
   ASPECT_PRESETS,

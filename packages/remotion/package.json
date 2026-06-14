@@ -1,22 +1,25 @@
 {
   "name": "@typecaast/remotion",
   "version": "0.0.0",
-  "description": "Remotion composition for deterministic Typecaast video export.",
+  "description": "Remotion composition + renderer for deterministic Typecaast video export.",
   "license": "Apache-2.0",
   "type": "module",
   "sideEffects": false,
   "files": [
     "dist"
   ],
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
+      "import": "./dist/index.js"
+    },
+    "./render": {
+      "types": "./dist/render.d.ts",
+      "import": "./dist/render.js"
+    },
+    "./render-root": "./dist/render-root.js"
   },
   "scripts": {
     "build": "tsup",
@@ -27,10 +30,13 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@remotion/bundler": "^4.0.290",
+    "@remotion/renderer": "^4.0.290",
     "@typecaast/core": "workspace:*",
     "@typecaast/react": "workspace:*",
     "@typecaast/schema": "workspace:*",
-    "@typecaast/skin-kit": "workspace:*"
+    "@typecaast/skin-kit": "workspace:*",
+    "@typecaast/skins": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -38,6 +44,7 @@
     "remotion": "^4.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "react": "^19.0.0",

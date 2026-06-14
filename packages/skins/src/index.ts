@@ -5,3 +5,4 @@
 
 export { slack } from "./slack/index.js";
 export { SLACK_COLORS, type SlackColors } from "./slack/tokens.js";
+export { builtinSkins, getSkin } from "./registry.js";

@@ -86,11 +86,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M2.1 `@typecaast/remotion`: `<TypecaastComposition>` mapping frame→t→`getStateAt`
 - [x] M2.2 `remotion`: duration from timeline; canvas size + scale factor; transparent bg
 - [x] M2.3 `remotion`: font + emoji loading in the Remotion runtime (deterministic)
-- [ ] M2.4 `cli`: `render` command (format, --size/aspect presets, --scale, --theme [default light], --transparent)
+- [x] M2.4 `cli`: `render` command (format, --size/aspect presets, --scale, --theme [default light], --transparent)
 - [ ] M2.5 Pinned render container image (Chromium/Remotion/Node/fonts/emoji) + docs
 - [ ] M2.6 **Frame-parity test:** React state at t === Remotion state at frame across fixtures
 - [ ] M2.7 Render smoke test in CI (short config → MP4)
-- [ ] M2.8 Keep renderer a clean callable package (future paid-service seam)
+- [x] M2.8 Keep renderer a clean callable package (future paid-service seam)
 - [ ] M2.E **Exit demo:** `typecaast render billing-toast.json` → MP4 + GIF, 16:9 and 9:16
 
 ---
