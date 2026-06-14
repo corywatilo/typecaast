@@ -47,7 +47,7 @@ Anyone can add a platform skin — see the "Build a skin" guide (docs) and the s
 
 ## Code of Conduct
 
-This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). By participating you agree to uphold it.
+Be respectful and keep it focused on the work — see the [Code of Conduct](./CODE_OF_CONDUCT.md). By participating you agree to uphold it.
 
 ## Security
 
