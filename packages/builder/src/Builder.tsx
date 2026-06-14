@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import {
   configSchema,
   validateConfig,
@@ -58,6 +58,8 @@ export interface BuilderProps {
   onChange?: (config: ConfigInput) => void;
   /** Called on discrete user actions (export/share/preview) — see BuilderEvent. */
   onEvent?: (event: BuilderEvent) => void;
+  /** Extra controls rendered in the header's top-right (e.g. a theme toggle). */
+  headerActions?: ReactNode;
   /** Persist to localStorage + the URL hash (shareable links). Default true. */
   persist?: boolean;
   className?: string;
@@ -89,6 +91,7 @@ export function Builder({
   theme = "dark",
   onChange,
   onEvent,
+  headerActions,
   persist = true,
   className,
   style,
@@ -151,6 +154,7 @@ export function Builder({
         <span className="tc-muted" style={{ fontSize: 12 }}>
           {config.timeline.length} steps · {config.participants.length} cast
         </span>
+        {headerActions}
         <Button size="sm" variant="primary" onClick={() => setModal("export")}>
           Export
         </Button>

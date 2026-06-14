@@ -6,9 +6,12 @@ import { Builder } from "@typecaast/builder";
 import { builtinSkins } from "@typecaast/skins";
 import { billingToast } from "../../lib/configs";
 import { track } from "../../lib/analytics";
+import { useResolvedSiteTheme } from "../../lib/theme";
+import { ThemeToggle } from "../../components/ThemeToggle";
 
 export default function PlaygroundPage() {
   const prevConfig = useRef<ConfigInput | null>(null);
+  const siteTheme = useResolvedSiteTheme();
 
   useEffect(() => {
     track("builder_opened");
@@ -36,9 +39,10 @@ export default function PlaygroundPage() {
       <Builder
         initialConfig={billingToast}
         skins={builtinSkins}
-        theme="dark"
+        theme={siteTheme}
         onChange={handleChange}
         onEvent={(event) => track(event)}
+        headerActions={<ThemeToggle />}
       />
     </div>
   );
