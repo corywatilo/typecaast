@@ -1,30 +1,25 @@
 import type { Config } from "@typecaast/schema";
-import type { GetStateAt, ResolvedTheme } from "@typecaast/core";
 import {
-  createMockBillingToastGetStateAt,
-  MOCK_BILLING_TOAST_DURATION_MS,
-  MOCK_BILLING_TOAST_STEPS,
-} from "@typecaast/core/mocks";
+  createEngine,
+  type Capabilities,
+  type EngineHandle,
+  type ResolvedTheme,
+} from "@typecaast/core";
 
-export interface Engine {
-  getStateAt: GetStateAt;
-  durationMs: number;
-  /** Step boundaries for stepNext/stepPrev. */
-  steps: number[];
-}
+export type Engine = EngineHandle;
 
 /**
- * ⚠️ M1-UI MOCK. Ignores the config's timeline and returns the faked
- * billing-toast engine so the player + skins can be built and validated
- * against the locked `SimState` contract before the real engine exists.
+ * The single seam between a config and a playable engine. M1-UI ran this over a
+ * hand-mocked timeline; M1-engine swaps in the real `compile` + `getStateAt`
+ * here — and nothing else in the renderer changed (same `Engine` shape).
  *
- * M1-engine replaces this with `compile(config)` → `getStateAt`. The
- * `<Typecaast>` / `useTypecaast` API stays identical — only this adapter swaps.
+ * Optional `capabilities` (from the active skin) drop unsupported events/content
+ * from the sampled state while leaving the config intact.
  */
-export function configToEngine(_config: Config, theme: ResolvedTheme): Engine {
-  return {
-    getStateAt: createMockBillingToastGetStateAt(theme),
-    durationMs: MOCK_BILLING_TOAST_DURATION_MS,
-    steps: MOCK_BILLING_TOAST_STEPS,
-  };
+export function configToEngine(
+  config: Config,
+  theme: ResolvedTheme,
+  capabilities?: Capabilities,
+): Engine {
+  return createEngine(config, theme, capabilities);
 }

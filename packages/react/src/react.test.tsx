@@ -69,34 +69,42 @@ const testSkin: Skin = {
   },
 };
 
+// A real config — the engine compiles its timeline (no mock).
 const config: Config = configSchema.parse({
   version: 1,
   meta: { canvas: { width: 880, height: 720 }, skin: { id: "slack" } },
   participants: mockParticipants,
-  timeline: [{ type: "message", from: "cory", text: "placeholder" }],
+  timeline: [
+    { type: "message", from: "cory", text: "i got a billing toast error?" },
+    { type: "reaction", target: "$prev", emoji: "🦔" },
+    { type: "typing", from: "paul" },
+    { type: "message", from: "paul", text: "shouldn't error" },
+    { type: "composerType", from: "cory", text: "Let me check." },
+    { type: "send" },
+  ],
 });
 
-describe("useTypecaast", () => {
-  it("starts empty and advances state on seek", () => {
+describe("useTypecaast (real engine)", () => {
+  it("starts empty and reveals the real config's messages by the end", () => {
     const { result } = renderHook(() =>
       useTypecaast(config, { theme: "light" }),
     );
     expect(result.current.state.messages).toHaveLength(0);
     expect(result.current.duration).toBeGreaterThan(0);
 
-    act(() => result.current.seek(900));
-    expect(result.current.state.messages).toHaveLength(1);
-    expect(textOf(result.current.state.messages[0]!)).toContain(
-      "billing toast",
-    );
+    act(() => result.current.seek(result.current.duration));
+    const texts = result.current.state.messages.map(textOf);
+    expect(texts.some((t) => t.includes("billing toast error"))).toBe(true);
   });
 
-  it("steps to the next boundary", () => {
+  it("steps to the next boundary and reveals the first message", () => {
     const { result } = renderHook(() =>
       useTypecaast(config, { theme: "dark" }),
     );
+    // First boundary is t=0 (empty); advance past it to the first event.
     act(() => result.current.stepNext());
-    expect(result.current.state.messages).toHaveLength(1);
+    act(() => result.current.stepNext());
+    expect(result.current.state.messages.length).toBeGreaterThan(0);
     expect(result.current.state.theme).toBe("dark");
   });
 });

@@ -51,7 +51,7 @@ const windowFrame: CSSProperties = {
  * export, and per-step editing land in M4.
  */
 export function Builder({ config, skin, className, style }: BuilderProps) {
-  const tc = useTypecaast(config);
+  const tc = useTypecaast(config, { capabilities: skin.meta.capabilities });
   const n = config.timeline.length;
   const activeIndex =
     n > 0

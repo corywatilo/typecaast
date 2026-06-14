@@ -36,7 +36,13 @@ export function Typecaast({
   className,
   style,
 }: TypecaastProps): ReactNode {
-  const { state } = useTypecaast(config, { theme, autoplay, loop, rate });
+  const { state } = useTypecaast(config, {
+    theme,
+    autoplay,
+    loop,
+    rate,
+    capabilities: skin.meta.capabilities,
+  });
   const fonts = useSkinFonts(skin);
   return (
     <div

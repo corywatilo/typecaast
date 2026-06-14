@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Config, ThemeMode } from "@typecaast/schema";
-import type { Player, SimState } from "@typecaast/core";
-import { createMockPlayer } from "@typecaast/core/mocks";
+import {
+  createPlayer,
+  type Capabilities,
+  type Player,
+  type SimState,
+} from "@typecaast/core";
 import { configToEngine } from "./engine-adapter.js";
 import { useResolvedTheme } from "./use-resolved-theme.js";
 
@@ -11,6 +15,8 @@ export interface UseTypecaastOptions {
   autoplay?: boolean;
   loop?: boolean;
   rate?: number;
+  /** The active skin's capabilities, to drop what it can't render. */
+  capabilities?: Capabilities;
 }
 
 /** Imperative controls + live state returned by {@link useTypecaast}. */
@@ -45,18 +51,24 @@ export function useTypecaast(
   config: Config,
   options: UseTypecaastOptions = {},
 ): TypecaastControls {
-  const { theme, autoplay = false, loop = false, rate = 1 } = options;
+  const {
+    theme,
+    autoplay = false,
+    loop = false,
+    rate = 1,
+    capabilities,
+  } = options;
   const resolved = useResolvedTheme(theme ?? config.meta.theme);
 
   const player = useMemo<Player>(() => {
-    const engine = configToEngine(config, resolved);
-    return createMockPlayer(engine.getStateAt, {
+    const engine = configToEngine(config, resolved, capabilities);
+    return createPlayer(engine.getStateAt, {
       durationMs: engine.durationMs,
       steps: engine.steps,
       loop,
       rate,
     });
-  }, [config, resolved, loop, rate]);
+  }, [config, resolved, capabilities, loop, rate]);
 
   const [state, setState] = useState<SimState>(() => player.state);
   const [currentMs, setCurrentMs] = useState<number>(() => player.currentMs);

@@ -24,6 +24,12 @@ const config: Config = configSchema.parse({
     { type: "message", from: "cory", text: "i got a billing toast error?" },
     { type: "reaction", target: "$prev", emoji: "🦔" },
     { type: "typing", from: "paul" },
+    {
+      type: "system",
+      from: "posthog-bot",
+      card: "pr-opened",
+      text: "Pull request opened.",
+    },
     { type: "composerType", from: "cory", text: "Let me check." },
     { type: "send" },
   ],
@@ -48,11 +54,11 @@ describe("Builder", () => {
     expect(screen.getByLabelText("Pause")).toBeTruthy();
   });
 
-  it("scrubbing advances the preview", () => {
+  it("scrubbing to the end reveals the whole thread (incl. the PR card)", () => {
     render(<Builder config={config} skin={slack} />);
-    const slider = screen.getByLabelText("Scrub timeline");
-    act(() => fireEvent.change(slider, { target: { value: "7800" } }));
-    // The PR system card (APP badge) is visible by 7.8s.
+    const slider = screen.getByLabelText("Scrub timeline") as HTMLInputElement;
+    // Scrub past the end; the player clamps to duration.
+    act(() => fireEvent.change(slider, { target: { value: "999999" } }));
     expect(screen.getByText("APP")).toBeTruthy();
   });
 });
