@@ -51,7 +51,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 ## M1-UI — Skins + player UI + builder shell on MOCKED data (UI-FIRST)
 *Build the visible product against mocked `SimState`/stub player — no engine yet. Validate UX + confirm what the engine/schema must produce.*
 
-- [ ] M1U.1 `@typecaast/skin-kit`: `defineSkin`, `Skin`/`Capabilities`/`SkinTokens` types, theme context, font-loader helper
+- [x] M1U.1 `@typecaast/skin-kit`: `defineSkin`, `Skin`/`Capabilities`/`SkinTokens` types, theme context, font-loader helper
 - [ ] M1U.2 `skin-kit`: shared animation primitives driven by `revealProgress` (fade/slide, typing dots, reaction pop)
 - [ ] M1U.3 `@typecaast/react`: `<Typecaast>` + `useTypecaast` wired to the **stub player over mock `SimState`** (rAF clock against faked timeline)
 - [ ] M1U.4 `react`: theme resolution (`auto` → OS/`matchMedia`, reactive; fallback `light`)
