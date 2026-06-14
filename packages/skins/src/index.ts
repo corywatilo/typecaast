@@ -7,4 +7,5 @@ export { slack } from "./slack/index.js";
 export { SLACK_COLORS, type SlackColors } from "./slack/tokens.js";
 export { claudeCode } from "./claude-code/index.js";
 export { imessage } from "./imessage/index.js";
+export { whatsapp } from "./whatsapp/index.js";
 export { builtinSkins, getSkin } from "./registry.js";
