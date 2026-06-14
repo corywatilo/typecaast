@@ -3,7 +3,7 @@ import type { Config, ThemeMode } from "@typecaast/schema";
 import type { Player, SimState } from "@typecaast/core";
 import { createMockPlayer } from "@typecaast/core/mocks";
 import { configToEngine } from "./engine-adapter.js";
-import { resolveTheme } from "./resolve-theme.js";
+import { useResolvedTheme } from "./use-resolved-theme.js";
 
 export interface UseTypecaastOptions {
   /** Force a theme; otherwise resolved from `config.meta.theme`. */
@@ -44,7 +44,7 @@ export function useTypecaast(
   options: UseTypecaastOptions = {},
 ): TypecaastControls {
   const { theme, autoplay = false, loop = false, rate = 1 } = options;
-  const resolved = resolveTheme(theme ?? config.meta.theme);
+  const resolved = useResolvedTheme(theme ?? config.meta.theme);
 
   const player = useMemo<Player>(() => {
     const engine = configToEngine(config, resolved);

@@ -12,3 +12,4 @@ export {
 } from "./use-typecaast.js";
 export { TypecaastStage, type TypecaastStageProps } from "./stage.js";
 export { resolveTheme } from "./resolve-theme.js";
+export { useResolvedTheme, usePrefersDark } from "./use-resolved-theme.js";
