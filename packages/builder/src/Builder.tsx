@@ -1,4 +1,13 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import {
   configSchema,
   validateConfig,
@@ -12,6 +21,7 @@ import {
   Badge,
   Button,
   Heading,
+  IconButton,
   Panel,
   Segmented,
   ThemeRoot,
@@ -33,6 +43,7 @@ import {
   updateStep,
 } from "./store.js";
 import { loadFromUrl, loadLocal, saveLocal, updateUrl } from "./persistence.js";
+import { canRedo, canUndo, historyReducer, initHistory } from "./history.js";
 
 /**
  * User-action events the builder surfaces (PLAN §27 funnel). The builder itself
@@ -96,11 +107,14 @@ export function Builder({
   className,
   style,
 }: BuilderProps) {
-  const [config, setConfig] = useState<ConfigInput>(() =>
-    persist
-      ? (loadFromUrl() ?? loadLocal() ?? (initialConfig as ConfigInput))
-      : (initialConfig as ConfigInput),
+  const [history, dispatch] = useReducer(historyReducer, undefined, () =>
+    initHistory(
+      persist
+        ? (loadFromUrl() ?? loadLocal() ?? (initialConfig as ConfigInput))
+        : (initialConfig as ConfigInput),
+    ),
   );
+  const config = history.config;
   const [selected, setSelected] = useState<number | null>(null);
   const [previewTheme, setPreviewTheme] = useState<ThemeMode>(
     (initialConfig.meta?.theme as ThemeMode) ?? "auto",
@@ -110,14 +124,48 @@ export function Builder({
   const [rightTab, setRightTab] = useState<RightTab>("app");
   const [modal, setModal] = useState<null | "export" | "import">(null);
 
-  const update = (next: ConfigInput) => {
-    setConfig(next);
-    if (persist) {
-      saveLocal(next);
-      updateUrl(next);
+  // Commit a config change to history. `coalesce` collapses rapid text edits.
+  const commit = useCallback(
+    (next: ConfigInput, coalesce = false) =>
+      dispatch({ type: "commit", config: next, coalesce, now: Date.now() }),
+    [],
+  );
+  const update = (next: ConfigInput) => commit(next);
+
+  // Persist + notify whenever the config changes (edit, undo, or redo).
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
     }
-    onChange?.(next);
-  };
+    if (persist) {
+      saveLocal(config);
+      updateUrl(config);
+    }
+    onChange?.(config);
+  }, [config, persist, onChange]);
+
+  // Undo / redo on Cmd/Ctrl+Z (Shift to redo) — but let native undo win while
+  // typing in a field, where it edits the text instead of the timeline.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "z") return;
+      const el = e.target as HTMLElement | null;
+      const tag = el?.tagName;
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        el?.isContentEditable
+      )
+        return;
+      e.preventDefault();
+      dispatch({ type: e.shiftKey ? "redo" : "undo" });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const parsed = useMemo(() => configSchema.safeParse(config), [config]);
   const diagnostics = useMemo(() => validateConfig(config), [config]);
@@ -154,6 +202,22 @@ export function Builder({
         <span className="tc-muted" style={{ fontSize: 12 }}>
           {config.timeline.length} steps · {config.participants.length} cast
         </span>
+        <IconButton
+          aria-label="Undo"
+          title="Undo (⌘Z)"
+          disabled={!canUndo(history)}
+          onClick={() => dispatch({ type: "undo" })}
+        >
+          ↶
+        </IconButton>
+        <IconButton
+          aria-label="Redo"
+          title="Redo (⇧⌘Z)"
+          disabled={!canRedo(history)}
+          onClick={() => dispatch({ type: "redo" })}
+        >
+          ↷
+        </IconButton>
         {headerActions}
         <Button size="sm" variant="primary" onClick={() => setModal("export")}>
           Export
@@ -200,7 +264,7 @@ export function Builder({
                 onMove={(from, to) => update(moveStep(config, from, to))}
                 onDuplicate={(i) => update(duplicateStep(config, i))}
                 onUpdateStep={(i, patch) =>
-                  update(updateStep(config, i, patch as never))
+                  commit(updateStep(config, i, patch as never), true)
                 }
                 onImport={() => setModal("import")}
               />
