@@ -10,7 +10,9 @@ export function HeroSim() {
       style={{
         width: 480,
         maxWidth: "100%",
-        height: 640,
+        // Match the canvas aspect (480×640) so the scaled sim fills the card
+        // edge-to-edge at any width — no letterbox gap behind the skin.
+        aspectRatio: "480 / 640",
         display: "flex",
         borderRadius: 16,
         overflow: "hidden",
@@ -19,7 +21,7 @@ export function HeroSim() {
         background: "var(--tc-panel)",
       }}
     >
-      <LiveSim config={billingToast} skin={slack} theme="light" />
+      <LiveSim config={billingToast} skin={slack} theme="light" fit="scale" />
     </div>
   );
 }

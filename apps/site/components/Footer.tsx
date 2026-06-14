@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ManageAnalyticsLink } from "../lib/analytics";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Footer() {
   return (
@@ -67,6 +68,24 @@ export function Footer() {
             <ManageAnalyticsLink className="tc-muted" />
           </div>
         </div>
+      </div>
+      <div
+        className="wrap"
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          marginTop: 32,
+          paddingTop: 24,
+          borderTop: "1px solid var(--tc-border)",
+        }}
+      >
+        <span className="tc-muted" style={{ fontSize: 12.5 }}>
+          © Typecaast
+        </span>
+        <ThemeToggle />
       </div>
     </footer>
   );

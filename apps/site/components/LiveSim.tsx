@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import {
   configSchema,
   type ConfigInput,
+  type FitMode,
   type ThemeMode,
 } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
@@ -13,12 +14,14 @@ export function LiveSim({
   config,
   skin,
   theme = "auto",
+  fit,
   autoplay = true,
   loop = true,
 }: {
   config: ConfigInput;
   skin: Skin;
   theme?: ThemeMode;
+  fit?: FitMode;
   autoplay?: boolean;
   loop?: boolean;
 }) {
@@ -28,6 +31,7 @@ export function LiveSim({
       config={parsed}
       skin={skin}
       theme={theme}
+      fit={fit}
       autoplay={autoplay}
       loop={loop}
     />

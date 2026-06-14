@@ -7,6 +7,6 @@ export default defineConfig((options) => ({
   target: "node20",
   banner: { js: "#!/usr/bin/env node" },
   dts: !options.watch,
-  clean: true,
+  clean: !options.watch,
   sourcemap: true,
 }));
