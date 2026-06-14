@@ -1,4 +1,4 @@
-import type { TimelineStep } from "@typecaast/schema";
+import type { TimelineStepInput } from "@typecaast/schema";
 
 export function formatMs(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
@@ -10,7 +10,7 @@ function truncate(text: string, max = 28): string {
 }
 
 /** A short human label for a timeline step, for the track chips. */
-export function stepLabel(step: TimelineStep): string {
+export function stepLabel(step: TimelineStepInput): string {
   switch (step.type) {
     case "message":
     case "composerType":

@@ -30,7 +30,8 @@
     "@typecaast/core": "workspace:*",
     "@typecaast/react": "workspace:*",
     "@typecaast/schema": "workspace:*",
-    "@typecaast/skin-kit": "workspace:*"
+    "@typecaast/skin-kit": "workspace:*",
+    "@typecaast/ui": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18"

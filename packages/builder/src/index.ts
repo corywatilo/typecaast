@@ -1,9 +1,11 @@
 /**
  * `@typecaast/builder` — the embeddable visual editor (source-available,
- * FSL-1.1-Apache-2.0). M1U.11 ships the early shell: preview + controls +
- * timeline track over the mocked engine.
+ * FSL-1.1-Apache-2.0). Import the design-system stylesheet once at your app
+ * root: `import "@typecaast/ui/styles.css"`.
  */
 
 export { Builder, type BuilderProps } from "./Builder.js";
-export { Controls } from "./Controls.js";
-export { TimelineTrack, type TimelineTrackProps } from "./TimelineTrack.js";
+export { Preview } from "./Preview.js";
+export { TimelinePanel } from "./TimelinePanel.js";
+export { StepEditor } from "./StepEditor.js";
+export * from "./store.js";

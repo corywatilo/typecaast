@@ -1,14 +1,35 @@
-import type { CSSProperties } from "react";
-import type { Config } from "@typecaast/schema";
+import { useMemo, useState, type CSSProperties } from "react";
+import {
+  configSchema,
+  validateConfig,
+  type Config,
+  type ConfigInput,
+  type ThemeMode,
+} from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
-import { TypecaastStage, useTypecaast } from "@typecaast/react";
-import { Controls } from "./Controls.js";
-import { TimelineTrack } from "./TimelineTrack.js";
-import { ui } from "./theme.js";
+import type { ResolvedTheme } from "@typecaast/core";
+import { Badge, Heading, Panel, ThemeRoot } from "@typecaast/ui";
+import { Preview } from "./Preview.js";
+import { TimelinePanel } from "./TimelinePanel.js";
+import { StepEditor } from "./StepEditor.js";
+import {
+  addStep,
+  blankStep,
+  deleteStep,
+  duplicateStep,
+  moveStep,
+  updateStep,
+} from "./store.js";
 
 export interface BuilderProps {
-  config: Config;
-  skin: Skin;
+  /** Initial config (raw or parsed). */
+  initialConfig: ConfigInput | Config;
+  /** Skins available in the picker, keyed by id. */
+  skins: Record<string, Skin>;
+  /** The builder chrome theme (the tool itself). */
+  theme?: ResolvedTheme;
+  /** Called whenever the edited config changes. */
+  onChange?: (config: ConfigInput) => void;
   className?: string;
   style?: CSSProperties;
 }
@@ -16,78 +37,163 @@ export interface BuilderProps {
 const layout: CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  background: ui.bg,
-  color: ui.text,
-  fontFamily: ui.font,
-  borderRadius: 12,
+  height: "100%",
+  width: "100%",
   overflow: "hidden",
-  border: `1px solid ${ui.panelBorder}`,
 };
 
-const stage: CSSProperties = {
-  flex: "1 1 auto",
-  minHeight: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: 24,
-  background: ui.stage,
-};
+export function Builder({
+  initialConfig,
+  skins,
+  theme = "dark",
+  onChange,
+  className,
+  style,
+}: BuilderProps) {
+  const [config, setConfig] = useState<ConfigInput>(
+    initialConfig as ConfigInput,
+  );
+  const [selected, setSelected] = useState<number | null>(0);
+  const [previewTheme, setPreviewTheme] = useState<ThemeMode>(
+    (initialConfig.meta?.theme as ThemeMode) ?? "auto",
+  );
 
-const windowFrame: CSSProperties = {
-  width: 460,
-  height: 560,
-  display: "flex",
-  borderRadius: 10,
-  overflow: "hidden",
-  border: `1px solid ${ui.panelBorder}`,
-  boxShadow: "0 16px 48px rgba(0,0,0,0.45)",
-};
-
-/**
- * The early builder shell (M1U.11): a live preview driven by the player, a
- * scrub/step/play control bar, and a timeline track of the config's steps —
- * all wired to the mocked engine to feel out the editing UX. Persistence,
- * export, and per-step editing land in M4.
- */
-export function Builder({ config, skin, className, style }: BuilderProps) {
-  const tc = useTypecaast(config, { capabilities: skin.meta.capabilities });
-  const n = config.timeline.length;
-  const activeIndex =
-    n > 0
-      ? Math.min(
-          n - 1,
-          Math.floor((tc.currentMs / Math.max(1, tc.duration)) * n),
-        )
-      : -1;
-
-  const onSelect = (i: number) => {
-    // Mock phase: steps are spaced proportionally (real times land in M4).
-    tc.scrubTo((i / Math.max(1, n)) * tc.duration + 1);
+  const update = (next: ConfigInput) => {
+    setConfig(next);
+    onChange?.(next);
   };
 
+  const parsed = useMemo(() => configSchema.safeParse(config), [config]);
+  const diagnostics = useMemo(() => validateConfig(config), [config]);
+  const errors = diagnostics.filter((d) => d.severity === "error");
+  const skin = skins[config.meta.skin.id];
+
+  const defaultFrom =
+    config.participants.find((p) => p.isSelf)?.id ??
+    config.participants[0]?.id ??
+    "self";
+
+  const selectedStep =
+    selected !== null ? config.timeline[selected] : undefined;
+
   return (
-    <div
+    <ThemeRoot
+      theme={theme}
       className={className}
       style={{ ...layout, ...style }}
-      data-testid="builder"
     >
-      <div style={stage}>
-        <div style={windowFrame}>
-          <TypecaastStage
-            state={tc.state}
-            skin={skin}
-            participants={config.participants}
-            options={config.meta.skin.options}
+      <header
+        style={{
+          flex: "0 0 auto",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "10px 16px",
+          borderBottom: "1px solid var(--tc-border)",
+          background: "var(--tc-panel)",
+        }}
+      >
+        <Heading level={2} style={{ fontSize: 15 }}>
+          Typecaast
+        </Heading>
+        <Badge tone="accent">Builder</Badge>
+        <span style={{ flex: 1 }} />
+        <span className="tc-muted" style={{ fontSize: 12 }}>
+          {config.timeline.length} steps · {config.participants.length} cast
+        </span>
+      </header>
+
+      <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
+        <aside
+          style={{
+            flex: "0 0 280px",
+            borderRight: "1px solid var(--tc-border)",
+            background: "var(--tc-panel)",
+            minHeight: 0,
+          }}
+        >
+          <TimelinePanel
+            config={config}
+            selected={selected}
+            onSelect={setSelected}
+            onAdd={(t) => {
+              update(addStep(config, blankStep(t, defaultFrom)));
+              setSelected(config.timeline.length);
+            }}
+            onDelete={(i) => {
+              update(deleteStep(config, i));
+              setSelected(null);
+            }}
+            onMove={(from, to) => update(moveStep(config, from, to))}
+            onDuplicate={(i) => update(duplicateStep(config, i))}
           />
-        </div>
+        </aside>
+
+        <main style={{ flex: "1 1 auto", minWidth: 0, minHeight: 0 }}>
+          {parsed.success && skin ? (
+            <Preview
+              config={parsed.data as Config}
+              skin={skin}
+              previewTheme={previewTheme}
+              onPreviewThemeChange={setPreviewTheme}
+            />
+          ) : (
+            <div
+              style={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 24,
+              }}
+            >
+              <Panel raised style={{ maxWidth: 420, padding: 20 }}>
+                <Heading level={2}>Can't preview yet</Heading>
+                {!skin ? (
+                  <p className="tc-muted" style={{ fontSize: 13 }}>
+                    Unknown skin <code>{config.meta.skin.id}</code>.
+                  </p>
+                ) : (
+                  <ul style={{ fontSize: 13, paddingLeft: 18 }}>
+                    {errors.slice(0, 6).map((d, i) => (
+                      <li key={i} className="tc-muted">
+                        <span className="tc-mono">{d.location ?? ""}</span>{" "}
+                        {d.message}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Panel>
+            </div>
+          )}
+        </main>
+
+        <aside
+          style={{
+            flex: "0 0 320px",
+            borderLeft: "1px solid var(--tc-border)",
+            background: "var(--tc-panel)",
+            minHeight: 0,
+            overflowY: "auto",
+            padding: 16,
+          }}
+        >
+          {selectedStep ? (
+            <StepEditor
+              step={selectedStep}
+              participants={config.participants}
+              onChange={(patch) =>
+                selected !== null &&
+                update(updateStep(config, selected, patch as never))
+              }
+            />
+          ) : (
+            <p className="tc-muted" style={{ fontSize: 13 }}>
+              Select a step to edit it, or add one from the timeline.
+            </p>
+          )}
+        </aside>
       </div>
-      <Controls tc={tc} />
-      <TimelineTrack
-        steps={config.timeline}
-        activeIndex={activeIndex}
-        onSelect={onSelect}
-      />
-    </div>
+    </ThemeRoot>
   );
 }

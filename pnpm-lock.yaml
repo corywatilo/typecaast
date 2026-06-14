@@ -53,6 +53,9 @@ importers:
       '@typecaast/skin-kit':
         specifier: workspace:*
         version: link:../skin-kit
+      '@typecaast/ui':
+        specifier: workspace:*
+        version: link:../ui
     devDependencies:
       '@testing-library/react':
         specifier: ^16.1.0

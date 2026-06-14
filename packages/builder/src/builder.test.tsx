@@ -6,14 +6,14 @@ import {
   screen,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { configSchema, type Config } from "@typecaast/schema";
+import type { ConfigInput } from "@typecaast/schema";
 import { mockParticipants } from "@typecaast/core/mocks";
 import { slack } from "@typecaast/skins";
 import { Builder } from "./Builder.js";
 
 afterEach(cleanup);
 
-const config: Config = configSchema.parse({
+const config: ConfigInput = {
   version: 1,
   meta: {
     canvas: { width: 880, height: 720 },
@@ -24,41 +24,44 @@ const config: Config = configSchema.parse({
     { type: "message", from: "cory", text: "i got a billing toast error?" },
     { type: "reaction", target: "$prev", emoji: "🦔" },
     { type: "typing", from: "paul" },
-    {
-      type: "system",
-      from: "posthog-bot",
-      card: "pr-opened",
-      text: "Pull request opened.",
-    },
-    { type: "composerType", from: "cory", text: "Let me check." },
-    { type: "send" },
   ],
-});
+};
 
 describe("Builder", () => {
-  it("renders the preview, controls, and a track chip per step", () => {
-    render(<Builder config={config} skin={slack} />);
-    expect(screen.getByTestId("builder")).toBeTruthy();
-    expect(screen.getByTestId("builder-controls")).toBeTruthy();
-    const track = screen.getByTestId("builder-track");
-    // One chip (button) per timeline step.
-    expect(track.querySelectorAll("button")).toHaveLength(
-      config.timeline.length,
+  it("renders the timeline, header count, and previews the skin", () => {
+    render(<Builder initialConfig={config} skins={{ slack }} />);
+    expect(screen.getByText("Typecaast")).toBeTruthy();
+    expect(screen.getByText(/3 steps/)).toBeTruthy();
+    // Step rows show their type badges.
+    expect(screen.getAllByText("message").length).toBeGreaterThan(0);
+    // Preview renders the Slack thread chrome.
+    expect(screen.getByText("Thread")).toBeTruthy();
+  });
+
+  it("selecting a step opens the editor", () => {
+    render(<Builder initialConfig={config} skins={{ slack }} />);
+    const firstStep = screen.getAllByText("message")[0]!;
+    act(() => fireEvent.click(firstStep));
+    // The step editor shows the message text in a textarea.
+    expect(
+      screen.getByDisplayValue("i got a billing toast error?"),
+    ).toBeTruthy();
+  });
+
+  it("adding a step grows the timeline", () => {
+    render(<Builder initialConfig={config} skins={{ slack }} />);
+    act(() => fireEvent.click(screen.getByText("+ Step")));
+    act(() => fireEvent.click(screen.getByText("send")));
+    expect(screen.getByText(/4 steps/)).toBeTruthy();
+  });
+
+  it("editing a message updates the preview", () => {
+    render(<Builder initialConfig={config} skins={{ slack }} />);
+    act(() => fireEvent.click(screen.getAllByText("message")[0]!));
+    const textarea = screen.getByDisplayValue("i got a billing toast error?");
+    act(() =>
+      fireEvent.change(textarea, { target: { value: "totally new text" } }),
     );
-  });
-
-  it("play toggles to pause", () => {
-    render(<Builder config={config} skin={slack} />);
-    const play = screen.getByLabelText("Play");
-    act(() => fireEvent.click(play));
-    expect(screen.getByLabelText("Pause")).toBeTruthy();
-  });
-
-  it("scrubbing to the end reveals the whole thread (incl. the PR card)", () => {
-    render(<Builder config={config} skin={slack} />);
-    const slider = screen.getByLabelText("Scrub timeline") as HTMLInputElement;
-    // Scrub past the end; the player clamps to duration.
-    act(() => fireEvent.change(slider, { target: { value: "999999" } }));
-    expect(screen.getByText("APP")).toBeTruthy();
+    expect(screen.getByDisplayValue("totally new text")).toBeTruthy();
   });
 });

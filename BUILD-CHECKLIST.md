@@ -124,7 +124,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 *Exit: public generator; passes the design-review gate.*
 
 - [x] M4.1 Design system: tokens (type scale, spacing, radius, motion), core components (bespoke, not stock)
-- [ ] M4.2 `@typecaast/builder`: harden the M1-UI builder shell into the full timeline track editor (add/reorder/delete, drag-retime, per-step overrides)
+- [x] M4.2 `@typecaast/builder`: harden the M1-UI builder shell into the full timeline track editor (add/reorder/delete, drag-retime, per-step overrides)
 - [ ] M4.3 builder: preview-as-you-go — scrub, step, loop range, inline timing/pacing edits with live re-pace
 - [ ] M4.4 builder: participant manager; skin picker + auto options form; capability/lint panel
 - [ ] M4.5 builder: output controls — aspect presets + scale, editable mid-script with live reflow; fit/fps/seed
