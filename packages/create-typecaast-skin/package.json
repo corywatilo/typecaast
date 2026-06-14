@@ -3,6 +3,19 @@
   "version": "0.0.0",
   "description": "Scaffold a new Typecaast skin.",
   "license": "Apache-2.0",
+  "homepage": "https://typecaast.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/corywatilo/typecaast.git",
+    "directory": "packages/create-typecaast-skin"
+  },
+  "keywords": [
+    "typecaast",
+    "skin",
+    "scaffold",
+    "chat",
+    "create"
+  ],
   "type": "module",
   "bin": {
     "create-typecaast-skin": "./dist/index.js"
