@@ -144,13 +144,13 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 ## M5 — Capture (extension + saved-page) — CUT-LINE
 *Exit: capture a page → confirm slots → play; meets capture quality bar (§10).*
 
-- [ ] M5.1 Distiller: subtree isolation (visible/selected only, drop hidden DOM + data-*) + repeating-row → slotted template + scoped CSS + token extraction → `SkinDraft`
+- [x] M5.1 Distiller: subtree isolation (visible/selected only, drop hidden DOM + data-*) + repeating-row → slotted template + scoped CSS + token extraction → `SkinDraft`
 - [ ] M5.2 **Security: sanitize allowlist** (strip scripts/handlers/iframes/js+nonimage-data URLs/CSS hazards); render template skins in shadow-DOM + sandboxed iframe; strict CSP; **hostile-fixture CI suite** (§10)
 - [ ] M5.2b Capture hygiene: one-time pre-share notice; safer share defaults; local-first (§18)
 - [ ] M5.2c Style scoping verified on a hostile host page (zero leakage both directions)
 - [ ] M5.3 MV3 Chrome extension: element picker → capture → draft (local-only)
-- [ ] M5.4 Saved-page importer (.html/.mhtml) → same distiller
-- [ ] M5.5 `TemplateSkinAdapter` — captured drafts satisfy the `Skin` contract via slot filling
+- [x] M5.4 Saved-page importer (.html/.mhtml) → same distiller
+- [x] M5.5 `TemplateSkinAdapter` — captured drafts satisfy the `Skin` contract via slot filling
 - [ ] M5.6 `typecaast scaffold-skin` — draft → editable template skin package
 - [ ] M5.7 Light/dark double-capture flow
 - [ ] M5.8 Capture quality-bar fixtures + metrics (slot detection ≥80%, fix time ≤10min)

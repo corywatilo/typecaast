@@ -14,6 +14,7 @@ const RUNTIME = [
   "remotion",
   "skins",
   "skin-kit",
+  "capture",
   "cli",
 ];
 

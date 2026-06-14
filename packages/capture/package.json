@@ -1,0 +1,56 @@
+{
+  "name": "@typecaast/capture",
+  "version": "0.0.0",
+  "description": "Capture tooling: distill a chat UI subtree into a sanitized, slotted SkinDraft + TemplateSkinAdapter (Apache-2.0).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./import": {
+      "types": "./dist/import-page.d.ts",
+      "import": "./dist/import-page.js",
+      "require": "./dist/import-page.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@typecaast/core": "workspace:*",
+    "@typecaast/schema": "workspace:*",
+    "@typecaast/skin-kit": "workspace:*",
+    "dompurify": "^3.2.4"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@typecaast/react": "workspace:*",
+    "@types/jsdom": "^21.1.7",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^4.0.0"
+  }
+}
