@@ -55,9 +55,7 @@ export default function Home() {
                 level={0}
                 style={{ marginTop: 18, marginBottom: 18, maxWidth: 640 }}
               >
-                Simulate &amp; record chat
-                <br />
-                in the UIs people know.
+                Simulate &amp; record chat interactions in the UIs people know.
               </Heading>
               <p
                 className="tc-muted"
