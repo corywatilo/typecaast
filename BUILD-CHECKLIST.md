@@ -83,8 +83,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 ## M2 — Video export (self-hosted)
 *Exit: billing-toast renders to MP4/GIF locally; frame-parity test green.*
 
-- [ ] M2.1 `@typecaast/remotion`: `<TypecaastComposition>` mapping frame→t→`getStateAt`
-- [ ] M2.2 `remotion`: duration from timeline; canvas size + scale factor; transparent bg
+- [x] M2.1 `@typecaast/remotion`: `<TypecaastComposition>` mapping frame→t→`getStateAt`
+- [x] M2.2 `remotion`: duration from timeline; canvas size + scale factor; transparent bg
 - [ ] M2.3 `remotion`: font + emoji loading in the Remotion runtime (deterministic)
 - [ ] M2.4 `cli`: `render` command (format, --size/aspect presets, --scale, --theme [default light], --transparent)
 - [ ] M2.5 Pinned render container image (Chromium/Remotion/Node/fonts/emoji) + docs
