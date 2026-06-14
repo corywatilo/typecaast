@@ -15,10 +15,21 @@ export interface ContentClassNames {
   image?: string;
 }
 
+/** Per-mark inline styles, so skins can theme marks without a CSS file. */
+export interface ContentStyles {
+  text?: CSSProperties;
+  link?: CSSProperties;
+  mention?: CSSProperties;
+  code?: CSSProperties;
+  emoji?: CSSProperties;
+}
+
 export interface MessageContentProps {
   nodes: ContentNode[];
   /** Per-mark class names so skins style marks with their own CSS. */
   classNames?: ContentClassNames;
+  /** Per-mark inline styles (merged with the defaults). */
+  styles?: ContentStyles;
   /** Extra style for in-message images (skins set radius, max size, etc.). */
   imageStyle?: CSSProperties;
 }
@@ -27,13 +38,14 @@ function renderInline(
   span: InlineNode,
   key: number,
   cn: ContentClassNames,
+  st: ContentStyles,
 ): ReactNode {
   switch (span.type) {
     case "text":
       return span.value;
     case "code":
       return (
-        <code key={key} data-tc-mark="code" className={cn.code}>
+        <code key={key} data-tc-mark="code" className={cn.code} style={st.code}>
           {span.value}
         </code>
       );
@@ -43,6 +55,7 @@ function renderInline(
           key={key}
           data-tc-mark="link"
           className={cn.link}
+          style={st.link}
           href={span.href}
           rel="noreferrer"
         >
@@ -51,13 +64,23 @@ function renderInline(
       );
     case "mention":
       return (
-        <span key={key} data-tc-mark="mention" className={cn.mention}>
+        <span
+          key={key}
+          data-tc-mark="mention"
+          className={cn.mention}
+          style={st.mention}
+        >
           {span.label}
         </span>
       );
     case "emoji":
       return (
-        <span key={key} data-tc-mark="emoji" className={cn.emoji}>
+        <span
+          key={key}
+          data-tc-mark="emoji"
+          className={cn.emoji}
+          style={st.emoji}
+        >
           {span.value}
         </span>
       );
@@ -93,6 +116,7 @@ function renderImage(
 export function MessageContent({
   nodes,
   classNames = {},
+  styles = {},
   imageStyle,
 }: MessageContentProps): ReactNode {
   return (
@@ -101,8 +125,15 @@ export function MessageContent({
         if (node.type === "text") {
           const text = node as TextNode;
           return (
-            <span key={i} data-tc-node="text" className={classNames.text}>
-              {text.spans.map((span, j) => renderInline(span, j, classNames))}
+            <span
+              key={i}
+              data-tc-node="text"
+              className={classNames.text}
+              style={styles.text}
+            >
+              {text.spans.map((span, j) =>
+                renderInline(span, j, classNames, styles),
+              )}
             </span>
           );
         }
