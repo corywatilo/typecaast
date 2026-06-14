@@ -29,62 +29,14 @@ export function TimelinePanel({
   const [adding, setAdding] = useState(false);
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div
-        style={{
-          flex: "0 0 auto",
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "10px 12px",
-          borderBottom: "1px solid var(--tc-border)",
-        }}
-      >
-        <Button
-          size="sm"
-          variant="primary"
-          onClick={() => setAdding((v) => !v)}
-        >
-          + Step
-        </Button>
-        <Button size="sm" variant="ghost" onClick={onImport}>
-          Import
-        </Button>
-      </div>
-
-      {adding ? (
-        <div
-          style={{
-            flex: "0 0 auto",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
-            padding: 10,
-            borderBottom: "1px solid var(--tc-border)",
-            background: "var(--tc-bg-subtle)",
-          }}
-        >
-          {STEP_TYPES.map((t) => (
-            <Button
-              key={t}
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                onAdd(t);
-                setAdding(false);
-              }}
-            >
-              {t}
-            </Button>
-          ))}
-        </div>
-      ) : null}
-
       <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 8 }}>
         {config.timeline.map((step, i) => {
           const active = i === selected;
           return (
             <div key={i} style={{ marginBottom: 4 }}>
               <div
+                className="tc-step-row"
+                data-active={active ? "" : undefined}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -201,6 +153,57 @@ export function TimelinePanel({
             No steps yet — add one to start.
           </p>
         ) : null}
+      </div>
+
+      {/* Add new steps from the end of the list — no scrolling back to the top. */}
+      {adding ? (
+        <div
+          style={{
+            flex: "0 0 auto",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 6,
+            padding: 10,
+            borderTop: "1px solid var(--tc-border)",
+            background: "var(--tc-bg-subtle)",
+          }}
+        >
+          {STEP_TYPES.map((t) => (
+            <Button
+              key={t}
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                onAdd(t);
+                setAdding(false);
+              }}
+            >
+              {t}
+            </Button>
+          ))}
+        </div>
+      ) : null}
+
+      <div
+        style={{
+          flex: "0 0 auto",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "10px 12px",
+          borderTop: "1px solid var(--tc-border)",
+        }}
+      >
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={() => setAdding((v) => !v)}
+        >
+          + Step
+        </Button>
+        <Button size="sm" variant="ghost" onClick={onImport}>
+          Import
+        </Button>
       </div>
     </div>
   );

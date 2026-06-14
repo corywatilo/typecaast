@@ -1,7 +1,15 @@
-import type { ConfigInput } from "@typecaast/schema";
+import type { ComposerMode, ConfigInput } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
-import { Badge, Field, Input, Panel, Select } from "@typecaast/ui";
-import { setSkin } from "../store.js";
+import {
+  Badge,
+  Field,
+  InfoTip,
+  Input,
+  Panel,
+  Segmented,
+  Select,
+} from "@typecaast/ui";
+import { setSkin, updateMeta } from "../store.js";
 import { capabilityLint } from "../lint.js";
 
 const OPTION_FIELDS = [
@@ -82,6 +90,28 @@ export function SkinPanel({
           ))}
         </div>
       </div>
+
+      <Field
+        label={
+          <span
+            style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
+          >
+            Message input
+            <InfoTip text="Whether the reply box shows. Auto reveals it only while someone is typing/sending; Always keeps it visible; Hidden never shows it." />
+          </span>
+        }
+      >
+        <Segmented<ComposerMode>
+          aria-label="Message input visibility"
+          value={config.meta.composer ?? "auto"}
+          onChange={(v) => onChange(updateMeta(config, { composer: v }))}
+          options={[
+            { value: "auto", label: "Auto" },
+            { value: "always", label: "Always" },
+            { value: "never", label: "Hidden" },
+          ]}
+        />
+      </Field>
 
       {warnings.length > 0 ? (
         <Panel style={{ padding: 12 }}>

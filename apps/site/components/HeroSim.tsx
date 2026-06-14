@@ -21,13 +21,7 @@ export function HeroSim() {
         background: "var(--tc-panel)",
       }}
     >
-      <LiveSim
-        config={billingToast}
-        skin={slack}
-        theme="light"
-        fit="scale"
-        composer="always"
-      />
+      <LiveSim config={billingToast} skin={slack} theme="light" fit="scale" />
     </div>
   );
 }

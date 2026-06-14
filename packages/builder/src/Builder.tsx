@@ -77,6 +77,8 @@ const layout: CSSProperties = {
 
 const columnHeader: CSSProperties = {
   flex: "0 0 auto",
+  display: "flex",
+  justifyContent: "center",
   padding: "10px 12px",
   borderBottom: "1px solid var(--tc-border)",
 };

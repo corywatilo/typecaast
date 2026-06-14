@@ -6,6 +6,7 @@ export const billingToast: ConfigInput = {
   meta: {
     canvas: { width: 480, height: 640 },
     skin: { id: "slack", options: { channel: "#alerts" } },
+    composer: "always",
   },
   participants: [
     { id: "cory", name: "Cory Watilo", isSelf: true },

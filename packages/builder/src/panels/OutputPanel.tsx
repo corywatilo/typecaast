@@ -1,5 +1,6 @@
+import type { ReactNode } from "react";
 import type { ConfigInput } from "@typecaast/schema";
-import { Button, Field, Input, Select, Slider } from "@typecaast/ui";
+import { Button, Field, InfoTip, Input, Select, Slider } from "@typecaast/ui";
 import { setCanvas, updateMeta, updatePacing } from "../store.js";
 
 export const ASPECT_PRESETS: Record<string, { width: number; height: number }> =
@@ -15,6 +16,16 @@ export const ASPECT_PRESETS: Record<string, { width: number; height: number }> =
 const num = (v: unknown, fallback: number) =>
   typeof v === "number" ? v : fallback;
 
+/** A field label with a trailing info tooltip. */
+function L({ children, tip }: { children: ReactNode; tip: string }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+      {children}
+      <InfoTip text={tip} />
+    </span>
+  );
+}
+
 export function OutputPanel({
   config,
   onChange,
@@ -24,18 +35,31 @@ export function OutputPanel({
 }) {
   const { width, height } = config.meta.canvas;
   const pacing = config.pacing ?? {};
+  // Reflect the active preset in the label until the dimensions deviate.
+  const currentPreset =
+    Object.entries(ASPECT_PRESETS).find(
+      ([, p]) => p.width === width && p.height === height,
+    )?.[0] ?? "";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <Field label="Aspect preset">
+      <Field
+        label={
+          <L tip="Pick a canvas size. The label stays on the preset until you change the width or height.">
+            Size preset
+          </L>
+        }
+      >
         <Select
-          value=""
+          value={currentPreset}
           onChange={(e) => {
             const p = ASPECT_PRESETS[e.currentTarget.value];
             if (p) onChange(setCanvas(config, p.width, p.height));
           }}
         >
-          <option value="">Custom…</option>
+          <option value="">
+            Custom ({width}×{height})
+          </option>
           {Object.keys(ASPECT_PRESETS).map((k) => (
             <option key={k} value={k}>
               {k} ({ASPECT_PRESETS[k]!.width}×{ASPECT_PRESETS[k]!.height})
@@ -63,7 +87,13 @@ export function OutputPanel({
             }
           />
         </Field>
-        <Field label="Fit">
+        <Field
+          label={
+            <L tip="How the sim fits its container. Responsive (reflow) re-wraps to the available width; Scale renders at the exact canvas size, scaled to fit; Fixed is the exact size, clipped.">
+              Fit
+            </L>
+          }
+        >
           <Select
             value={config.meta.fit ?? "reflow"}
             onChange={(e) =>
@@ -74,12 +104,18 @@ export function OutputPanel({
               )
             }
           >
-            <option value="reflow">reflow</option>
-            <option value="scale">scale</option>
-            <option value="fixed">fixed</option>
+            <option value="reflow">Responsive (reflow)</option>
+            <option value="scale">Scale to fit</option>
+            <option value="fixed">Fixed size</option>
           </Select>
         </Field>
-        <Field label="FPS">
+        <Field
+          label={
+            <L tip="Frames per second for video export only — it has no effect on the live web preview.">
+              FPS
+            </L>
+          }
+        >
           <Input
             type="number"
             value={config.meta.fps ?? 30}
@@ -90,7 +126,13 @@ export function OutputPanel({
             }
           />
         </Field>
-        <Field label="Seed">
+        <Field
+          label={
+            <L tip="Random seed for jitter/humanize. The same seed always replays identically — change it to reshuffle the timing.">
+              Seed
+            </L>
+          }
+        >
           <Input
             type="number"
             value={config.meta.seed ?? 42}
@@ -101,7 +143,13 @@ export function OutputPanel({
             }
           />
         </Field>
-        <Field label="Background">
+        <Field
+          label={
+            <L tip="Background behind the skin for video export (e.g. transparent for WebM, or a CSS color).">
+              Background
+            </L>
+          }
+        >
           <Input
             value={config.meta.background ?? "transparent"}
             onChange={(e) =>
@@ -114,13 +162,28 @@ export function OutputPanel({
       </div>
 
       <div style={{ paddingTop: 8, borderTop: "1px solid var(--tc-border)" }}>
-        <p className="tc-label" style={{ marginBottom: 10 }}>
-          Pacing
+        <p
+          className="tc-label"
+          style={{
+            marginBottom: 10,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+          }}
+        >
+          Pacing{" "}
+          <InfoTip text="Auto-timing for the conversation. Per-step delays in the timeline override these defaults." />
         </p>
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}
         >
-          <Field label="Reading WPM">
+          <Field
+            label={
+              <L tip="Words-per-minute used to time how long a message lingers before the next one. Higher = faster.">
+                Reading WPM
+              </L>
+            }
+          >
             <Input
               type="number"
               value={num(pacing.readingWpm, 240)}
@@ -133,7 +196,13 @@ export function OutputPanel({
               }
             />
           </Field>
-          <Field label="Typing CPS">
+          <Field
+            label={
+              <L tip="Characters-per-second for typing indicators and the composer animation.">
+                Typing CPS
+              </L>
+            }
+          >
             <Input
               type="number"
               value={num(pacing.typingCps, 14)}
@@ -146,7 +215,13 @@ export function OutputPanel({
               }
             />
           </Field>
-          <Field label="Inter-message gap (ms)">
+          <Field
+            label={
+              <L tip="Default pause between consecutive messages from different people.">
+                Inter-message gap (ms)
+              </L>
+            }
+          >
             <Input
               type="number"
               value={num(pacing.interMessageGapMs, 900)}
@@ -159,7 +234,13 @@ export function OutputPanel({
               }
             />
           </Field>
-          <Field label="Reaction lag (ms)">
+          <Field
+            label={
+              <L tip="How long after a message before its reaction lands.">
+                Reaction lag (ms)
+              </L>
+            }
+          >
             <Input
               type="number"
               value={num(pacing.reactionDelayMs, 700)}
@@ -174,7 +255,11 @@ export function OutputPanel({
           </Field>
         </div>
         <Field
-          label={`Humanize (${Math.round(num(pacing.humanize, 0.15) * 100)}%)`}
+          label={
+            <L tip="Adds seeded random variation to delays so the timing feels less robotic. 0% = exact, no jitter.">
+              {`Humanize (${Math.round(num(pacing.humanize, 0.15) * 100)}%)`}
+            </L>
+          }
         >
           <Slider
             min={0}
