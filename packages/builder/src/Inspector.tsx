@@ -5,9 +5,10 @@ import { Segmented } from "@typecaast/ui";
 import { StepEditor } from "./StepEditor.js";
 import { CastPanel } from "./panels/CastPanel.js";
 import { SkinPanel } from "./panels/SkinPanel.js";
+import { OutputPanel } from "./panels/OutputPanel.js";
 import { updateStep } from "./store.js";
 
-type Tab = "step" | "cast" | "skin";
+type Tab = "step" | "cast" | "skin" | "output";
 
 export function Inspector({
   config,
@@ -34,6 +35,7 @@ export function Inspector({
           { value: "step", label: "Step" },
           { value: "cast", label: "Cast" },
           { value: "skin", label: "Skin" },
+          { value: "output", label: "Output" },
         ]}
       />
       {tab === "step" ? (
@@ -57,6 +59,9 @@ export function Inspector({
       ) : null}
       {tab === "skin" ? (
         <SkinPanel config={config} skins={skins} onChange={onChange} />
+      ) : null}
+      {tab === "output" ? (
+        <OutputPanel config={config} onChange={onChange} />
       ) : null}
     </div>
   );

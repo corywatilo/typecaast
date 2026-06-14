@@ -25,6 +25,23 @@ export function setSkin(
   });
 }
 
+type Pacing = NonNullable<ConfigInput["pacing"]>;
+
+export function updatePacing(
+  config: ConfigInput,
+  patch: Partial<Pacing>,
+): ConfigInput {
+  return { ...config, pacing: { ...(config.pacing ?? {}), ...patch } };
+}
+
+export function setCanvas(
+  config: ConfigInput,
+  width: number,
+  height: number,
+): ConfigInput {
+  return updateMeta(config, { canvas: { width, height } });
+}
+
 export function addStep(
   config: ConfigInput,
   step: Step,

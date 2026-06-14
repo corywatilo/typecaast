@@ -8,8 +8,10 @@ import {
   duplicateStep,
   moveStep,
   removeParticipant,
+  setCanvas,
   setSkin,
   updateMeta,
+  updatePacing,
   updateParticipant,
   updateStep,
 } from "./store.js";
@@ -55,6 +57,16 @@ describe("config store", () => {
     expect(removeParticipant(base, 0).participants).toHaveLength(1);
     expect(setSkin(base, "imessage").meta.skin.id).toBe("imessage");
     expect(updateMeta(base, { seed: 99 }).meta.seed).toBe(99);
+  });
+
+  it("sets canvas + pacing", () => {
+    expect(setCanvas(base, 1080, 1920).meta.canvas).toEqual({
+      width: 1080,
+      height: 1920,
+    });
+    expect(updatePacing(base, { readingWpm: 300 }).pacing?.readingWpm).toBe(
+      300,
+    );
   });
 
   it("blankStep produces valid steps for every type", () => {
