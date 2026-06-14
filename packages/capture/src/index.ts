@@ -21,3 +21,4 @@ export {
   templateSkinFromDraft,
   type TemplateSkinOptions,
 } from "./template-skin.js";
+export { mergeThemeDrafts } from "./merge.js";

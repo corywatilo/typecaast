@@ -59,11 +59,38 @@
         font-size: 12px;
         opacity: 0.8;
       }
+      #notice {
+        font-size: 12px;
+        line-height: 1.4;
+        background: rgba(91, 91, 214, 0.1);
+        border: 1px solid rgba(91, 91, 214, 0.4);
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin-bottom: 10px;
+      }
+      button.link {
+        display: inline;
+        width: auto;
+        padding: 0;
+        margin: 4px 0 0;
+        background: none;
+        border: 0;
+        color: #5b5bd6;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <h1>Typecaast Capture</h1>
     <p class="lede">Pick a chat thread to capture as a skin draft. Stays local.</p>
+    <div id="notice" hidden>
+      A capture includes whatever text is on screen — it may contain private
+      messages. Review the draft before sharing it. Captures are saved only to
+      your machine.
+      <button id="notice-ok" class="link">Got it</button>
+    </div>
     <button id="pick">Pick &amp; capture</button>
     <button id="download" disabled>Download last draft</button>
     <p id="status"></p>

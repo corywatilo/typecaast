@@ -5,10 +5,24 @@ import { LAST_DRAFT_KEY, type ExtMessage } from "./messages.js";
 const statusEl = document.getElementById("status") as HTMLParagraphElement;
 const pickBtn = document.getElementById("pick") as HTMLButtonElement;
 const dlBtn = document.getElementById("download") as HTMLButtonElement;
+const noticeEl = document.getElementById("notice") as HTMLDivElement;
+const noticeOk = document.getElementById("notice-ok") as HTMLButtonElement;
+
+const SEEN_NOTICE_KEY = "tc:seen-notice";
 
 function setStatus(text: string): void {
   statusEl.textContent = text;
 }
+
+/** One-time pre-share hygiene notice (PLAN §18, M5.2b). */
+async function maybeShowNotice(): Promise<void> {
+  const store = await chrome.storage.local.get(SEEN_NOTICE_KEY);
+  if (!store[SEEN_NOTICE_KEY]) noticeEl.hidden = false;
+}
+noticeOk.addEventListener("click", () => {
+  noticeEl.hidden = true;
+  void chrome.storage.local.set({ [SEEN_NOTICE_KEY]: true });
+});
 
 async function refreshLast(): Promise<void> {
   const store = await chrome.storage.local.get(LAST_DRAFT_KEY);
@@ -59,3 +73,4 @@ chrome.runtime.onMessage.addListener((msg: ExtMessage) => {
 });
 
 void refreshLast();
+void maybeShowNotice();

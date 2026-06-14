@@ -146,17 +146,17 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 
 - [x] M5.1 Distiller: subtree isolation (visible/selected only, drop hidden DOM + data-*) + repeating-row → slotted template + scoped CSS + token extraction → `SkinDraft`
 - [x] M5.2 **Security: sanitize allowlist** (strip scripts/handlers/iframes/js+nonimage-data URLs/CSS hazards); render template skins in shadow-DOM + **hostile-fixture CI suite** (§10). _(sandboxed-iframe + strict-CSP embed-level hardening folded into the R.4 pre-launch pentest — CSP can't bind to a shadow root)_
-- [ ] M5.2b Capture hygiene: one-time pre-share notice; safer share defaults; local-first (§18)
+- [x] M5.2b Capture hygiene: one-time pre-share notice; safer share defaults; local-first (§18)
 - [x] M5.2c Style scoping verified on a hostile host page (zero leakage both directions)
 - [x] M5.3 MV3 Chrome extension: element picker → capture → draft (local-only)
 - [x] M5.4 Saved-page importer (.html/.mhtml) → same distiller
 - [x] M5.5 `TemplateSkinAdapter` — captured drafts satisfy the `Skin` contract via slot filling
 - [x] M5.6 `typecaast scaffold-skin` — draft → editable template skin package
-- [ ] M5.7 Light/dark double-capture flow
-- [ ] M5.8 Capture quality-bar fixtures + metrics (slot detection ≥80%, fix time ≤10min)
-- [ ] M5.9 Docs: capture guide + cleanup walkthrough
-- [ ] M5.10 Capture PostHog AI chat → promote to built-in skin
-- [ ] M5.E **Exit demo:** capture a real page, confirm slots, play a simulation in it
+- [x] M5.7 Light/dark double-capture flow
+- [x] M5.8 Capture quality-bar fixtures + metrics (slot detection ≥80%, fix time ≤10min)
+- [x] M5.9 Docs: capture guide + cleanup walkthrough
+- [ ] M5.10 Capture PostHog AI chat → promote to built-in skin _(needs a live authenticated capture of PostHog Max — user action)_
+- [x] M5.E **Exit demo:** capture a real page, confirm slots, play a simulation in it _(saved-page import → slots → play; live-page run pending with M5.10)_
 
 ---
 

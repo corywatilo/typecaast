@@ -37,6 +37,13 @@ export const slotReportSchema = z.object({
 });
 export type SlotReport = z.infer<typeof slotReportSchema>;
 
+const tokenSetSchema = z.object({
+  colors: z.record(z.string(), z.string()),
+  fonts: z.record(z.string(), z.string()).optional(),
+  space: z.record(z.string(), z.string()).optional(),
+  radius: z.record(z.string(), z.string()).optional(),
+});
+
 export const skinDraftSchema = z.object({
   version: z.literal(1),
   meta: z.object({
@@ -63,13 +70,13 @@ export const skinDraftSchema = z.object({
   }),
   /** Best-effort extra CSS (pseudo-elements, keyframes) — may be empty. */
   css: z.string(),
-  /** Extracted design tokens (best effort). */
-  tokens: z.object({
-    colors: z.record(z.string(), z.string()),
-    fonts: z.record(z.string(), z.string()).optional(),
-    space: z.record(z.string(), z.string()).optional(),
-    radius: z.record(z.string(), z.string()).optional(),
-  }),
+  /** Extracted design tokens (best effort) — the primary/captured theme. */
+  tokens: tokenSetSchema,
+  /**
+   * Dark-theme tokens from a paired capture (M5.7 double-capture flow). When
+   * present, the skin supports both themes and switches CSS vars by theme.
+   */
+  darkTokens: tokenSetSchema.optional(),
   /** Detection report per region. */
   detection: z.object({
     frame: slotReportSchema,

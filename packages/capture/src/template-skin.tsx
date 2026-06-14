@@ -141,11 +141,22 @@ export function templateSkinFromDraft(
       ? sanitizeHtml(draft.slots.composer)
       : undefined,
   };
-  const tokens: SkinTokens = { colors: draft.tokens.colors ?? {} };
-  const css = styleText(tokens, draft.css ?? "");
-  const theme = draft.meta.theme ?? "light";
+  const lightTokens: SkinTokens = { colors: draft.tokens.colors ?? {} };
+  const darkTokens: SkinTokens = draft.darkTokens
+    ? { colors: draft.darkTokens.colors ?? {} }
+    : lightTokens;
+  const cssByTheme = {
+    light: styleText(lightTokens, draft.css ?? ""),
+    dark: styleText(darkTokens, draft.css ?? ""),
+  };
+  const supportsThemes: ("light" | "dark")[] = draft.darkTokens
+    ? ["light", "dark"]
+    : [draft.meta.theme ?? "light"];
 
-  const Frame: FC<FrameProps & { children?: ReactNode }> = ({ children }) => {
+  const Frame: FC<FrameProps & { children?: ReactNode }> = ({
+    theme,
+    children,
+  }) => {
     const hostRef = useRef<HTMLDivElement>(null);
     const [mount, setMount] = useState<HTMLElement | null>(null);
     useLayoutEffect(() => {
@@ -154,7 +165,7 @@ export function templateSkinFromDraft(
       const shadow = host.shadowRoot ?? host.attachShadow({ mode: "open" });
       shadow.innerHTML = "";
       const style = host.ownerDocument.createElement("style");
-      style.textContent = css;
+      style.textContent = theme === "dark" ? cssByTheme.dark : cssByTheme.light;
       shadow.appendChild(style);
       const wrapper = host.ownerDocument.createElement("div");
       wrapper.style.width = "100%";
@@ -166,7 +177,7 @@ export function templateSkinFromDraft(
         wrapper;
       slot.textContent = "";
       setMount(slot);
-    }, []);
+    }, [theme]);
     return (
       <div ref={hostRef} style={{ width: "100%", height: "100%" }}>
         {mount ? createPortal(children, mount) : null}
@@ -251,10 +262,10 @@ export function templateSkinFromDraft(
     meta: {
       name: draft.meta.name,
       defaultCanvas: draft.meta.canvas ?? { width: 420, height: 720 },
-      supportsThemes: [theme],
+      supportsThemes,
       capabilities: opts.capabilities ?? DEFAULT_CAPS,
     },
     components,
-    tokens: { light: tokens, dark: tokens },
+    tokens: { light: lightTokens, dark: darkTokens },
   };
 }
