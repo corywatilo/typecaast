@@ -91,7 +91,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M2.6 **Frame-parity test:** React state at t === Remotion state at frame across fixtures
 - [x] M2.7 Render smoke test in CI (short config → MP4)
 - [x] M2.8 Keep renderer a clean callable package (future paid-service seam)
-- [ ] M2.E **Exit demo:** `typecaast render billing-toast.json` → MP4 + GIF, 16:9 and 9:16
+- [x] M2.E **Exit demo:** `typecaast render billing-toast.json` → MP4 + GIF, 16:9 and 9:16
 
 ---
 
