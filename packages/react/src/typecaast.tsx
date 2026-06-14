@@ -4,6 +4,7 @@ import type { Skin } from "@typecaast/skin-kit";
 import { useTypecaast } from "./use-typecaast.js";
 import { useSkinFonts } from "./use-skin-fonts.js";
 import { TypecaastStage } from "./stage.js";
+import { FitBox } from "./fit-box.js";
 
 export interface TypecaastProps {
   config: Config;
@@ -31,6 +32,7 @@ export function Typecaast({
   autoplay,
   loop,
   rate,
+  fit,
   className,
   style,
 }: TypecaastProps): ReactNode {
@@ -43,12 +45,14 @@ export function Typecaast({
       data-typecaast=""
       data-fonts={fonts}
     >
-      <TypecaastStage
-        state={state}
-        skin={skin}
-        participants={config.participants}
-        options={config.meta.skin.options}
-      />
+      <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
+        <TypecaastStage
+          state={state}
+          skin={skin}
+          participants={config.participants}
+          options={config.meta.skin.options}
+        />
+      </FitBox>
     </div>
   );
 }

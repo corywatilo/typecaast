@@ -39,43 +39,59 @@ export function TypecaastStage({
   return (
     <ThemeProvider theme={theme} tokens={tokens}>
       <Frame theme={theme} options={options}>
-        {state.messages.map((message, i) => {
-          const author = byId.get(message.from);
-          if (!author) return null;
-          if (message.variant === "system") {
+        {/* Thread viewport: bottom-anchored + clipped, so as the thread grows
+            older items shift up out of view ("content shifts up", PLAN §7).
+            The engine's scroll.targetOffset is honored here once real layout
+            measurement lands; for now the flex anchor gives the same feel. */}
+        <div
+          data-typecaast-thread=""
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-end",
+            flex: "1 1 auto",
+            minHeight: 0,
+            overflow: "hidden",
+          }}
+        >
+          {state.messages.map((message, i) => {
+            const author = byId.get(message.from);
+            if (!author) return null;
+            if (message.variant === "system") {
+              return (
+                <SystemMessage
+                  key={message.id}
+                  theme={theme}
+                  message={message}
+                  author={author}
+                />
+              );
+            }
+            const prev = state.messages[i - 1];
+            const previousAuthor = prev ? byId.get(prev.from) : undefined;
             return (
-              <SystemMessage
+              <Message
                 key={message.id}
                 theme={theme}
                 message={message}
                 author={author}
+                previousAuthor={previousAuthor}
               />
             );
-          }
-          const prev = state.messages[i - 1];
-          const previousAuthor = prev ? byId.get(prev.from) : undefined;
-          return (
-            <Message
-              key={message.id}
-              theme={theme}
-              message={message}
-              author={author}
-              previousAuthor={previousAuthor}
-            />
-          );
-        })}
-        {state.typingIndicators.map((typing, i) => {
-          const author = byId.get(typing.from);
-          if (!author) return null;
-          return (
-            <TypingIndicator
-              key={`typing-${typing.from}-${i}`}
-              theme={theme}
-              typing={typing}
-              author={author}
-            />
-          );
-        })}
+          })}
+          {state.typingIndicators.map((typing, i) => {
+            const author = byId.get(typing.from);
+            if (!author) return null;
+            return (
+              <TypingIndicator
+                key={`typing-${typing.from}-${i}`}
+                theme={theme}
+                typing={typing}
+                author={author}
+              />
+            );
+          })}
+        </div>
         {composerAuthor ? (
           <Composer
             theme={theme}
