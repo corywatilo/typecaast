@@ -97,7 +97,7 @@ export function Typecaast({
             skin={skin}
             participants={config.participants}
             options={config.meta.skin.options}
-            composer={composer}
+            composer={composer ?? config.meta.composer}
           />
         </FitBox>
       </div>

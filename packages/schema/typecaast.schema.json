@@ -92,6 +92,15 @@
             "inline",
             "url"
           ]
+        },
+        "composer": {
+          "default": "auto",
+          "type": "string",
+          "enum": [
+            "auto",
+            "always",
+            "never"
+          ]
         }
       },
       "required": [
@@ -102,7 +111,8 @@
         "skin",
         "seed",
         "background",
-        "assets"
+        "assets",
+        "composer"
       ],
       "additionalProperties": false
     },

@@ -17,6 +17,15 @@ export const fitModeSchema = z.enum(["reflow", "scale", "fixed"]);
 export type FitMode = z.infer<typeof fitModeSchema>;
 
 /**
+ * Reply-box (composer) visibility:
+ * - `auto`: shown only while someone is typing/sending (default).
+ * - `always`: keep the message input visible the whole time.
+ * - `never`: never show it.
+ */
+export const composerModeSchema = z.enum(["auto", "always", "never"]);
+export type ComposerMode = z.infer<typeof composerModeSchema>;
+
+/**
  * Color theme. `auto` inherits the host page's `prefers-color-scheme` (live
  * preview) and falls back to `light`; video export resolves `auto` to a
  * concrete mode and defaults to `light` when unspecified.
@@ -52,6 +61,8 @@ export const metaSchema = z.object({
   /** Canvas background: `"transparent"` or any CSS color. */
   background: z.string().default("transparent"),
   assets: assetModeSchema.default("inline"),
+  /** Reply-box visibility (see `composerModeSchema`). */
+  composer: composerModeSchema.default("auto"),
 });
 
 /** `meta` as it appears after parsing (defaults applied). */

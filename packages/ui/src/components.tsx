@@ -224,6 +224,27 @@ export function Kbd({ children }: { children?: ReactNode }) {
   return <kbd className="tc-kbd">{children}</kbd>;
 }
 
+/**
+ * A small "ⓘ" affordance with a tooltip describing a control. CSS-driven
+ * (hover + keyboard focus) so it stays server-renderable — no client hooks.
+ */
+export function InfoTip({ text, label }: { text: string; label?: string }) {
+  return (
+    <span className="tc-infotip-wrap">
+      <button
+        type="button"
+        className="tc-infotip"
+        aria-label={label ?? "More info"}
+      >
+        i
+      </button>
+      <span role="tooltip" className="tc-infotip-pop">
+        {text}
+      </span>
+    </span>
+  );
+}
+
 export function Heading({
   level = 2,
   className,
