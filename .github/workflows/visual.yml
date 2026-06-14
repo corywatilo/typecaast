@@ -12,6 +12,7 @@ on:
       - "packages/skin-kit/**"
       - "packages/react/**"
       - "packages/core/**"
+      - "packages/capture/**"
 
 jobs:
   visual:
@@ -32,6 +33,9 @@ jobs:
         run: pnpm --filter @typecaast/skins build-storybook
       - name: Visual regression
         run: pnpm --filter @typecaast/skins test:visual
+      # Captured-skin style scoping (PLAN §10, M5.2c) — shadow-DOM isolation.
+      - name: Capture style-scoping
+        run: pnpm --filter @typecaast/capture test:scoping
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

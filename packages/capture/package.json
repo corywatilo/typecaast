@@ -34,6 +34,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vitest run",
+    "test:scoping": "playwright test",
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
@@ -48,6 +49,7 @@
     "zod": "^4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@testing-library/react": "^16.1.0",
     "@typecaast/react": "workspace:*",
     "@types/jsdom": "^21.1.7",
