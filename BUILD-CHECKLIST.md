@@ -129,7 +129,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M4.4 builder: participant manager; skin picker + auto options form; capability/lint panel
 - [x] M4.5 builder: output controls — aspect presets + scale, editable mid-script with live reflow; fit/fps/seed
 - [x] M4.6 builder: theme toggle; import/paste JSON (round-trip); export JSON + embed snippet (inline vs url assets)
-- [ ] M4.7 builder: state persisted to URL + localStorage
+- [x] M4.7 builder: state persisted to URL + localStorage
 - [ ] M4.8 Next.js site: landing (dogfooded live sims as hero), MDX docs, playground (= builder), preset gallery, examples
 - [ ] M4.9 a11y: axe in CI for builder + embed; keyboard nav; reduced-motion; transcript; manual SR smoke
 - [ ] M4.10 **PostHog analytics (site/builder only):** reverse-proxy ingest, pageview autocapture, builder funnel events (§27), flags

@@ -3,6 +3,7 @@ import type { ConfigInput } from "@typecaast/schema";
 import { Button, Field, Segmented } from "@typecaast/ui";
 import { updateMeta } from "../store.js";
 import { embedSnippet, renderSnippet, toJSON } from "../exporting.js";
+import { shareUrl } from "../persistence.js";
 
 function copy(text: string): void {
   const nav = (
@@ -113,7 +114,7 @@ export function ExportPanel({
         />
       </Field>
 
-      <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <Button
           variant="primary"
           onClick={() => download("typecaast.json", toJSON(config))}
@@ -121,6 +122,7 @@ export function ExportPanel({
           ⬇ Download JSON
         </Button>
         <CopyButton text={toJSON(config)} label="Copy JSON" />
+        <CopyButton text={shareUrl()} label="🔗 Share link" />
       </div>
 
       <div>

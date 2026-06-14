@@ -19,6 +19,7 @@ import {
   duplicateStep,
   moveStep,
 } from "./store.js";
+import { loadFromUrl, loadLocal, saveLocal, updateUrl } from "./persistence.js";
 
 export interface BuilderProps {
   /** Initial config (raw or parsed). */
@@ -29,6 +30,8 @@ export interface BuilderProps {
   theme?: ResolvedTheme;
   /** Called whenever the edited config changes. */
   onChange?: (config: ConfigInput) => void;
+  /** Persist to localStorage + the URL hash (shareable links). Default true. */
+  persist?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -46,11 +49,14 @@ export function Builder({
   skins,
   theme = "dark",
   onChange,
+  persist = true,
   className,
   style,
 }: BuilderProps) {
-  const [config, setConfig] = useState<ConfigInput>(
-    initialConfig as ConfigInput,
+  const [config, setConfig] = useState<ConfigInput>(() =>
+    persist
+      ? (loadFromUrl() ?? loadLocal() ?? (initialConfig as ConfigInput))
+      : (initialConfig as ConfigInput),
   );
   const [selected, setSelected] = useState<number | null>(0);
   const [previewTheme, setPreviewTheme] = useState<ThemeMode>(
@@ -60,6 +66,10 @@ export function Builder({
 
   const update = (next: ConfigInput) => {
     setConfig(next);
+    if (persist) {
+      saveLocal(next);
+      updateUrl(next);
+    }
     onChange?.(next);
   };
 
