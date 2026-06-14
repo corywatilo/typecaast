@@ -109,9 +109,9 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 ---
 
 ## M3b — Remaining presets + ecosystem
-- [ ] M3b.1 Cursor panel skin (if not done in M3a)
+- [x] M3b.1 Cursor panel skin (if not done in M3a)
 - [ ] M3b.2 Messages (macOS) skin — sidebar, window chrome, wider layout (shares iOS tokens)
-- [ ] M3b.3 WhatsApp skin (green accent, double-tick receipts)
+- [x] M3b.3 WhatsApp skin (green accent, double-tick receipts)
 - [ ] M3b.4 Discord / Telegram skin (channel layout, role colors)
 - [ ] M3b.5 `create-typecaast-skin` scaffold CLI
 - [ ] M3b.6 AI authoring skill (`skill: create-skin`) — screenshot/draft → theme-aware skin

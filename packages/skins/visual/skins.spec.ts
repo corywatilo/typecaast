@@ -20,6 +20,8 @@ const STORIES = [
   "skins-imessage-ios--typing",
   "skins-whatsapp--light-complete",
   "skins-whatsapp--dark-complete",
+  "skins-cursor-panel--dark-complete",
+  "skins-cursor-panel--light-complete",
 ];
 
 for (const id of STORIES) {
