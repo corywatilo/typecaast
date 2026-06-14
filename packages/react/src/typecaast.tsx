@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { Config, FitMode, ThemeMode } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import { useTypecaast } from "./use-typecaast.js";
+import { useSkinFonts } from "./use-skin-fonts.js";
 import { TypecaastStage } from "./stage.js";
 
 export interface TypecaastProps {
@@ -34,8 +35,14 @@ export function Typecaast({
   style,
 }: TypecaastProps): ReactNode {
   const { state } = useTypecaast(config, { theme, autoplay, loop, rate });
+  const fonts = useSkinFonts(skin);
   return (
-    <div className={className} style={style} data-typecaast="">
+    <div
+      className={className}
+      style={style}
+      data-typecaast=""
+      data-fonts={fonts}
+    >
       <TypecaastStage
         state={state}
         skin={skin}

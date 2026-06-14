@@ -13,3 +13,4 @@ export {
 export { TypecaastStage, type TypecaastStageProps } from "./stage.js";
 export { resolveTheme } from "./resolve-theme.js";
 export { useResolvedTheme, usePrefersDark } from "./use-resolved-theme.js";
+export { useSkinFonts, type FontLoadState } from "./use-skin-fonts.js";
