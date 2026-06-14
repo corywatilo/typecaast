@@ -8,20 +8,23 @@ import {
   type ThemeMode,
 } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
-import { Typecaast } from "@typecaast/react";
+import { Typecaast, type ComposerMode } from "@typecaast/react";
 
 export function LiveSim({
   config,
   skin,
   theme = "auto",
   fit,
+  composer,
   autoplay = true,
-  loop = true,
+  // Rest on the final frame by default; opt into cycling with loop.
+  loop = false,
 }: {
   config: ConfigInput;
   skin: Skin;
   theme?: ThemeMode;
   fit?: FitMode;
+  composer?: ComposerMode;
   autoplay?: boolean;
   loop?: boolean;
 }) {
@@ -32,6 +35,7 @@ export function LiveSim({
       skin={skin}
       theme={theme}
       fit={fit}
+      composer={composer}
       autoplay={autoplay}
       loop={loop}
     />

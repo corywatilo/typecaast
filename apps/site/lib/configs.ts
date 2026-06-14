@@ -15,29 +15,40 @@ export const billingToast: ConfigInput = {
   timeline: [
     {
       type: "message",
+      id: "m1",
       from: "cory",
       text: "i got a billing toast error on the dashboard but i think it's a bug?",
     },
-    { type: "reaction", target: "$prev", emoji: "🦔", delay: 1200 },
-    { type: "typing", from: "paul", showTypingFor: 1800 },
+    // Paul escalates to the PostHog app — we show him typing it in the reply box.
     {
-      type: "message",
+      type: "composerType",
       from: "paul",
       text: "@PostHog the billing/spend API call shouldn't show an error toast to the user…",
+    },
+    { type: "send", id: "m2" },
+    // The PostHog app reacts 👀 to signal it saw the mention and is on it
+    // (hover the reaction to see who reacted).
+    {
+      type: "reaction",
+      target: "m2",
+      emoji: "👀",
+      shortcode: "eyes",
+      from: "posthog-bot",
+      delay: 900,
+    },
+    {
+      type: "message",
+      from: "posthog-bot",
+      text: "Let me check how exceptions are captured in the frontend.",
+      delay: 1400,
     },
     {
       type: "system",
       from: "posthog-bot",
       card: "pr-opened",
-      text: "Pull request opened.",
+      text: "Pull request opened — guards the billing/spend call so it no longer toasts on error.",
       actions: [{ label: "View PR" }, { label: "Open in PostHog Code" }],
     },
-    {
-      type: "composerType",
-      from: "cory",
-      text: "Let me check how exceptions are captured in the frontend.",
-    },
-    { type: "send" },
   ],
 };
 
