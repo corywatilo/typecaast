@@ -24,6 +24,7 @@ const STORIES = [
   "skins-cursor-panel--light-complete",
   "skins-messages-macos--light-complete",
   "skins-messages-macos--dark-complete",
+  "skins-discord--complete",
 ];
 
 for (const id of STORIES) {
