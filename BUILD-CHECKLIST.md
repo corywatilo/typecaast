@@ -16,14 +16,14 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 ## Phase 0 — Pre-build gates (§25 of spec) — must clear before M1
 - [ ] G.1 Legal/trademark posture reviewed; PostHog sign-off (§17)
 - [ ] G.2 **License tiers confirmed** — open-core: Apache runtime / FSL builder / private cloud; CLA; lawyer review (§17)
-- [ ] G.3 Per-skin font map locked: intended font + OFL substitute + license (§19)
-- [ ] G.4 Deterministic runtime defined: pinned container, fonts, emoji font (§19)
+- [x] G.3 Per-skin font map locked: intended font + OFL substitute + license (§19) — [docs/fonts.md](./docs/fonts.md)
+- [x] G.4 Deterministic runtime defined: pinned container, fonts, emoji font (§19) — `docker/Dockerfile.render` + [docs/RENDERING.md](./docs/RENDERING.md)
 - [ ] G.5 Design system + visual identity direction agreed; M4 design-review gate named (§11)
-- [ ] G.6 Support matrix (browsers/Node/Remotion) agreed (§21)
-- [ ] G.7 Performance budgets + benchmark fixtures defined (§21)
-- [ ] G.8 Error taxonomy + CLI exit codes agreed (§23)
+- [x] G.6 Support matrix (browsers/Node/Remotion) agreed (§21) — [docs/support-matrix.md](./docs/support-matrix.md)
+- [x] G.7 Performance budgets + benchmark fixtures defined (§21) — [docs/performance.md](./docs/performance.md) + `core` `engine.bench.ts`
+- [x] G.8 Error taxonomy + CLI exit codes agreed (§23) — [docs/errors.md](./docs/errors.md)
 - [ ] G.9 Public-vs-private split decided: paid service in private `typecaast-cloud` repo (§29)
-- [ ] G.10 Analytics event taxonomy drafted (builder + purchase funnels) (§27)
+- [x] G.10 Analytics event taxonomy drafted (builder + purchase funnels) (§27) — [ANALYTICS.md](./ANALYTICS.md)
 
 ---
 
