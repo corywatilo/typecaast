@@ -9,6 +9,7 @@ export {
   type TypecaastCompositionProps,
 } from "./composition.js";
 export { frameToMs, getDurationInFrames } from "./timing.js";
+export { useRemotionFonts } from "./fonts.js";
 export {
   getCompositionMetadata,
   ASPECT_PRESETS,

@@ -85,7 +85,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 
 - [x] M2.1 `@typecaast/remotion`: `<TypecaastComposition>` mapping frame→t→`getStateAt`
 - [x] M2.2 `remotion`: duration from timeline; canvas size + scale factor; transparent bg
-- [ ] M2.3 `remotion`: font + emoji loading in the Remotion runtime (deterministic)
+- [x] M2.3 `remotion`: font + emoji loading in the Remotion runtime (deterministic)
 - [ ] M2.4 `cli`: `render` command (format, --size/aspect presets, --scale, --theme [default light], --transparent)
 - [ ] M2.5 Pinned render container image (Chromium/Remotion/Node/fonts/emoji) + docs
 - [ ] M2.6 **Frame-parity test:** React state at t === Remotion state at frame across fixtures

@@ -5,6 +5,7 @@ import { TypecaastStage } from "@typecaast/react";
 import type { Config } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import { frameToMs } from "./timing.js";
+import { useRemotionFonts } from "./fonts.js";
 
 export interface TypecaastCompositionProps {
   config: Config;
@@ -27,6 +28,7 @@ export function TypecaastComposition({
   theme = "light",
   background,
 }: TypecaastCompositionProps): ReactNode {
+  useRemotionFonts(skin);
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const engine = useMemo(
