@@ -103,8 +103,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M3a.3 One more flagship (Cursor panel OR WhatsApp) to stress the contract
 - [x] M3a.4 Visual-regression harness (light + dark) gated against reference screenshots
 - [x] M3a.5 `@typecaast/skin-kit` beta published + Storybook regression template
-- [ ] M3a.6 Skin-authoring docs ("Build a skin": contract, capabilities, fonts, tokens, pixel-perfect bar)
-- [ ] M3a.E **Exit demo:** external contributor authors a trivial skin following docs only
+- [x] M3a.6 Skin-authoring docs ("Build a skin": contract, capabilities, fonts, tokens, pixel-perfect bar)
+- [x] M3a.E **Exit demo:** external contributor authors a trivial skin following docs only
 
 ---
 
