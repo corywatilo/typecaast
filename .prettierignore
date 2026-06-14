@@ -5,6 +5,9 @@
 pnpm-lock.yaml
 *.tsbuildinfo
 
+# Generated artifacts
+**/typecaast.schema.json
+
 # Source-of-truth planning docs — kept verbatim
 PLAN.md
 BUILD-CHECKLIST.md

@@ -7,4 +7,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   treeshake: true,
+  onSuccess: "node scripts/gen-json-schema.mjs",
 });
