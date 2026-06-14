@@ -163,7 +163,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 ## Release
 - [ ] R.1 v0.9 (M0–M4) if M5 slips; or v1.0 (M0–M5)
 - [ ] R.2 Changelog via Changesets; dist-tags (alpha/beta/latest)
-- [ ] R.3 Docs site + README final pass; disclaimers/trademarks + license labeling in place
+- [x] R.3 Docs site + README final pass; disclaimers/trademarks + license labeling in place _(README: quick-start/render/capture/packages/live-URL; site /docs live; license + trademark sections in place)_
 - [ ] R.4 **Pre-launch security review/pentest** of capture + template-skin path (§10) — hard gate if M5 shipped
 - [ ] R.5 Lawyer sign-off on FSL tiering + trade-dress posture (§17)
 
