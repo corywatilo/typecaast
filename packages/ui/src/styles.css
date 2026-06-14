@@ -312,6 +312,61 @@
 .tc-step-row:not([data-active]):hover {
   background: var(--tc-bg-subtle) !important;
 }
+.tc-step-grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--tc-text-subtle);
+  font-size: 13px;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+}
+.tc-step-grip:hover {
+  color: var(--tc-text);
+}
+.tc-step-grip:active {
+  cursor: grabbing;
+}
+
+/* Insert-between-rows "+" (revealed on hover, Shopify-style). */
+.tc-insert-zone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 10px;
+  margin: 1px 0;
+  padding: 0 2px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--tc-dur) var(--tc-ease);
+}
+.tc-insert-zone:hover {
+  opacity: 1;
+}
+.tc-insert-line {
+  flex: 1;
+  height: 1px;
+  background: var(--tc-accent);
+}
+.tc-insert-plus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--tc-accent);
+  color: var(--tc-accent-contrast);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
 
 /* InfoTip: ⓘ trigger + CSS-driven tooltip (no JS). */
 .tc-infotip-wrap {

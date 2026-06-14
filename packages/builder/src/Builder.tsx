@@ -253,9 +253,9 @@ export function Builder({
                 config={config}
                 selected={selected}
                 onSelect={setSelected}
-                onAdd={(t) => {
-                  update(addStep(config, blankStep(t, defaultFrom)));
-                  setSelected(config.timeline.length);
+                onAdd={(t, at) => {
+                  update(addStep(config, blankStep(t, defaultFrom), at));
+                  setSelected(at ?? config.timeline.length);
                 }}
                 onDelete={(i) => {
                   update(deleteStep(config, i));
