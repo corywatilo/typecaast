@@ -16,6 +16,8 @@ export interface UseTypecaastOptions {
 /** Imperative controls + live state returned by {@link useTypecaast}. */
 export interface TypecaastControls {
   state: SimState;
+  /** Current playback time in ms (reactive). */
+  currentMs: number;
   play(): void;
   pause(): void;
   seek(timeMs: number): void;
@@ -57,19 +59,32 @@ export function useTypecaast(
   }, [config, resolved, loop, rate]);
 
   const [state, setState] = useState<SimState>(() => player.state);
+  const [currentMs, setCurrentMs] = useState<number>(() => player.currentMs);
+  const [playing, setPlaying] = useState<boolean>(() => player.playing);
 
   useEffect(() => {
-    setState(player.state);
-    const off = player.on("tick", setState);
+    const sync = () => {
+      setState(player.state);
+      setCurrentMs(player.currentMs);
+    };
+    sync();
+    setPlaying(player.playing);
+    const offs = [
+      player.on("tick", sync),
+      player.on("seek", sync),
+      player.on("play", () => setPlaying(true)),
+      player.on("pause", () => setPlaying(false)),
+    ];
     if (autoplay) player.play();
     return () => {
-      off();
+      offs.forEach((off) => off());
       player.destroy();
     };
   }, [player, autoplay]);
 
   return {
     state,
+    currentMs,
     play: () => player.play(),
     pause: () => player.pause(),
     seek: (t) => player.seek(t),
@@ -79,7 +94,7 @@ export function useTypecaast(
     stepPrev: () => player.stepPrev(),
     duration: player.durationMs,
     rate: player.rate,
-    playing: player.playing,
+    playing,
     player,
   };
 }
