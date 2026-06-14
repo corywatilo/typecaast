@@ -40,7 +40,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M0.6 `@typecaast/schema`: content-node registry + `ContentNode[]` (text marks + image); `text`/`images` sugar → nodes
 - [x] M0.7 `@typecaast/schema`: timeline step union (message, reaction, typing, composerType, send, edit, delete, readReceipt, system, beat)
 - [x] M0.8 `@typecaast/schema`: generate JSON Schema + export inferred TS types
-- [ ] M0.9 **Contracts (lock early): `SimState` type** (messages w/ reveal progress, typing, composer, scroll, duration) + **skin-prop types** + **Player interface** — the surface the UI builds against
+- [x] M0.9 **Contracts (lock early): `SimState` type** (messages w/ reveal progress, typing, composer, scroll, duration) + **skin-prop types** + **Player interface** — the surface the UI builds against
 - [ ] M0.10 **Mock-state fixtures:** hand-authored `SimState` snapshots + a scripted/faked playback stub implementing the Player interface (no real engine) for UI work
 - [ ] M0.11 `@typecaast/cli`: `validate` command with error taxonomy + exit codes
 - [ ] M0.12 Example config: the Slack billing-toast thread (fixture used downstream)

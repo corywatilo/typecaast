@@ -36,6 +36,12 @@ importers:
         specifier: ^3.0.0
         version: 3.2.6
 
+  packages/core:
+    dependencies:
+      '@typecaast/schema':
+        specifier: workspace:*
+        version: link:../schema
+
   packages/schema:
     dependencies:
       zod:
