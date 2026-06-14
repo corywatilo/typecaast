@@ -94,6 +94,8 @@ importers:
         specifier: workspace:*
         version: link:../schema
 
+  packages/create-typecaast-skin: {}
+
   packages/react:
     dependencies:
       '@typecaast/core':

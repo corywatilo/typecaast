@@ -1,0 +1,21 @@
+{
+  "name": "create-typecaast-skin",
+  "version": "0.0.0",
+  "description": "Scaffold a new Typecaast skin.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "create-typecaast-skin": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  }
+}
