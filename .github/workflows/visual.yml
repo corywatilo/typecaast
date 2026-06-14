@@ -1,0 +1,40 @@
+name: Visual regression
+
+# Snapshots are environment-specific (fonts/emoji/Chromium). Baselines are
+# generated on macOS, so this gate runs on a macOS runner to match. Triggered
+# manually (and on PRs that touch skins) rather than on every push.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [master]
+    paths:
+      - "packages/skins/**"
+      - "packages/skin-kit/**"
+      - "packages/react/**"
+      - "packages/core/**"
+
+jobs:
+  visual:
+    name: skin snapshots (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Install Playwright Chromium
+        run: pnpm --filter @typecaast/skins exec playwright install --with-deps chromium
+      - name: Build Storybook
+        run: pnpm --filter @typecaast/skins build-storybook
+      - name: Visual regression
+        run: pnpm --filter @typecaast/skins test:visual
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-diffs
+          path: packages/skins/test-results
+          if-no-files-found: ignore

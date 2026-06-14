@@ -26,6 +26,8 @@
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots",
     "clean": "rm -rf dist .turbo storybook-static"
   },
   "dependencies": {
@@ -38,6 +40,7 @@
     "zod": "^4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@storybook/react": "^8.4.7",
     "@storybook/react-vite": "^8.4.7",
     "@typecaast/react": "workspace:*",

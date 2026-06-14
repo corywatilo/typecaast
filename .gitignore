@@ -39,3 +39,9 @@ next-env.d.ts
 
 # turborepo
 .turbo
+
+# playwright (keep visual/__screenshots__ baselines; ignore transient output)
+test-results
+playwright-report
+**/visual/**/*-actual.png
+**/visual/**/*-diff.png
