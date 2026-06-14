@@ -61,6 +61,9 @@ export function compile(config: Config): CompiledTimeline {
 
   const pacing = config.pacing;
   const rng = createRng(config.meta.seed);
+  const selfIds = new Set(
+    config.participants.filter((p) => p.isSelf).map((p) => p.id),
+  );
   const messages: CompiledMessage[] = [];
   const typings: CompiledTimeline["typings"] = [];
   const composers: CompiledComposer[] = [];
@@ -111,9 +114,12 @@ export function compile(config: Config): CompiledTimeline {
 
         const id = nextId(step.id);
         const reveal = step.instant ? 0 : REVEAL_MS;
+        const from =
+          step.type === "system" ? (step.from ?? "system") : step.from;
         const msg: CompiledMessage = {
           id,
-          from: step.type === "system" ? (step.from ?? "system") : step.from,
+          from,
+          isSelf: selfIds.has(from),
           variant: step.type === "system" ? "system" : "message",
           content: toContentNodes(step),
           appearMs: appearAt,
@@ -162,9 +168,11 @@ export function compile(config: Config): CompiledTimeline {
         if (lastComposer) {
           lastComposer.sendMs = sendAt;
           const id = nextId(step.id);
+          const sendFrom = step.from ?? lastComposer.from;
           const msg: CompiledMessage = {
             id,
-            from: step.from ?? lastComposer.from,
+            from: sendFrom,
+            isSelf: selfIds.has(sendFrom),
             variant: "message",
             content: toContentNodes({ text: lastComposer.text }),
             appearMs: sendAt,

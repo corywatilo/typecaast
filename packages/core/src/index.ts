@@ -13,3 +13,6 @@ export const CORE_CONTRACT_VERSION = 1;
 export type * from "./sim-state.js";
 export type * from "./skin-props.js";
 export type * from "./player.js";
+
+/** The engine: compile() + getStateAt() + createEngine(). */
+export * from "./engine/index.js";

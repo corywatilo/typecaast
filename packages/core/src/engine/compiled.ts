@@ -13,6 +13,8 @@ export interface CompiledReaction {
 export interface CompiledMessage {
   id: string;
   from: string;
+  /** Whether the author is the self participant (baked in at compile). */
+  isSelf: boolean;
   variant: MessageVariant;
   content: ContentNode[];
   /** When it starts revealing. */

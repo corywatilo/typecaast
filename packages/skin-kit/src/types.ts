@@ -1,8 +1,9 @@
 import type { FC, ReactNode } from "react";
 import type { ZodType } from "zod";
-import type { Size, StepType } from "@typecaast/schema";
+import type { Size } from "@typecaast/schema";
 import type {
   AvatarProps,
+  Capabilities,
   ComposerProps,
   FrameProps,
   MessageProps,
@@ -12,27 +13,9 @@ import type {
   TypingProps,
 } from "@typecaast/core";
 
-/**
- * How a skin represents a given event type:
- * - `native`: a first-class affordance (Slack "X is typing…").
- * - `fallback`: rendered in a degraded but present form.
- * - `unsupported`: dropped from this skin's render (kept in the config).
- */
-export type EventCapability = "native" | "fallback" | "unsupported";
-
-/**
- * What a skin supports and how it represents each event/content type. The
- * engine reads this to drop unsupported events/content per-skin (retaining
- * them in the config); the builder surfaces drops as non-blocking warnings.
- */
-export interface Capabilities {
-  events: Partial<Record<StepType, EventCapability>>;
-  /** Keyed by content node type (e.g. `image: true`, `videoEmbed: false`). */
-  content: Partial<Record<string, boolean>>;
-  reactions: boolean;
-  threads: boolean;
-  readReceipts: boolean;
-}
+// The Capabilities contract is owned by the engine (`@typecaast/core`) so it can
+// resolve unsupported events/content; re-exported here for skin authors.
+export type { Capabilities, EventCapability } from "@typecaast/core";
 
 /** Per-theme design tokens. Open-ended so skins add their own scales. */
 export interface SkinTokens {
