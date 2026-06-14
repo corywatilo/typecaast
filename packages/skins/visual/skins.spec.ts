@@ -22,6 +22,8 @@ const STORIES = [
   "skins-whatsapp--dark-complete",
   "skins-cursor-panel--dark-complete",
   "skins-cursor-panel--light-complete",
+  "skins-messages-macos--light-complete",
+  "skins-messages-macos--dark-complete",
 ];
 
 for (const id of STORIES) {

@@ -9,4 +9,5 @@ export { claudeCode } from "./claude-code/index.js";
 export { imessage } from "./imessage/index.js";
 export { whatsapp } from "./whatsapp/index.js";
 export { cursor } from "./cursor/index.js";
+export { messagesMacos } from "./messages-macos/index.js";
 export { builtinSkins, getSkin } from "./registry.js";
