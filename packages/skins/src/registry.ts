@@ -1,11 +1,13 @@
 import type { Skin } from "@typecaast/skin-kit";
 import { slack } from "./slack/index.js";
 import { claudeCode } from "./claude-code/index.js";
+import { imessage } from "./imessage/index.js";
 
 /** The built-in skins, keyed by id (matches `meta.skin.id` in a config). */
 export const builtinSkins: Record<string, Skin> = {
   slack,
   "claude-code": claudeCode,
+  imessage,
 };
 
 /** Resolve a built-in skin by id (e.g. for the CLI / render root). */

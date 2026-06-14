@@ -99,7 +99,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 *Exit: a third party can author a skin from docs alone.*
 
 - [x] M3a.1 Claude Code (TUI) skin — mono font, ANSI palette, prompt/spinner/streaming output (dark-first)
-- [ ] M3a.2 iMessage (iOS) skin — full-bleed bubbles, contact bar, keyboard, status bar; Inter substitute; light + dark
+- [x] M3a.2 iMessage (iOS) skin — full-bleed bubbles, contact bar, keyboard, status bar; Inter substitute; light + dark
 - [ ] M3a.3 One more flagship (Cursor panel OR WhatsApp) to stress the contract
 - [ ] M3a.4 Visual-regression harness (light + dark) gated against reference screenshots
 - [ ] M3a.5 `@typecaast/skin-kit` beta published + Storybook regression template
