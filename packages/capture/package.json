@@ -21,6 +21,11 @@
       "types": "./dist/import-page.d.ts",
       "import": "./dist/import-page.js",
       "require": "./dist/import-page.cjs"
+    },
+    "./draft": {
+      "types": "./dist/draft.d.ts",
+      "import": "./dist/draft.js",
+      "require": "./dist/draft.cjs"
     }
   },
   "scripts": {

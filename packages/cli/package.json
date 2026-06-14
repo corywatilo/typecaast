@@ -25,6 +25,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@typecaast/capture": "workspace:*",
     "@typecaast/remotion": "workspace:*",
     "@typecaast/schema": "workspace:*",
     "cac": "^6.7.14"

@@ -1,6 +1,10 @@
 import { cac } from "cac";
 import { runValidate } from "./commands/validate.js";
 import { runRender, type RenderOptions } from "./commands/render.js";
+import {
+  runScaffoldSkin,
+  type ScaffoldOptions,
+} from "./commands/scaffold-skin.js";
 
 const VERSION = "0.0.0";
 
@@ -26,6 +30,18 @@ cli
   .example("  typecaast render billing-toast.json --size 1080x1920 --scale 2")
   .action(async (config: string, options: RenderOptions) => {
     process.exit(await runRender(config, options));
+  });
+
+cli
+  .command(
+    "scaffold-skin <draft>",
+    "Turn a capture SkinDraft into a template skin package",
+  )
+  .option("-o, --out <dir>", "Output directory (default: skins/<id>)")
+  .option("--name <name>", "Skin name (default: from the draft)")
+  .example("  typecaast scaffold-skin draft.json --name 'Slack-style'")
+  .action((draft: string, options: ScaffoldOptions) => {
+    process.exit(runScaffoldSkin(draft, options));
   });
 
 cli.help();

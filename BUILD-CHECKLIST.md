@@ -151,7 +151,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [ ] M5.3 MV3 Chrome extension: element picker → capture → draft (local-only)
 - [x] M5.4 Saved-page importer (.html/.mhtml) → same distiller
 - [x] M5.5 `TemplateSkinAdapter` — captured drafts satisfy the `Skin` contract via slot filling
-- [ ] M5.6 `typecaast scaffold-skin` — draft → editable template skin package
+- [x] M5.6 `typecaast scaffold-skin` — draft → editable template skin package
 - [ ] M5.7 Light/dark double-capture flow
 - [ ] M5.8 Capture quality-bar fixtures + metrics (slot detection ≥80%, fix time ≤10min)
 - [ ] M5.9 Docs: capture guide + cleanup walkthrough

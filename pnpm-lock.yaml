@@ -173,6 +173,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@typecaast/capture':
+        specifier: workspace:*
+        version: link:../capture
       '@typecaast/remotion':
         specifier: workspace:*
         version: link:../remotion
