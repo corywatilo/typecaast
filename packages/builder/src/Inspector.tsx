@@ -6,9 +6,10 @@ import { StepEditor } from "./StepEditor.js";
 import { CastPanel } from "./panels/CastPanel.js";
 import { SkinPanel } from "./panels/SkinPanel.js";
 import { OutputPanel } from "./panels/OutputPanel.js";
+import { ExportPanel } from "./panels/ExportPanel.js";
 import { updateStep } from "./store.js";
 
-type Tab = "step" | "cast" | "skin" | "output";
+type Tab = "step" | "cast" | "skin" | "output" | "export";
 
 export function Inspector({
   config,
@@ -36,6 +37,7 @@ export function Inspector({
           { value: "cast", label: "Cast" },
           { value: "skin", label: "Skin" },
           { value: "output", label: "Output" },
+          { value: "export", label: "Export" },
         ]}
       />
       {tab === "step" ? (
@@ -62,6 +64,9 @@ export function Inspector({
       ) : null}
       {tab === "output" ? (
         <OutputPanel config={config} onChange={onChange} />
+      ) : null}
+      {tab === "export" ? (
+        <ExportPanel config={config} onChange={onChange} />
       ) : null}
     </div>
   );

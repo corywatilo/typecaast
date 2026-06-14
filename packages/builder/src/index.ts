@@ -10,4 +10,5 @@ export { TimelinePanel } from "./TimelinePanel.js";
 export { Inspector } from "./Inspector.js";
 export { StepEditor } from "./StepEditor.js";
 export { capabilityLint, type LintWarning } from "./lint.js";
+export { toJSON, embedSnippet, renderSnippet, skinVar } from "./exporting.js";
 export * from "./store.js";
