@@ -17,6 +17,7 @@
     "test": "turbo run test",
     "validate:examples": "node packages/cli/dist/index.js validate examples/billing-toast.json",
     "check:registry": "node scripts/check-registry.mjs",
+    "check:no-telemetry": "node scripts/check-no-telemetry.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yaml,yml}\"",
     "clean": "turbo run clean && rm -rf node_modules",

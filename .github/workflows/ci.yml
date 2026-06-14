@@ -53,3 +53,6 @@ jobs:
 
       - name: Check skin registry is in sync
         run: pnpm check:registry
+
+      - name: Telemetry guard (no analytics in runtime packages)
+        run: pnpm check:no-telemetry
