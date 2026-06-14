@@ -70,7 +70,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 *Swap mocks for real logic; the UI should not need to change.*
 
 - [x] M1E.1 `@typecaast/core`: seeded RNG; pacing model types
-- [ ] M1E.2 `core`: `compile(config)` — auto-pacing (WPM/CPS, gaps, reaction lag, jitter) + per-step overrides → absolute timeline
+- [x] M1E.2 `core`: `compile(config)` — auto-pacing (WPM/CPS, gaps, reaction lag, jitter) + per-step overrides → absolute timeline
 - [ ] M1E.3 `core`: `getStateAt(t)` pure sampler → `SimState` (matches the M0.9 contract)
 - [ ] M1E.4 `core`: capability resolution (drop unsupported events/content per skin, retain in config)
 - [ ] M1E.5 `core`: real Player (play/pause/seek/scrubTo/setRate/stepNext/stepPrev/loop, tick/end) replacing the stub
