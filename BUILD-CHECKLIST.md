@@ -37,7 +37,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M0.4b Secrets hygiene: `.env.example`, `.gitignore` env files, GitHub **secret scanning + push protection**, gitleaks pre-commit hook (§29)
 - [x] M0.4c Provision repo/CI via GitHub MCP/CLI (branch protection, environments, Actions secrets placeholders) (§28) — branch protection (no force-push/deletion, direct commits allowed), secret scanning + push protection enabled. Environments + Actions secrets deferred to M4 (Vercel/PostHog provisioning).
 - [x] M0.5 `@typecaast/schema`: Zod schema for `meta` (canvas, fps, fit, theme, assets, seed), `participants`, `pacing`
-- [ ] M0.6 `@typecaast/schema`: content-node registry + `ContentNode[]` (text marks + image); `text`/`images` sugar → nodes
+- [x] M0.6 `@typecaast/schema`: content-node registry + `ContentNode[]` (text marks + image); `text`/`images` sugar → nodes
 - [ ] M0.7 `@typecaast/schema`: timeline step union (message, reaction, typing, composerType, send, edit, delete, readReceipt, system, beat)
 - [ ] M0.8 `@typecaast/schema`: generate JSON Schema + export inferred TS types
 - [ ] M0.9 **Contracts (lock early): `SimState` type** (messages w/ reveal progress, typing, composer, scroll, duration) + **skin-prop types** + **Player interface** — the surface the UI builds against
