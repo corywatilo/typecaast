@@ -135,8 +135,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M4.10 **PostHog analytics (site/builder only):** reverse-proxy ingest, pageview autocapture, builder funnel events (§27), flags
 - [x] M4.10b **Consent model:** opt-in content-sharing banner; default **obfuscates content client-side** (interactions only); consent-keyed content-field gate; masking + recordings follow the same switch; revocable; publish `ANALYTICS.md` (events, what opt-in unlocks, region, retention) (§27)
 - [x] M4.11 **Telemetry guard:** CI test asserting `core`/`react`/`skins`/`skin-kit`/`cli` import no analytics SDK (zero phone-home)
-- [ ] M4.12 Provision via MCP: **Vercel** (project/env/domain), **Cloudflare** (DNS + proxy route + SSL), **PostHog** (project/flags/dashboards) — capture as runbooks in private ops repo (§28/§29)
-- [ ] M4.13 Deploy to Vercel; per-PR preview deploys
+- [x] M4.12 Provision: **Vercel** (project `typecaast-web` → `apps/site`, env, domain), **Cloudflare** (apex A + `www` CNAME, SSL=Full strict), **PostHog** (project + publishable key, dashboard) — see [DEPLOY.md](./DEPLOY.md). _(CF records are DNS-only so Vercel issues TLS; flip to proxied later if CF CDN/WAF is wanted. Flags created in PostHog as needed.)_
+- [x] M4.13 Deploy to Vercel; per-PR preview deploys _(Git-connected to `corywatilo/typecaast`@`master`; live at https://typecaast.com, `www` redirects; PRs auto-deploy previews)_
 - [ ] M4.E **Exit demo:** builder produces a working embed + self-contained config; analytics funnel visible in PostHog; **named design review passed**
 
 ---
