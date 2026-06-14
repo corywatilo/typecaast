@@ -34,6 +34,33 @@ project env for builds).
   in the Vercel dashboard).
 - **Previews:** every PR against `master` gets an automatic preview deployment.
 
+## Publishing to npm (Trusted Publishing / OIDC)
+
+Packages publish from `.github/workflows/release.yml` via **npm trusted
+publishing** — no long-lived `NPM_TOKEN`. The workflow has `id-token: write`;
+pnpm (≥11.0.9, which has the OIDC fix) exchanges a GitHub OIDC token for npm
+credentials, and npm validates it against each package's **trusted publisher**.
+Provenance is attached automatically.
+
+**One-time setup per package** (on npmjs.com, for each published `@typecaast/*`
+package + `create-typecaast-skin`): package **Settings → Trusted Publishing →
+Add → GitHub Actions**, with:
+
+- Organization / user: `corywatilo`
+- Repository: `typecaast`
+- Workflow filename: `release.yml`
+- Environment: _(leave blank)_
+
+Packages: `core`, `schema`, `react`, `remotion`, `skins`, `skin-kit`,
+`capture`, `cli`, `builder` (and `create-typecaast-skin`).
+
+Once configured, the old `NPM_TOKEN` repo secret is unused and can be **revoked**
+on npm. Trusted publishing only kicks in on a real version bump (a merged
+"Version Packages" PR); a push with no changesets publishes nothing.
+
+> If a future publish 404s on auth, confirm the package's trusted publisher
+> matches the repo + `release.yml`, and that pnpm is ≥ 11.0.9.
+
 ## First-time provisioning (already done)
 
 1. Vercel project linked to the repo; root dir / framework / build set.
