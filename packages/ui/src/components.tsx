@@ -1,0 +1,221 @@
+import type {
+  ButtonHTMLAttributes,
+  CSSProperties,
+  HTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+  SelectHTMLAttributes,
+} from "react";
+
+type ResolvedTheme = "light" | "dark";
+
+function cx(...parts: (string | false | undefined | null)[]): string {
+  return parts.filter(Boolean).join(" ");
+}
+
+/** Root that scopes the design system + sets the theme. Wrap your app in it. */
+export function ThemeRoot({
+  theme = "dark",
+  className,
+  style,
+  children,
+}: {
+  theme?: ResolvedTheme;
+  className?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
+}) {
+  return (
+    <div className={cx("tc", className)} data-tc-theme={theme} style={style}>
+      {children}
+    </div>
+  );
+}
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg";
+}
+
+export function Button({
+  variant = "outline",
+  size = "md",
+  className,
+  type = "button",
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      type={type}
+      className={cx(
+        "tc-btn",
+        `tc-btn--${variant}`,
+        size !== "md" && `tc-btn--${size}`,
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function IconButton({
+  className,
+  type = "button",
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button type={type} className={cx("tc-icon-btn", className)} {...props} />
+  );
+}
+
+export function Input({
+  className,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={cx("tc-input", className)} {...props} />;
+}
+
+export function Select({
+  className,
+  children,
+  ...props
+}: SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select className={cx("tc-select", className)} {...props}>
+      {children}
+    </select>
+  );
+}
+
+export function Field({
+  label,
+  htmlFor,
+  children,
+  className,
+}: {
+  label?: ReactNode;
+  htmlFor?: string;
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cx("tc-field", className)}>
+      {label ? (
+        <label className="tc-label" htmlFor={htmlFor}>
+          {label}
+        </label>
+      ) : null}
+      {children}
+    </div>
+  );
+}
+
+export function Panel({
+  raised,
+  className,
+  children,
+  style,
+}: {
+  raised?: boolean;
+  className?: string;
+  children?: ReactNode;
+  style?: CSSProperties;
+}) {
+  return (
+    <div
+      className={cx("tc-panel", raised && "tc-panel--raised", className)}
+      style={style}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function Badge({
+  tone = "neutral",
+  className,
+  children,
+}: {
+  tone?: "neutral" | "accent" | "warn";
+  className?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <span
+      className={cx(
+        "tc-badge",
+        tone !== "neutral" && `tc-badge--${tone}`,
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+export interface SegmentedOption<T extends string> {
+  value: T;
+  label: ReactNode;
+}
+
+export function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  className,
+  "aria-label": ariaLabel,
+}: {
+  options: SegmentedOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+  className?: string;
+  "aria-label"?: string;
+}) {
+  return (
+    <div
+      className={cx("tc-segmented", className)}
+      role="group"
+      aria-label={ariaLabel}
+    >
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          className="tc-segmented__item"
+          aria-pressed={o.value === value}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function Slider({
+  className,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input type="range" className={cx("tc-slider", className)} {...props} />
+  );
+}
+
+export function Kbd({ children }: { children?: ReactNode }) {
+  return <kbd className="tc-kbd">{children}</kbd>;
+}
+
+export function Heading({
+  level = 2,
+  className,
+  children,
+  ...rest
+}: { level?: 0 | 1 | 2 } & HTMLAttributes<HTMLHeadingElement>) {
+  const cls = level === 0 ? "tc-display" : level === 1 ? "tc-h1" : "tc-h2";
+  const Tag = (level === 1 ? "h1" : level === 0 ? "h1" : "h2") as "h1" | "h2";
+  return (
+    <Tag className={cx(cls, className)} {...rest}>
+      {children}
+    </Tag>
+  );
+}
