@@ -114,7 +114,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M3b.3 WhatsApp skin (green accent, double-tick receipts)
 - [x] M3b.4 Discord / Telegram skin (channel layout, role colors)
 - [x] M3b.5 `create-typecaast-skin` scaffold CLI
-- [ ] M3b.6 AI authoring skill (`skill: create-skin`) — screenshot/draft → theme-aware skin
+- [x] M3b.6 AI authoring skill (`skill: create-skin`) — screenshot/draft → theme-aware skin
 - [ ] M3b.7 Community registry/gallery (GitHub-based) + submission checklist
 - [ ] M3b.E **Exit demo:** all v1 presets in gallery, light + dark, passing regression
 

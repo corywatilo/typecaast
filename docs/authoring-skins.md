@@ -267,5 +267,11 @@ Community skins go through a checklist before listing:
 - Storybook stories + visual-regression baselines.
 - Provenance declared; clean sample content (no real customer data).
 
-Scaffolding (`create-typecaast-skin`) and an AI authoring skill are coming —
-until then, copy the smallest existing skin (`claude-code`) as a starting point.
+**Faster paths:**
+
+- **Scaffold:** `npm create typecaast-skin "<Name>"` generates a working skin
+  folder (tokens, components, capabilities) to customize.
+- **AI authoring skill:** the [`create-skin`](../.claude/skills/create-skin/SKILL.md)
+  skill walks an agent from a reference screenshot (or a captured draft) all the
+  way to a registered, theme-aware skin with stories and a visual baseline.
+- Or copy the smallest existing skin (`claude-code`) as a starting point.
