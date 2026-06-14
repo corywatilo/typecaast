@@ -1,11 +1,14 @@
 name: Release
 
-# Changesets release automation. On push to master it opens/updates a
-# "Version Packages" PR; merging that PR publishes the changed packages to npm.
-# Requires the NPM_TOKEN secret (publishing is gated on it — see §29).
+# Changesets release automation. Opens/updates a "Version Packages" PR;
+# merging that PR publishes the changed packages to npm.
+#
+# Manual (`workflow_dispatch`) for now. To make it run on every push to master,
+# first: (1) enable repo Settings → Actions → "Allow GitHub Actions to create
+# and approve pull requests", and (2) add the NPM_TOKEN secret (§29). Then add
+# the `push: branches: [master]` trigger back.
 on:
-  push:
-    branches: [master]
+  workflow_dispatch:
 
 concurrency: release-${{ github.ref }}
 
