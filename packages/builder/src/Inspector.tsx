@@ -8,6 +8,7 @@ import { SkinPanel } from "./panels/SkinPanel.js";
 import { OutputPanel } from "./panels/OutputPanel.js";
 import { ExportPanel } from "./panels/ExportPanel.js";
 import { updateStep } from "./store.js";
+import type { BuilderEvent } from "./Builder.js";
 
 type Tab = "step" | "cast" | "skin" | "output" | "export";
 
@@ -16,11 +17,13 @@ export function Inspector({
   selected,
   skins,
   onChange,
+  onEvent,
 }: {
   config: ConfigInput;
   selected: number | null;
   skins: Record<string, Skin>;
   onChange: (next: ConfigInput) => void;
+  onEvent?: (event: BuilderEvent) => void;
 }) {
   const [tab, setTab] = useState<Tab>("step");
   const selectedStep =
@@ -66,7 +69,7 @@ export function Inspector({
         <OutputPanel config={config} onChange={onChange} />
       ) : null}
       {tab === "export" ? (
-        <ExportPanel config={config} onChange={onChange} />
+        <ExportPanel config={config} onChange={onChange} onEvent={onEvent} />
       ) : null}
     </div>
   );

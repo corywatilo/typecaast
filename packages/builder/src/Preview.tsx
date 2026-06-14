@@ -15,6 +15,7 @@ export function Preview({
   onPreviewThemeChange,
   loop,
   onLoopChange,
+  onPlay,
 }: {
   config: Config;
   skin: Skin;
@@ -22,6 +23,7 @@ export function Preview({
   onPreviewThemeChange: (t: ThemeMode) => void;
   loop: boolean;
   onLoopChange: (loop: boolean) => void;
+  onPlay?: () => void;
 }) {
   const tc = useTypecaast(config, {
     theme: previewTheme,
@@ -48,6 +50,7 @@ export function Preview({
     }
     if (atEnd) tc.seek(0);
     tc.play();
+    onPlay?.();
   };
 
   const aspect = config.meta.canvas.width / config.meta.canvas.height;

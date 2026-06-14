@@ -4,7 +4,7 @@
  * root: `import "@typecaast/ui/styles.css"`.
  */
 
-export { Builder, type BuilderProps } from "./Builder.js";
+export { Builder, type BuilderProps, type BuilderEvent } from "./Builder.js";
 export { Preview } from "./Preview.js";
 export { TimelinePanel } from "./TimelinePanel.js";
 export { Inspector } from "./Inspector.js";

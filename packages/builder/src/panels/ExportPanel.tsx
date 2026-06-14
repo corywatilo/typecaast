@@ -4,6 +4,7 @@ import { Button, Field, Segmented } from "@typecaast/ui";
 import { updateMeta } from "../store.js";
 import { embedSnippet, renderSnippet, toJSON } from "../exporting.js";
 import { shareUrl } from "../persistence.js";
+import type { BuilderEvent } from "../Builder.js";
 
 function copy(text: string): void {
   const nav = (
@@ -34,9 +35,11 @@ function download(name: string, text: string): void {
 function CopyButton({
   text,
   label = "Copy",
+  onCopied,
 }: {
   text: string;
   label?: string;
+  onCopied?: () => void;
 }) {
   const [done, setDone] = useState(false);
   return (
@@ -45,6 +48,7 @@ function CopyButton({
       variant="ghost"
       onClick={() => {
         copy(text);
+        onCopied?.();
         setDone(true);
         setTimeout(() => setDone(false), 1200);
       }}
@@ -79,9 +83,11 @@ function CodeBlock({ code }: { code: string }) {
 export function ExportPanel({
   config,
   onChange,
+  onEvent,
 }: {
   config: ConfigInput;
   onChange: (next: ConfigInput) => void;
+  onEvent?: (event: BuilderEvent) => void;
 }) {
   const [importText, setImportText] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
@@ -117,12 +123,23 @@ export function ExportPanel({
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <Button
           variant="primary"
-          onClick={() => download("typecaast.json", toJSON(config))}
+          onClick={() => {
+            download("typecaast.json", toJSON(config));
+            onEvent?.("json_exported");
+          }}
         >
           ⬇ Download JSON
         </Button>
-        <CopyButton text={toJSON(config)} label="Copy JSON" />
-        <CopyButton text={shareUrl()} label="🔗 Share link" />
+        <CopyButton
+          text={toJSON(config)}
+          label="Copy JSON"
+          onCopied={() => onEvent?.("json_exported")}
+        />
+        <CopyButton
+          text={shareUrl()}
+          label="🔗 Share link"
+          onCopied={() => onEvent?.("share_link_created")}
+        />
       </div>
 
       <div>
@@ -135,7 +152,7 @@ export function ExportPanel({
           }}
         >
           <span className="tc-label">Embed snippet</span>
-          <CopyButton text={embed} />
+          <CopyButton text={embed} onCopied={() => onEvent?.("embed_copied")} />
         </div>
         <CodeBlock code={embed} />
       </div>
@@ -150,7 +167,10 @@ export function ExportPanel({
           }}
         >
           <span className="tc-label">Render it yourself</span>
-          <CopyButton text={render} />
+          <CopyButton
+            text={render}
+            onCopied={() => onEvent?.("render_snippet_copied")}
+          />
         </div>
         <CodeBlock code={render} />
         <p className="tc-muted" style={{ fontSize: 11.5, marginTop: 6 }}>

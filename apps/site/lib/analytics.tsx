@@ -10,7 +10,12 @@ import { useEffect } from "react";
  */
 
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "/ingest";
+// The browser always talks to the same-origin reverse proxy (see next.config);
+// `ui_host` points dashboard links at the real app host (region-derived).
+const INGEST_PROXY = "/ingest";
+const UI_HOST = (
+  process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com"
+).replace(".i.posthog.com", ".posthog.com");
 
 export type TcEvent =
   | "builder_opened"
@@ -30,6 +35,7 @@ interface PostHogLike {
     props?: Record<string, string | number | boolean>,
   ): void;
   init(key: string, options: Record<string, unknown>): void;
+  isFeatureEnabled(flag: string): boolean | undefined;
 }
 
 let client: PostHogLike | null = null;
@@ -42,6 +48,11 @@ export function track(
   client?.capture(event, props);
 }
 
+/** Read a PostHog feature flag (false until the client + flags have loaded). */
+export function isFeatureEnabled(flag: string): boolean {
+  return client?.isFeatureEnabled(flag) ?? false;
+}
+
 export function Analytics() {
   useEffect(() => {
     if (!KEY) return;
@@ -50,7 +61,8 @@ export function Analytics() {
       if (cancelled) return;
       const posthog = mod.default as unknown as PostHogLike;
       posthog.init(KEY, {
-        api_host: HOST,
+        api_host: INGEST_PROXY,
+        ui_host: UI_HOST,
         capture_pageview: true,
         autocapture: false,
         // Content masked by default; opt-in unlocks it (M4.10b).

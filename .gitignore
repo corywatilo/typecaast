@@ -45,3 +45,8 @@ test-results
 playwright-report
 **/visual/**/*-actual.png
 **/visual/**/*-diff.png
+.env.local
+
+# MCP setup-wizard scratch (vendored integration skills + one-time reports)
+.claude/skills/integration-*/
+posthog-setup-report.md

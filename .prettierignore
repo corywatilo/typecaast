@@ -5,6 +5,9 @@
 pnpm-lock.yaml
 *.tsbuildinfo
 
+# Vendored tooling (MCP skill references, local agent config) — not project source
+.claude/**
+
 # Generated artifacts
 **/typecaast.schema.json
 

@@ -21,6 +21,19 @@ import {
 } from "./store.js";
 import { loadFromUrl, loadLocal, saveLocal, updateUrl } from "./persistence.js";
 
+/**
+ * User-action events the builder surfaces (PLAN §27 funnel). The builder itself
+ * ships **zero telemetry** (it just calls this callback); the host site decides
+ * whether to forward them to analytics. Config-derived events (skin selected,
+ * step added) come through `onChange` instead.
+ */
+export type BuilderEvent =
+  | "preview_played"
+  | "json_exported"
+  | "embed_copied"
+  | "share_link_created"
+  | "render_snippet_copied";
+
 export interface BuilderProps {
   /** Initial config (raw or parsed). */
   initialConfig: ConfigInput | Config;
@@ -30,6 +43,8 @@ export interface BuilderProps {
   theme?: ResolvedTheme;
   /** Called whenever the edited config changes. */
   onChange?: (config: ConfigInput) => void;
+  /** Called on discrete user actions (export/share/preview) — see BuilderEvent. */
+  onEvent?: (event: BuilderEvent) => void;
   /** Persist to localStorage + the URL hash (shareable links). Default true. */
   persist?: boolean;
   className?: string;
@@ -49,6 +64,7 @@ export function Builder({
   skins,
   theme = "dark",
   onChange,
+  onEvent,
   persist = true,
   className,
   style,
@@ -146,6 +162,7 @@ export function Builder({
               onPreviewThemeChange={setPreviewTheme}
               loop={loop}
               onLoopChange={setLoop}
+              onPlay={() => onEvent?.("preview_played")}
             />
           ) : (
             <div
@@ -194,6 +211,7 @@ export function Builder({
             selected={selected}
             skins={skins}
             onChange={update}
+            onEvent={onEvent}
           />
         </aside>
       </div>

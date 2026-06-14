@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Heading } from "@typecaast/ui";
 import { Nav } from "../../components/Nav";
 import { Footer } from "../../components/Footer";
+import { DocsViewedTracker } from "../../components/DocsViewedTracker";
 
 const REPO = "https://github.com/corywatilo/typecaast/blob/master";
 
@@ -28,6 +29,7 @@ function Code({ children }: { children: string }) {
 export default function DocsPage() {
   return (
     <>
+      <DocsViewedTracker />
       <Nav />
       <main className="wrap" style={{ padding: "48px 24px", maxWidth: 760 }}>
         <Heading level={1}>Docs</Heading>
