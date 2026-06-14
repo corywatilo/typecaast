@@ -4,7 +4,11 @@ import type { MessageVariant, SystemCard } from "../sim-state.js";
 /** A reaction baked onto a message with absolute timing. */
 export interface CompiledReaction {
   emoji: string;
+  /** Emoji shortcode (no colons), for tooltips. */
+  shortcode?: string;
   by: string[];
+  /** Reactor display names, resolved from participants at compile time. */
+  byNames: string[];
   appearMs: number;
   popMs: number;
 }

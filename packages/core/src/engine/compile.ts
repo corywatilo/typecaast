@@ -64,6 +64,7 @@ export function compile(config: Config): CompiledTimeline {
   const selfIds = new Set(
     config.participants.filter((p) => p.isSelf).map((p) => p.id),
   );
+  const nameById = new Map(config.participants.map((p) => [p.id, p.name]));
   const messages: CompiledMessage[] = [];
   const typings: CompiledTimeline["typings"] = [];
   const composers: CompiledComposer[] = [];
@@ -198,9 +199,12 @@ export function compile(config: Config): CompiledTimeline {
             step.delay ??
             withJitter(rng, pacing.reactionDelayMs, pacing.humanize);
           const appearAt = target.appearMs + target.revealMs + delay;
+          const by = step.from ? [step.from] : [];
           target.reactions.push({
             emoji: step.emoji,
-            by: step.from ? [step.from] : [],
+            ...(step.shortcode ? { shortcode: step.shortcode } : {}),
+            by,
+            byNames: by.map((id) => nameById.get(id) ?? id),
             appearMs: appearAt,
             popMs: REACTION_POP_MS,
           });

@@ -5,7 +5,7 @@ import { useTypecaast } from "./use-typecaast.js";
 import { useSkinFonts } from "./use-skin-fonts.js";
 import { useReducedMotion } from "./use-reduced-motion.js";
 import { buildTranscript } from "./transcript.js";
-import { TypecaastStage } from "./stage.js";
+import { TypecaastStage, type ComposerMode } from "./stage.js";
 import { FitBox } from "./fit-box.js";
 
 export interface TypecaastProps {
@@ -18,6 +18,8 @@ export interface TypecaastProps {
   rate?: number;
   /** Container fit mode; defaults to `config.meta.fit`. */
   fit?: FitMode;
+  /** Composer (reply box) visibility: `auto` (default) / `always` / `never`. */
+  composer?: ComposerMode;
   /** Accessible label for the simulation. */
   label?: string;
   className?: string;
@@ -50,6 +52,7 @@ export function Typecaast({
   loop,
   rate,
   fit,
+  composer,
   label,
   className,
   style,
@@ -94,6 +97,7 @@ export function Typecaast({
             skin={skin}
             participants={config.participants}
             options={config.meta.skin.options}
+            composer={composer}
           />
         </FitBox>
       </div>

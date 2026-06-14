@@ -43,8 +43,10 @@ export function sampleState(
       if (r.appearMs > t) continue;
       reactions.push({
         emoji: r.emoji,
+        ...(r.shortcode ? { shortcode: r.shortcode } : {}),
         count: r.by.length || 1,
         by: r.by,
+        byNames: r.byNames,
         progress: r.popMs === 0 ? 1 : clamp01((t - r.appearMs) / r.popMs),
       });
       if (t - r.appearMs < SCROLL_FLAG_MS) reactionRecently = true;

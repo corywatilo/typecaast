@@ -10,7 +10,11 @@ export {
   type UseTypecaastOptions,
   type TypecaastControls,
 } from "./use-typecaast.js";
-export { TypecaastStage, type TypecaastStageProps } from "./stage.js";
+export {
+  TypecaastStage,
+  type TypecaastStageProps,
+  type ComposerMode,
+} from "./stage.js";
 export { resolveTheme } from "./resolve-theme.js";
 export { useResolvedTheme, usePrefersDark } from "./use-resolved-theme.js";
 export { useReducedMotion } from "./use-reduced-motion.js";

@@ -51,6 +51,8 @@ export const reactionStepSchema = z.object({
   type: z.literal("reaction"),
   target: z.string(),
   emoji: z.string(),
+  /** Emoji shortcode without colons, e.g. `"eyes"` — shown in skin tooltips. */
+  shortcode: z.string().optional(),
   from: z.string().optional(),
   ...stepBaseShape,
 });

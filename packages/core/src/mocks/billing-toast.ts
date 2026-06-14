@@ -145,6 +145,7 @@ function reactionsFor(targetId: string, t: number): RenderedReaction[] {
       emoji: r.emoji,
       count: r.by.length,
       by: r.by,
+      byNames: r.by,
       progress: clamp01((t - r.start) / REACTION_MS),
     }));
 }

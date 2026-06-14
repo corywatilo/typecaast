@@ -22,9 +22,13 @@ export interface SystemCard {
 /** A reaction currently shown on a message. */
 export interface RenderedReaction {
   emoji: string;
+  /** Emoji shortcode without colons (e.g. `"eyes"`), for skin tooltips. */
+  shortcode?: string;
   count: number;
   /** Participant ids who reacted (for grouping/tooltips). */
   by: string[];
+  /** Display names of the reactors, resolved from participants (for tooltips). */
+  byNames: string[];
   /** 0..1 pop-in progress. */
   progress: number;
 }

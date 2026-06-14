@@ -453,6 +453,9 @@
               "emoji": {
                 "type": "string"
               },
+              "shortcode": {
+                "type": "string"
+              },
               "from": {
                 "type": "string"
               },

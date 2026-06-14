@@ -3,12 +3,21 @@ import type { Participant } from "@typecaast/schema";
 import type { SimState } from "@typecaast/core";
 import { ThemeProvider, type Skin } from "@typecaast/skin-kit";
 
+/** When the skin's composer (reply box) is shown. */
+export type ComposerMode = "auto" | "always" | "never";
+
 export interface TypecaastStageProps {
   state: SimState;
   skin: Skin;
   participants: Participant[];
   /** Skin-specific options from `meta.skin.options`. */
   options?: Record<string, unknown>;
+  /**
+   * Composer visibility: `auto` (default) shows it only while someone is
+   * typing/sending; `always` keeps the reply box visible (idle = placeholder);
+   * `never` hides it.
+   */
+  composer?: ComposerMode;
 }
 
 /**
@@ -21,6 +30,7 @@ export function TypecaastStage({
   skin,
   participants,
   options,
+  composer = "auto",
 }: TypecaastStageProps): ReactNode {
   const theme = state.theme;
   const byId = useMemo(() => {
@@ -32,9 +42,18 @@ export function TypecaastStage({
   const { Frame, Message, SystemMessage, TypingIndicator, Composer } =
     skin.components;
   const tokens = skin.tokens?.[theme];
+  // `always` keeps the reply box mounted even when idle (falls back to the self
+  // participant so a placeholder shows); `auto` only shows it while composing.
+  const selfParticipant = useMemo(
+    () => participants.find((p) => p.isSelf),
+    [participants],
+  );
   const composerAuthor = state.composer.from
     ? byId.get(state.composer.from)
-    : undefined;
+    : composer === "always"
+      ? selfParticipant
+      : undefined;
+  const showComposer = composer !== "never" && composerAuthor !== undefined;
 
   return (
     <ThemeProvider theme={theme} tokens={tokens}>
@@ -92,7 +111,7 @@ export function TypecaastStage({
             );
           })}
         </div>
-        {composerAuthor ? (
+        {showComposer ? (
           <Composer
             theme={theme}
             composer={state.composer}
