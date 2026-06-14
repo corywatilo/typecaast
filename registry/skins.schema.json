@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Typecaast skin registry",
+  "type": "object",
+  "required": ["version", "skins"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "skins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "official", "author", "themes", "summary"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "name": { "type": "string" },
+          "official": { "type": "boolean" },
+          "author": { "type": "string" },
+          "package": { "type": "string" },
+          "export": { "type": "string" },
+          "repo": { "type": "string", "format": "uri" },
+          "themes": {
+            "type": "array",
+            "items": { "enum": ["light", "dark"] },
+            "minItems": 1
+          },
+          "intendedFonts": { "type": "array", "items": { "type": "string" } },
+          "summary": { "type": "string", "maxLength": 120 },
+          "verified": { "type": "string" }
+        }
+      }
+    }
+  }
+}

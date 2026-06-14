@@ -1,0 +1,90 @@
+{
+  "$schema": "./skins.schema.json",
+  "version": 1,
+  "skins": [
+    {
+      "id": "slack",
+      "name": "Slack",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "slack",
+      "themes": ["light", "dark"],
+      "intendedFonts": ["Lato"],
+      "summary": "Slack-style thread: app cards, reactions, replies.",
+      "verified": "2026-Q2"
+    },
+    {
+      "id": "claude-code",
+      "name": "Claude Code (TUI)",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "claudeCode",
+      "themes": ["dark"],
+      "intendedFonts": ["JetBrains Mono"],
+      "summary": "Terminal UI with streaming output and a spinner.",
+      "verified": "2026-Q2"
+    },
+    {
+      "id": "imessage",
+      "name": "iMessage (iOS)",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "imessage",
+      "themes": ["light", "dark"],
+      "intendedFonts": ["SF Pro (→ Inter)"],
+      "summary": "iPhone Messages: bubbles, tapbacks, status bar, keyboard.",
+      "verified": "2026-Q2"
+    },
+    {
+      "id": "messages-macos",
+      "name": "Messages (macOS)",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "messagesMacos",
+      "themes": ["light", "dark"],
+      "intendedFonts": ["SF Pro (→ Inter)"],
+      "summary": "Desktop Messages: window chrome + conversation sidebar.",
+      "verified": "2026-Q2"
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "whatsapp",
+      "themes": ["light", "dark"],
+      "intendedFonts": ["Helvetica Neue (system)"],
+      "summary": "WhatsApp: in-bubble timestamps + double-tick receipts.",
+      "verified": "2026-Q2"
+    },
+    {
+      "id": "cursor",
+      "name": "Cursor panel",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "cursor",
+      "themes": ["dark", "light"],
+      "intendedFonts": ["gg sans (system)"],
+      "summary": "Cursor AI side-panel: prompts, responses, model chips.",
+      "verified": "2026-Q2"
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "discord",
+      "themes": ["dark"],
+      "intendedFonts": ["gg sans (→ Noto Sans)"],
+      "summary": "Discord channel: role colors, grouped messages, reactions.",
+      "verified": "2026-Q2"
+    }
+  ]
+}

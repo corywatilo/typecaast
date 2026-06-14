@@ -50,3 +50,6 @@ jobs:
 
       - name: Validate example configs
         run: pnpm validate:examples
+
+      - name: Check skin registry is in sync
+        run: pnpm check:registry
