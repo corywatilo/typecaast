@@ -11,14 +11,13 @@ import type { ResolvedTheme } from "@typecaast/core";
 import { Badge, Heading, Panel, ThemeRoot } from "@typecaast/ui";
 import { Preview } from "./Preview.js";
 import { TimelinePanel } from "./TimelinePanel.js";
-import { StepEditor } from "./StepEditor.js";
+import { Inspector } from "./Inspector.js";
 import {
   addStep,
   blankStep,
   deleteStep,
   duplicateStep,
   moveStep,
-  updateStep,
 } from "./store.js";
 
 export interface BuilderProps {
@@ -73,9 +72,6 @@ export function Builder({
     config.participants.find((p) => p.isSelf)?.id ??
     config.participants[0]?.id ??
     "self";
-
-  const selectedStep =
-    selected !== null ? config.timeline[selected] : undefined;
 
   return (
     <ThemeRoot
@@ -181,20 +177,12 @@ export function Builder({
             padding: 16,
           }}
         >
-          {selectedStep ? (
-            <StepEditor
-              step={selectedStep}
-              participants={config.participants}
-              onChange={(patch) =>
-                selected !== null &&
-                update(updateStep(config, selected, patch as never))
-              }
-            />
-          ) : (
-            <p className="tc-muted" style={{ fontSize: 13 }}>
-              Select a step to edit it, or add one from the timeline.
-            </p>
-          )}
+          <Inspector
+            config={config}
+            selected={selected}
+            skins={skins}
+            onChange={update}
+          />
         </aside>
       </div>
     </ThemeRoot>

@@ -7,5 +7,7 @@
 export { Builder, type BuilderProps } from "./Builder.js";
 export { Preview } from "./Preview.js";
 export { TimelinePanel } from "./TimelinePanel.js";
+export { Inspector } from "./Inspector.js";
 export { StepEditor } from "./StepEditor.js";
+export { capabilityLint, type LintWarning } from "./lint.js";
 export * from "./store.js";
