@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { Config, ThemeMode } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import { TypecaastStage, useTypecaast } from "@typecaast/react";
@@ -12,18 +13,46 @@ export function Preview({
   skin,
   previewTheme,
   onPreviewThemeChange,
+  loop,
+  onLoopChange,
 }: {
   config: Config;
   skin: Skin;
   previewTheme: ThemeMode;
   onPreviewThemeChange: (t: ThemeMode) => void;
+  loop: boolean;
+  onLoopChange: (loop: boolean) => void;
 }) {
   const tc = useTypecaast(config, {
     theme: previewTheme,
     capabilities: skin.meta.capabilities,
+    loop,
   });
+
+  // Preview-as-you-go: remember the scrub position and restore it whenever the
+  // engine recompiles (an edit), so editing never throws you back to t=0.
+  // Initial position is the end, so opening the builder shows the full thread.
+  const posRef = useRef<number>(Number.MAX_SAFE_INTEGER);
+  useEffect(() => {
+    posRef.current = tc.currentMs;
+  });
+  useEffect(() => {
+    tc.player.seek(Math.min(posRef.current, tc.player.durationMs));
+  }, [tc.player]);
+
+  const atEnd = tc.currentMs >= tc.duration - 1;
+  const togglePlay = () => {
+    if (tc.playing) {
+      tc.pause();
+      return;
+    }
+    if (atEnd) tc.seek(0);
+    tc.play();
+  };
+
   const aspect = config.meta.canvas.width / config.meta.canvas.height;
   const w = Math.min(380, 520 * Math.min(1, aspect));
+
   return (
     <div
       style={{
@@ -80,13 +109,24 @@ export function Preview({
           ⏮
         </IconButton>
         <IconButton
-          aria-label={tc.playing ? "Pause" : "Play"}
-          onClick={() => (tc.playing ? tc.pause() : tc.play())}
+          aria-label={tc.playing ? "Pause" : atEnd ? "Replay" : "Play"}
+          onClick={togglePlay}
         >
-          {tc.playing ? "⏸" : "▶"}
+          {tc.playing ? "⏸" : atEnd ? "↺" : "▶"}
         </IconButton>
         <IconButton aria-label="Next step" onClick={tc.stepNext}>
           ⏭
+        </IconButton>
+        <IconButton
+          aria-label="Loop"
+          onClick={() => onLoopChange(!loop)}
+          style={
+            loop
+              ? { borderColor: "var(--tc-accent)", color: "var(--tc-accent)" }
+              : undefined
+          }
+        >
+          🔁
         </IconButton>
         <Slider
           min={0}

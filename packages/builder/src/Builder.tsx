@@ -57,6 +57,7 @@ export function Builder({
   const [previewTheme, setPreviewTheme] = useState<ThemeMode>(
     (initialConfig.meta?.theme as ThemeMode) ?? "auto",
   );
+  const [loop, setLoop] = useState(false);
 
   const update = (next: ConfigInput) => {
     setConfig(next);
@@ -136,6 +137,8 @@ export function Builder({
               skin={skin}
               previewTheme={previewTheme}
               onPreviewThemeChange={setPreviewTheme}
+              loop={loop}
+              onLoopChange={setLoop}
             />
           ) : (
             <div
