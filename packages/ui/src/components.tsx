@@ -1,10 +1,14 @@
-import type {
-  ButtonHTMLAttributes,
-  CSSProperties,
-  HTMLAttributes,
-  InputHTMLAttributes,
-  ReactNode,
-  SelectHTMLAttributes,
+import {
+  cloneElement,
+  isValidElement,
+  useId,
+  type ButtonHTMLAttributes,
+  type CSSProperties,
+  type HTMLAttributes,
+  type InputHTMLAttributes,
+  type ReactElement,
+  type ReactNode,
+  type SelectHTMLAttributes,
 } from "react";
 
 type ResolvedTheme = "light" | "dark";
@@ -98,14 +102,29 @@ export function Field({
   children?: ReactNode;
   className?: string;
 }) {
+  // Programmatically tie the label to its control. If no `htmlFor` is given and
+  // the single child is an element without its own id, inject a generated one so
+  // the `<label htmlFor>` association holds (axe `label` / `select-name`).
+  const generatedId = useId();
+  let control = children;
+  let labelFor = htmlFor;
+  if (!labelFor && isValidElement(children)) {
+    const child = children as ReactElement<{ id?: string }>;
+    if (child.props.id) {
+      labelFor = child.props.id;
+    } else {
+      labelFor = generatedId;
+      control = cloneElement(child, { id: generatedId });
+    }
+  }
   return (
     <div className={cx("tc-field", className)}>
       {label ? (
-        <label className="tc-label" htmlFor={htmlFor}>
+        <label className="tc-label" htmlFor={labelFor}>
           {label}
         </label>
       ) : null}
-      {children}
+      {control}
     </div>
   );
 }

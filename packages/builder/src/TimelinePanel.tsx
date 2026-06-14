@@ -76,10 +76,6 @@ export function TimelinePanel({
           return (
             <div
               key={i}
-              role="button"
-              tabIndex={0}
-              onClick={() => onSelect(i)}
-              onKeyDown={(e) => e.key === "Enter" && onSelect(i)}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -87,34 +83,50 @@ export function TimelinePanel({
                 padding: "7px 9px",
                 marginBottom: 4,
                 borderRadius: 8,
-                cursor: "pointer",
                 border: `1px solid ${active ? "var(--tc-accent)" : "var(--tc-border)"}`,
                 background: active ? "var(--tc-bg-subtle)" : "var(--tc-panel)",
               }}
             >
-              <span
-                className="tc-muted tc-mono"
-                style={{ fontSize: 11, width: 16 }}
-              >
-                {i + 1}
-              </span>
-              <Badge tone={active ? "accent" : "neutral"}>{step.type}</Badge>
-              <span
+              <button
+                type="button"
+                aria-pressed={active}
+                onClick={() => onSelect(i)}
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
                   flex: 1,
                   minWidth: 0,
-                  fontSize: 13,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  padding: 0,
+                  border: 0,
+                  background: "transparent",
+                  cursor: "pointer",
+                  color: "inherit",
+                  font: "inherit",
+                  textAlign: "left",
                 }}
               >
-                {stepLabel(step)}
-              </span>
-              <span
-                style={{ display: "flex", gap: 2 }}
-                onClick={(e) => e.stopPropagation()}
-              >
+                <span
+                  className="tc-muted tc-mono"
+                  style={{ fontSize: 11, width: 16 }}
+                >
+                  {i + 1}
+                </span>
+                <Badge tone={active ? "accent" : "neutral"}>{step.type}</Badge>
+                <span
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: 13,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {stepLabel(step)}
+                </span>
+              </button>
+              <span style={{ display: "flex", gap: 2 }}>
                 <IconButton
                   aria-label="Move up"
                   onClick={() => onMove(i, i - 1)}

@@ -41,6 +41,7 @@
     "@typecaast/skins": "workspace:*",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "jest-axe": "^9.0.0",
     "jsdom": "^25.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

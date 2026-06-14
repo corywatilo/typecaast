@@ -112,6 +112,7 @@ export function Builder({
 
       <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
         <aside
+          aria-label="Timeline"
           style={{
             flex: "0 0 280px",
             borderRight: "1px solid var(--tc-border)",
@@ -178,6 +179,7 @@ export function Builder({
         </main>
 
         <aside
+          aria-label="Inspector"
           style={{
             flex: "0 0 320px",
             borderLeft: "1px solid var(--tc-border)",

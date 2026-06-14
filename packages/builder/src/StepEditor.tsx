@@ -9,14 +9,17 @@ function get(step: Step, key: string): unknown {
 }
 
 function Textarea({
+  id,
   value,
   onChange,
 }: {
+  id?: string;
   value: string;
   onChange: (v: string) => void;
 }) {
   return (
     <textarea
+      id={id}
       className="tc-input"
       style={{
         height: 64,

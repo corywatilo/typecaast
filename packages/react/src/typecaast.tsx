@@ -1,8 +1,10 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useMemo, type CSSProperties, type ReactNode } from "react";
 import type { Config, FitMode, ThemeMode } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import { useTypecaast } from "./use-typecaast.js";
 import { useSkinFonts } from "./use-skin-fonts.js";
+import { useReducedMotion } from "./use-reduced-motion.js";
+import { buildTranscript } from "./transcript.js";
 import { TypecaastStage } from "./stage.js";
 import { FitBox } from "./fit-box.js";
 
@@ -14,16 +16,31 @@ export interface TypecaastProps {
   autoplay?: boolean;
   loop?: boolean;
   rate?: number;
-  /** Container fit mode (wired in M1U.6); defaults to `config.meta.fit`. */
+  /** Container fit mode; defaults to `config.meta.fit`. */
   fit?: FitMode;
+  /** Accessible label for the simulation. */
+  label?: string;
   className?: string;
   style?: CSSProperties;
 }
 
+const SR_ONLY: CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clipPath: "inset(50%)",
+  whiteSpace: "nowrap",
+  border: 0,
+};
+
 /**
  * Mounts the real-time player and renders the resolved skin from live state.
- * Ticks via the player's clock and samples the engine each frame (mocked in
- * M1-UI, real from M1-engine — same component, no changes).
+ * The animated visuals are `aria-hidden`; an accessible transcript carries the
+ * conversation for screen readers, and `prefers-reduced-motion` snaps to the
+ * final state instead of animating (PLAN §20).
  */
 export function Typecaast({
   config,
@@ -33,32 +50,53 @@ export function Typecaast({
   loop,
   rate,
   fit,
+  label,
   className,
   style,
 }: TypecaastProps): ReactNode {
-  const { state } = useTypecaast(config, {
+  const reduced = useReducedMotion();
+  const tc = useTypecaast(config, {
     theme,
-    autoplay,
-    loop,
+    autoplay: autoplay && !reduced,
+    loop: loop && !reduced,
     rate,
     capabilities: skin.meta.capabilities,
   });
   const fonts = useSkinFonts(skin);
+
+  // Reduced motion: hold the completed conversation, no animation.
+  useEffect(() => {
+    if (reduced) tc.seek(tc.duration);
+  }, [reduced, tc]);
+
+  const transcript = useMemo(() => buildTranscript(config), [config]);
+
   return (
     <div
       className={className}
-      style={style}
+      style={{ position: "relative", ...style }}
       data-typecaast=""
       data-fonts={fonts}
+      role="figure"
+      aria-label={label ?? `Chat simulation (${skin.meta.name})`}
     >
-      <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
-        <TypecaastStage
-          state={state}
-          skin={skin}
-          participants={config.participants}
-          options={config.meta.skin.options}
-        />
-      </FitBox>
+      <ol style={SR_ONLY}>
+        {transcript.map((line, i) => (
+          <li key={i}>
+            {line.name}: {line.text}
+          </li>
+        ))}
+      </ol>
+      <div aria-hidden="true" style={{ height: "100%" }}>
+        <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
+          <TypecaastStage
+            state={tc.state}
+            skin={skin}
+            participants={config.participants}
+            options={config.meta.skin.options}
+          />
+        </FitBox>
+      </div>
     </div>
   );
 }
