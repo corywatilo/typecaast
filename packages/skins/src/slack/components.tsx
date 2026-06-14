@@ -1,4 +1,11 @@
-import type { CSSProperties, FC, ReactNode } from "react";
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FC,
+  type ReactNode,
+} from "react";
 import type {
   AvatarProps,
   ComposerProps,
@@ -12,13 +19,19 @@ import {
   fadeSlideIn,
   MessageContent,
   popIn,
-  TypingDots,
   type ContentStyles,
 } from "@typecaast/skin-kit";
 import { SLACK_COLORS, type SlackColors } from "./tokens.js";
 import { SLACK_FONT_STACK } from "./fonts.js";
 
 const AVATAR_RADIUS = 8;
+
+/** Join reactor names the way Slack does ("A", "A and B", "A, B, and C"). */
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
 
 /** Fabricate a stable wall-clock time from a timeline offset (sim starts 9:00am). */
 function formatTime(atMs: number): string {
@@ -62,6 +75,22 @@ function markStyles(c: SlackColors): ContentStyles {
   };
 }
 
+const AppBadge: FC<{ c: SlackColors }> = ({ c }) => (
+  <span
+    style={{
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: 0.4,
+      background: c.appBadgeBg,
+      color: c.appBadgeText,
+      borderRadius: 2,
+      padding: "1px 4px",
+    }}
+  >
+    APP
+  </span>
+);
+
 const Avatar: FC<AvatarProps> = ({ theme, participant, size = 36 }) => {
   const c = SLACK_COLORS[theme];
   if (participant.avatar) {
@@ -103,46 +132,146 @@ const Avatar: FC<AvatarProps> = ({ theme, participant, size = 36 }) => {
   );
 };
 
-const Reaction: FC<ReactionProps> = ({ theme, reaction }) => {
-  const c = SLACK_COLORS[theme];
+/** Nearest ancestor that clips overflow — the bound to keep the tooltip inside. */
+function clippingAncestor(el: HTMLElement | null): HTMLElement | null {
+  let node = el?.parentElement ?? null;
+  while (node) {
+    const o = getComputedStyle(node).overflow;
+    if (o && o !== "visible") return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
+/**
+ * Slack's custom hover tooltip: big emoji over "<names> reacted with :code:",
+ * with a tail pointing at the reaction. Centered, but **clamped** to stay
+ * inside the sim viewport (like Slack clamps to the window) — the tail tracks
+ * the reaction so it still points correctly after a shift.
+ */
+const ReactionTooltip: FC<{ reaction: ReactionProps["reaction"] }> = ({
+  reaction,
+}) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [dx, setDx] = useState(0);
+  const code = reaction.shortcode;
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const bound = clippingAncestor(el)?.getBoundingClientRect();
+    if (!bound) return;
+    const rect = el.getBoundingClientRect();
+    const m = 8;
+    let shift = 0;
+    if (rect.left < bound.left + m) shift = bound.left + m - rect.left;
+    else if (rect.right > bound.right - m) shift = bound.right - m - rect.right;
+    setDx(shift);
+  }, []);
+
   return (
     <span
+      ref={ref}
+      role="tooltip"
       style={{
-        ...popIn(reaction.progress),
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        background: c.reactionBg,
-        border: `1px solid ${c.reactionBorder}`,
-        color: c.reactionText,
+        position: "absolute",
+        bottom: "calc(100% + 9px)",
+        left: "50%",
+        transform: `translateX(calc(-50% + ${dx}px))`,
+        zIndex: 20,
+        width: 220,
+        boxSizing: "border-box",
+        background: "#1a1d21",
+        color: "#e8e8e8",
         borderRadius: 12,
-        padding: "1px 7px",
-        height: 22,
-        fontSize: 12,
+        padding: "16px 16px 14px",
+        textAlign: "center",
+        fontSize: 15,
+        lineHeight: 1.4,
+        boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
+        pointerEvents: "none",
       }}
     >
-      <span style={{ fontSize: 13 }}>{reaction.emoji}</span>
-      <span style={{ fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-        {reaction.count}
+      <span style={{ display: "block", fontSize: 36, marginBottom: 8 }}>
+        {reaction.emoji}
       </span>
+      <span style={{ fontWeight: 700 }}>{joinNames(reaction.byNames)}</span>
+      <span style={{ color: "#ababad" }}> reacted with </span>
+      <span style={{ color: "#ababad" }}>
+        {code ? `:${code}:` : reaction.emoji}
+      </span>
+      {/* downward tail — offset opposite the clamp shift so it stays on the chip */}
+      <span
+        style={{
+          position: "absolute",
+          top: "100%",
+          left: `calc(50% - ${dx}px)`,
+          transform: "translateX(-50%)",
+          width: 0,
+          height: 0,
+          borderLeft: "7px solid transparent",
+          borderRight: "7px solid transparent",
+          borderTop: "7px solid #1a1d21",
+        }}
+      />
     </span>
   );
 };
 
-const TypingIndicator: FC<TypingProps> = ({ theme, typing, author }) => {
+const Reaction: FC<ReactionProps> = ({ theme, reaction }) => {
+  const c = SLACK_COLORS[theme];
+  const [hover, setHover] = useState(false);
+  const hasReactors = reaction.byNames.length > 0;
+  return (
+    <span
+      style={{
+        position: "relative",
+        display: "inline-flex",
+        ...popIn(reaction.progress),
+      }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          background: c.reactionBg,
+          border: `1px solid ${c.reactionBorder}`,
+          color: c.reactionText,
+          borderRadius: 12,
+          padding: "1px 7px",
+          height: 22,
+          fontSize: 12,
+          cursor: hasReactors ? "pointer" : "default",
+        }}
+      >
+        <span style={{ fontSize: 13 }}>{reaction.emoji}</span>
+        <span style={{ fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+          {reaction.count}
+        </span>
+      </span>
+      {hover && hasReactors ? <ReactionTooltip reaction={reaction} /> : null}
+    </span>
+  );
+};
+
+// Slack shows a plain italicized "<name> is typing…" line — no bouncing dots
+// (those are an iMessage/WhatsApp idiom, not Slack's).
+const TypingIndicator: FC<TypingProps> = ({ theme, author }) => {
   const c = SLACK_COLORS[theme];
   return (
     <div
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 6,
         padding: "2px 16px 4px 60px",
         color: c.subtle,
         fontSize: 12,
+        fontStyle: "italic",
       }}
     >
-      <TypingDots progress={typing.progress} color={c.subtle} size={5} />
       <span>{author.name} is typing…</span>
     </div>
   );
@@ -232,19 +361,7 @@ const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
           <span style={{ fontWeight: 700, color: c.text }}>
             {author?.name ?? "App"}
           </span>
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: 0.4,
-              background: c.appBadgeBg,
-              color: c.appBadgeText,
-              borderRadius: 2,
-              padding: "1px 4px",
-            }}
-          >
-            APP
-          </span>
+          <AppBadge c={c} />
           <span style={{ fontSize: 12, color: c.subtle }}>
             {formatTime(message.atMs)}
           </span>
@@ -294,11 +411,12 @@ const Message: FC<MessageProps> = ({ theme, message, author }) => {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         {grouped ? null : (
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
             <span style={{ fontWeight: 700, color: c.text }}>
               {author.name}
             </span>
-            <span style={{ fontSize: 12, color: c.subtle }}>
+            {author.kind === "app" ? <AppBadge c={c} /> : null}
+            <span style={{ fontSize: 12, color: c.subtle, marginLeft: 2 }}>
               {formatTime(message.atMs)}
             </span>
           </div>
@@ -378,6 +496,8 @@ const Frame: FC<FrameProps & { children?: ReactNode }> = ({
           minHeight: 0,
           display: "flex",
           flexDirection: "column",
+          // Breathing room so the last message/card never touches the bottom edge.
+          paddingBottom: 12,
         }}
       >
         {children}
