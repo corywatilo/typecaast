@@ -8,3 +8,4 @@ export * from "./types.js";
 export * from "./define-skin.js";
 export * from "./theme.js";
 export * from "./fonts.js";
+export * from "./animation.js";
