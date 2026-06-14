@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { configSchema, type ConfigInput } from "@typecaast/schema";
 import {
-  configSchema,
-  type ConfigInput,
+  createEngine,
+  createPlayer,
   type ResolvedTheme,
-} from "@typecaast/schema";
-import { createEngine, createPlayer } from "@typecaast/core";
+} from "@typecaast/core";
 import { frameToMs, getDurationInFrames } from "./timing.js";
 
 /**
