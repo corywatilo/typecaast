@@ -1,0 +1,72 @@
+{
+  "$schema": "../packages/schema/typecaast.schema.json",
+  "version": 1,
+  "meta": {
+    "canvas": { "width": 880, "height": 720 },
+    "fps": 30,
+    "fit": "reflow",
+    "theme": "auto",
+    "skin": {
+      "id": "slack",
+      "options": { "channel": "#alerts", "showThreadHeader": true }
+    },
+    "seed": 42,
+    "background": "transparent",
+    "assets": "url"
+  },
+  "participants": [
+    {
+      "id": "cory",
+      "name": "Cory Watilo",
+      "avatar": "./cory.png",
+      "isSelf": true
+    },
+    {
+      "id": "paul",
+      "name": "Paul D'Ambra",
+      "avatar": "./paul.png",
+      "color": "#5b3a8e"
+    },
+    { "id": "posthog-bot", "name": "PostHog", "kind": "app" }
+  ],
+  "pacing": { "readingWpm": 240, "typingCps": 14, "humanize": 0.15 },
+  "timeline": [
+    {
+      "type": "message",
+      "id": "m1",
+      "from": "cory",
+      "text": "i got a billing toast error on the dashboard but i think it's a bug?"
+    },
+    { "type": "reaction", "target": "$prev", "emoji": "🦔", "delay": 1200 },
+    { "type": "typing", "from": "paul", "showTypingFor": 1800 },
+    {
+      "type": "message",
+      "id": "m2",
+      "from": "paul",
+      "text": "@PostHog the billing/spend API call shouldn't show an error toast to the user…"
+    },
+    {
+      "type": "message",
+      "id": "m3",
+      "from": "cory",
+      "text": "here's the toast:",
+      "images": [
+        { "src": "./toast.png", "alt": "billing error toast", "width": 320 }
+      ]
+    },
+    {
+      "type": "system",
+      "id": "s1",
+      "from": "posthog-bot",
+      "card": "pr-opened",
+      "text": "Pull request opened.",
+      "actions": [{ "label": "View PR" }, { "label": "Open in PostHog Code" }]
+    },
+    {
+      "type": "composerType",
+      "from": "cory",
+      "text": "Let me check how exceptions are captured in the frontend."
+    },
+    { "type": "send" }
+  ]
+}
