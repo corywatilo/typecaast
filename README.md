@@ -61,6 +61,20 @@ The React player and the video renderer sample the same engine frame-for-frame, 
 
 Seven faithful built-in skins ship today — Slack, iMessage, WhatsApp, Discord, Messages (macOS), Claude Code (terminal), Cursor — each in the platform's real light/dark language. Build your own from the seven-component contract ([`docs/authoring-skins.md`](./docs/authoring-skins.md)), or **capture** a real UI: the Chrome extension / saved-page importer distills a chat thread into an editable skin draft ([`docs/capturing-skins.md`](./docs/capturing-skins.md)).
 
+## Develop locally
+
+This repo is a pnpm + Turborepo monorepo. The site (landing, playground/builder, gallery, docs) is the Next.js app in `apps/site`.
+
+```bash
+pnpm install
+pnpm build      # warm the workspace package dist so the site resolves cleanly
+pnpm dev        # turbo: watch every package + run the Next dev server
+```
+
+Open **http://localhost:3000** — `/` (landing), `/playground` (builder), `/gallery`, `/docs`. `pnpm dev` runs everything in watch mode, so edits to a skin, `@typecaast/ui`, the builder, or the site hot-reload. For just the site (lighter, no live library edits): `pnpm --filter @typecaast/site dev`.
+
+Common tasks: `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm format` · `pnpm --filter @typecaast/skins test:visual` (Playwright skin snapshots) · `pnpm --filter @typecaast/core bench`. See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
 ## Packages
 
 | Package               | What                                                 | License            |
