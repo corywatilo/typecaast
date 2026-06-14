@@ -76,7 +76,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M1E.5 `core`: real Player (play/pause/seek/scrubTo/setRate/stepNext/stepPrev/loop, tick/end) replacing the stub
 - [x] M1E.6 `core` tests: determinism (referential stability), pacing math, capability resolution, override precedence
 - [x] M1E.7 Swap `react`/builder from mock to real engine; confirm zero UI changes needed (any change = a contract miss to note) — only `engine-adapter.ts` changed (mock → `createEngine`); zero changes to `<Typecaast>`, `TypecaastStage`, skins, or the builder layout. Added an optional `capabilities` to `useTypecaast` (threaded from `skin.meta.capabilities`) — a feature wiring, not a contract miss. Only test *fixtures* needed updating (they had leaned on the mock ignoring the config).
-- [ ] M1E.E **Exit demo:** billing-toast plays from a real config end-to-end, light + dark, Lato rendering
+- [x] M1E.E **Exit demo:** billing-toast plays from a real config end-to-end, light + dark, Lato rendering
 
 ---
 

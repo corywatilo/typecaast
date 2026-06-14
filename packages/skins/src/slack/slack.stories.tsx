@@ -1,16 +1,52 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import type { ResolvedTheme } from "@typecaast/core";
-import {
-  buildMockBillingToastState,
-  mockParticipants,
-  MOCK_BILLING_TOAST_DURATION_MS,
-} from "@typecaast/core/mocks";
+import { createEngine, type ResolvedTheme } from "@typecaast/core";
 import { configSchema, type Config } from "@typecaast/schema";
 import { Typecaast, TypecaastStage } from "@typecaast/react";
 import { slack } from "./index.js";
 
-/** A framed "window" so the skin reads like a real surface in the gallery. */
+/** The real billing-toast thread — compiled by the engine (no mock). */
+const config: Config = configSchema.parse({
+  version: 1,
+  meta: {
+    canvas: { width: 480, height: 720 },
+    skin: { id: "slack", options: { channel: "#alerts" } },
+  },
+  participants: [
+    { id: "cory", name: "Cory Watilo", isSelf: true },
+    { id: "paul", name: "Paul D'Ambra", color: "#5b3a8e" },
+    { id: "posthog-bot", name: "PostHog", kind: "app" },
+  ],
+  timeline: [
+    {
+      type: "message",
+      from: "cory",
+      text: "i got a billing toast error on the dashboard but i think it's a bug?",
+    },
+    { type: "reaction", target: "$prev", emoji: "🦔", delay: 1200 },
+    { type: "typing", from: "paul", showTypingFor: 1800 },
+    {
+      type: "message",
+      from: "paul",
+      text: "@PostHog the billing/spend API call shouldn't show an error toast to the user…",
+    },
+    {
+      type: "system",
+      from: "posthog-bot",
+      card: "pr-opened",
+      text: "Pull request opened.",
+      actions: [{ label: "View PR" }, { label: "Open in PostHog Code" }],
+    },
+    {
+      type: "composerType",
+      from: "cory",
+      text: "Let me check how exceptions are captured in the frontend.",
+    },
+    { type: "send" },
+  ],
+});
+
+/** A framed "window" so the skin reads like a real surface. */
 function Window({
   theme,
   children,
@@ -38,72 +74,51 @@ function Window({
   );
 }
 
-function Frozen({ t, theme }: { t: number; theme: ResolvedTheme }) {
+/** A deterministic frame from the REAL engine at a fraction of the duration. */
+function Frozen({ frac, theme }: { frac: number; theme: ResolvedTheme }) {
+  const engine = createEngine(config, theme, slack.meta.capabilities);
+  const state = engine.getStateAt(engine.durationMs * frac);
   return (
     <Window theme={theme}>
       <TypecaastStage
-        state={buildMockBillingToastState(t, theme)}
+        state={state}
         skin={slack}
-        participants={mockParticipants}
-        options={{ channel: "#alerts" }}
+        participants={config.participants}
+        options={config.meta.skin.options}
       />
     </Window>
   );
 }
 
-const animatedConfig: Config = configSchema.parse({
-  version: 1,
-  meta: {
-    canvas: { width: 480, height: 720 },
-    skin: { id: "slack", options: { channel: "#alerts" } },
-  },
-  participants: mockParticipants,
-  timeline: [{ type: "message", from: "cory", text: "placeholder" }],
-});
-
-const meta: Meta = {
-  title: "Skins/Slack",
-};
+const meta: Meta = { title: "Skins/Slack" };
 export default meta;
-
 type Story = StoryObj;
 
 export const LightComplete: Story = {
   name: "Light · Complete",
-  render: () => <Frozen t={MOCK_BILLING_TOAST_DURATION_MS} theme="light" />,
+  render: () => <Frozen frac={1} theme="light" />,
 };
 
 export const DarkComplete: Story = {
   name: "Dark · Complete",
-  render: () => <Frozen t={MOCK_BILLING_TOAST_DURATION_MS} theme="dark" />,
+  render: () => <Frozen frac={1} theme="dark" />,
 };
 
-export const PaulTyping: Story = {
-  name: "Light · Paul typing",
-  render: () => <Frozen t={3000} theme="light" />,
+export const MidThread: Story = {
+  name: "Light · Mid-thread",
+  render: () => <Frozen frac={0.55} theme="light" />,
 };
 
-export const SystemCard: Story = {
-  name: "Dark · PR system card",
-  render: () => <Frozen t={7800} theme="dark" />,
-};
-
-export const ComposerTyping: Story = {
-  name: "Light · Composer typing",
-  render: () => <Frozen t={9800} theme="light" />,
+export const DarkMidThread: Story = {
+  name: "Dark · Mid-thread",
+  render: () => <Frozen frac={0.55} theme="dark" />,
 };
 
 export const Animated: Story = {
   name: "Animated · Light (loop)",
   render: () => (
     <Window theme="light">
-      <Typecaast
-        config={animatedConfig}
-        skin={slack}
-        theme="light"
-        autoplay
-        loop
-      />
+      <Typecaast config={config} skin={slack} theme="light" autoplay loop />
     </Window>
   ),
 };
@@ -112,13 +127,7 @@ export const AnimatedDark: Story = {
   name: "Animated · Dark (loop)",
   render: () => (
     <Window theme="dark">
-      <Typecaast
-        config={animatedConfig}
-        skin={slack}
-        theme="dark"
-        autoplay
-        loop
-      />
+      <Typecaast config={config} skin={slack} theme="dark" autoplay loop />
     </Window>
   ),
 };
