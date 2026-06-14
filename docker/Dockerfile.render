@@ -1,0 +1,28 @@
+# Pinned, deterministic render environment for Typecaast video export (PLAN §19).
+# Cross-environment frame parity requires pinning Node, Chromium, the font set,
+# and the emoji font. The CLI documents this image; the future hosted render
+# service uses the same one.
+
+FROM node:22.12.0-bookworm-slim
+
+# Chrome Headless Shell system libraries + fonts. Noto Color Emoji is the single
+# source-of-truth emoji font so 🦔 etc. rasterize identically every render.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libnss3 libdbus-1-3 libatk1.0-0 libgbm1 libasound2 \
+      libxrandr2 libxkbcommon0 libxfixes3 libxcomposite1 libxdamage1 \
+      libatk-bridge2.0-0 libpango-1.0-0 libcairo2 libcups2 \
+      fonts-noto-color-emoji \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN corepack enable && corepack prepare pnpm@11.1.2 --activate
+
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile && pnpm build
+
+# Chrome Headless Shell is fetched on first render and pinned by the `remotion`
+# version in the lockfile. Pre-fetch it into the image for reproducible renders.
+RUN node packages/cli/dist/index.js render examples/quick.json --out /tmp/warm.mp4 \
+    && rm -f /tmp/warm.mp4
+
+ENTRYPOINT ["node", "packages/cli/dist/index.js", "render"]
