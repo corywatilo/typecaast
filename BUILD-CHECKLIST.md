@@ -53,7 +53,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 
 - [x] M1U.1 `@typecaast/skin-kit`: `defineSkin`, `Skin`/`Capabilities`/`SkinTokens` types, theme context, font-loader helper
 - [x] M1U.2 `skin-kit`: shared animation primitives driven by `revealProgress` (fade/slide, typing dots, reaction pop)
-- [ ] M1U.3 `@typecaast/react`: `<Typecaast>` + `useTypecaast` wired to the **stub player over mock `SimState`** (rAF clock against faked timeline)
+- [x] M1U.3 `@typecaast/react`: `<Typecaast>` + `useTypecaast` wired to the **stub player over mock `SimState`** (rAF clock against faked timeline)
 - [ ] M1U.4 `react`: theme resolution (`auto` → OS/`matchMedia`, reactive; fallback `light`)
 - [ ] M1U.5 `react`: per-skin web-font loading on mount (live correct fonts)
 - [ ] M1U.6 `react`: responsive `fit` modes (reflow / scale / fixed) + overflow auto-scroll
