@@ -62,7 +62,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M1U.9 Slack skin: light + dark tokens; Lato bundled; capability declaration
 - [x] M1U.10 Storybook for Slack skin (light + dark stories) — all driven by mock state
 - [x] M1U.11 Builder shell (early): timeline track + preview + controls **driving the mock** (no persistence/export yet) to feel out the editing UX
-- [ ] M1U.E **Validation gate:** billing-toast thread looks/feels right (light + dark) from faked state; **scope of engine + schema confirmed / adjusted before writing logic**
+- [x] M1U.E **Validation gate:** billing-toast thread looks/feels right (light + dark) from faked state; **scope of engine + schema confirmed / adjusted before writing logic** — verified via Storybook screenshots (light + dark complete, composer-typing with caret, reaction pill, PR card). No contract changes needed: the engine must produce exactly the mocked `SimState` (messages w/ revealProgress, reactions w/ progress, typing progress, composer text/caret/sending, scroll); schema's 10 step types + content nodes covered every case.
 
 ---
 
