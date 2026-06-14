@@ -57,7 +57,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M1U.4 `react`: theme resolution (`auto` → OS/`matchMedia`, reactive; fallback `light`)
 - [x] M1U.5 `react`: per-skin web-font loading on mount (live correct fonts)
 - [x] M1U.6 `react`: responsive `fit` modes (reflow / scale / fixed) + overflow auto-scroll
-- [ ] M1U.7 `react`: in-message image rendering
+- [x] M1U.7 `react`: in-message image rendering (shared `MessageContent` in skin-kit — used by skins in both the React + Remotion renderers)
 - [ ] M1U.8 Slack skin: Frame (thread header, "N replies"), Message (grouping, timestamps), TypingIndicator, Reaction pill, Composer, SystemMessage (PR card + action buttons), Avatar
 - [ ] M1U.9 Slack skin: light + dark tokens; Lato bundled; capability declaration
 - [ ] M1U.10 Storybook for Slack skin (light + dark stories) — all driven by mock state
