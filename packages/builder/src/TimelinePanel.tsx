@@ -1,4 +1,10 @@
-import { Fragment, useState, type CSSProperties } from "react";
+import {
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import type { ConfigInput } from "@typecaast/schema";
 import { STEP_TYPES, type StepType } from "@typecaast/schema";
 import {
@@ -229,7 +235,6 @@ export function TimelinePanel({
   onMove,
   onDuplicate,
   onUpdateStep,
-  onImport,
 }: {
   config: ConfigInput;
   selected: number | null;
@@ -240,10 +245,21 @@ export function TimelinePanel({
   onMove: (from: number, to: number) => void;
   onDuplicate: (index: number) => void;
   onUpdateStep: (index: number, patch: Record<string, unknown>) => void;
-  onImport: () => void;
 }) {
   const [adding, setAdding] = useState(false);
   const [insertAt, setInsertAt] = useState<number | null>(null);
+
+  // After appending from the end button, scroll the new step into view.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollToEnd = useRef(false);
+  const count = config.timeline.length;
+  useEffect(() => {
+    if (!scrollToEnd.current) return;
+    scrollToEnd.current = false;
+    const el = scrollRef.current;
+    // `scrollTo` is unimplemented in jsdom; guard so tests (and odd hosts) don't throw.
+    if (el?.scrollTo) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }, [count]);
 
   const ids = config.timeline.map((_, i) => `step-${i}`);
   const sensors = useSensors(
@@ -271,6 +287,7 @@ export function TimelinePanel({
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <div
+        ref={scrollRef}
         style={{
           flex: "1 1 auto",
           overflowY: "auto",
@@ -344,57 +361,51 @@ export function TimelinePanel({
             })}
           </SortableContext>
         </DndContext>
-      </div>
 
-      {/* Add to the end without scrolling back up. */}
-      {adding ? (
+        {/* The end-of-list add control sits directly below the steps, and
+            sticks to the bottom of the pane once the list overflows. */}
         <div
           style={{
-            flex: "0 0 auto",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
-            padding: 10,
+            position: "sticky",
+            bottom: 0,
+            // Negative side/bottom margins span past the scroll container's own
+            // 8px padding so the bar reaches the full column width.
+            margin: "4px -8px -8px",
+            padding: "10px 12px",
             borderTop: "1px solid var(--tc-border)",
-            background: "var(--tc-bg-subtle)",
+            background: "var(--tc-panel)",
           }}
         >
-          {STEP_TYPES.map((t) => (
+          {adding ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {STEP_TYPES.map((t) => (
+                <Button
+                  key={t}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    scrollToEnd.current = true;
+                    onAdd(t);
+                    setAdding(false);
+                  }}
+                >
+                  {t}
+                </Button>
+              ))}
+              <Button size="sm" variant="ghost" onClick={() => setAdding(false)}>
+                cancel
+              </Button>
+            </div>
+          ) : (
             <Button
-              key={t}
               size="sm"
-              variant="ghost"
-              onClick={() => {
-                onAdd(t);
-                setAdding(false);
-              }}
+              variant="primary"
+              onClick={() => setAdding(true)}
             >
-              {t}
+              + Step
             </Button>
-          ))}
+          )}
         </div>
-      ) : null}
-
-      <div
-        style={{
-          flex: "0 0 auto",
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "10px 12px",
-          borderTop: "1px solid var(--tc-border)",
-        }}
-      >
-        <Button
-          size="sm"
-          variant="primary"
-          onClick={() => setAdding((v) => !v)}
-        >
-          + Step
-        </Button>
-        <Button size="sm" variant="ghost" onClick={onImport}>
-          Import
-        </Button>
       </div>
     </div>
   );

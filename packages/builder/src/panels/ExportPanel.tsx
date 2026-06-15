@@ -2,7 +2,12 @@ import { useState } from "react";
 import type { ConfigInput } from "@typecaast/schema";
 import { Button, Field, Segmented } from "@typecaast/ui";
 import { updateMeta } from "../store.js";
-import { embedSnippet, renderSnippet, toJSON } from "../exporting.js";
+import {
+  embedSnippet,
+  installSnippet,
+  renderSnippet,
+  toJSON,
+} from "../exporting.js";
 import type { BuilderEvent } from "../Builder.js";
 
 function copy(text: string): void {
@@ -88,6 +93,7 @@ export function ExportPanel({
   onChange: (next: ConfigInput) => void;
   onEvent?: (event: BuilderEvent) => void;
 }) {
+  const install = installSnippet();
   const embed = embedSnippet(config);
   const render = renderSnippet(config);
 
@@ -120,6 +126,25 @@ export function ExportPanel({
           label="Copy JSON"
           onCopied={() => onEvent?.("json_exported")}
         />
+      </div>
+
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 6,
+          }}
+        >
+          <span className="tc-label">Install</span>
+          <CopyButton text={install} />
+        </div>
+        <CodeBlock code={install} />
+        <p className="tc-muted" style={{ fontSize: 11.5, marginTop: 6 }}>
+          Install the packages the snippet below imports, then drop in your
+          exported <code>typecaast.json</code>.
+        </p>
       </div>
 
       <div>

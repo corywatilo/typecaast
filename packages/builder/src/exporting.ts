@@ -16,6 +16,11 @@ export function toJSON(config: ConfigInput): string {
   return JSON.stringify(config, null, 2) + "\n";
 }
 
+/** The npm install line for the packages the embed snippet imports. */
+export function installSnippet(): string {
+  return `npm install @typecaast/react @typecaast/skins`;
+}
+
 /** A React embed snippet for the config. */
 export function embedSnippet(config: ConfigInput): string {
   const id = config.meta.skin.id;

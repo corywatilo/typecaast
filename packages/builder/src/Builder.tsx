@@ -233,6 +233,7 @@ export function Builder({
           }}
         >
           <div style={columnHeader}>
+            <div style={{ flex: 1 }} />
             <Segmented<LeftTab>
               aria-label="Left panel"
               value={leftTab}
@@ -242,6 +243,13 @@ export function Builder({
                 { value: "cast", label: "Cast" },
               ]}
             />
+            <div
+              style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}
+            >
+              <Button size="sm" variant="ghost" onClick={() => setModal("import")}>
+                Import
+              </Button>
+            </div>
           </div>
           <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
             {leftTab === "timeline" ? (
@@ -272,7 +280,6 @@ export function Builder({
                 onUpdateStep={(i, patch) =>
                   commit(updateStep(config, i, patch as never), true)
                 }
-                onImport={() => setModal("import")}
               />
             ) : (
               <div
