@@ -24,13 +24,15 @@ describe("export helpers", () => {
     expect(JSON.parse(toJSON(config))).toEqual(config);
   });
 
-  it("emits a React embed snippet with the right skin import", () => {
+  it("emits a zero-config React embed snippet (skin resolved from config)", () => {
     const s = embedSnippet(config);
-    // Must lead with the client directive (RSC frameworks) — see embedSnippet.
-    expect(s.startsWith('"use client";')).toBe(true);
-    expect(s).toContain("@typecaast/react");
-    expect(s).toContain("import { messagesMacos }");
-    expect(s).toContain("skin={messagesMacos}");
+    expect(s).toContain('import { Typecaast } from "@typecaast/react"');
+    expect(s).toContain('import config from "./typecaast.json"');
+    expect(s).toContain("<Typecaast config={config} autoplay loop />");
+    // Single source of truth: no skin import/prop, and no "use client" needed.
+    expect(s).not.toContain("@typecaast/skins");
+    expect(s).not.toContain("skin=");
+    expect(s).not.toContain("use client");
   });
 
   it("emits a render command with size + theme", () => {

@@ -26,3 +26,6 @@ export const imessage = defineSkin({
   components: imessageComponents,
   tokens: imessageTokens,
 });
+
+/** Default export so `@typecaast/skins/imessage` can be lazy-imported uniformly. */
+export default imessage;

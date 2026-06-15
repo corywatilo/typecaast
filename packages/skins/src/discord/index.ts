@@ -38,3 +38,6 @@ export const discord = defineSkin({
   },
   components: discordComponents,
 });
+
+/** Default export so `@typecaast/skins/discord` can be lazy-imported uniformly. */
+export default discord;

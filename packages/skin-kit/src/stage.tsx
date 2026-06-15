@@ -1,10 +1,10 @@
 import { useMemo, type ReactNode } from "react";
-import type { Participant } from "@typecaast/schema";
+import type { ComposerMode, Participant } from "@typecaast/schema";
 import type { SimState } from "@typecaast/core";
-import { ThemeProvider, type Skin } from "@typecaast/skin-kit";
+import { ThemeProvider } from "./theme.js";
+import type { Skin } from "./types.js";
 
-/** When the skin's composer (reply box) is shown. */
-export type ComposerMode = "auto" | "always" | "never";
+export type { ComposerMode };
 
 export interface TypecaastStageProps {
   state: SimState;
@@ -24,6 +24,9 @@ export interface TypecaastStageProps {
  * Maps a `SimState` onto a skin's components: a `Frame` wrapping the thread
  * items (Message / SystemMessage), the typing indicators, and the composer.
  * Reactions render inside the skin's `Message` (it reads `message.reactions`).
+ *
+ * Lives in `skin-kit` (the contract layer) so both `@typecaast/react` and the
+ * skins' own stories can render a frame without depending on the React player.
  */
 export function TypecaastStage({
   state,

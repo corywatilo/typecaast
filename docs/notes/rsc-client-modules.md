@@ -1,5 +1,14 @@
 # Embedding `<Typecaast>` in React Server Component frameworks — decision digest
 
+> **Update:** the "Open question" below was answered — we *did* build zero-config
+> resolution, but cleanly: the renderer depends on `@typecaast/skins` only after
+> breaking the cycle (moved `TypecaastStage` to `skin-kit`, decoupled the
+> stories), and it **lazy-loads one skin by id** via per-skin subpath exports
+> rather than bundling all of them. See `docs/notes/zero-config-refactor.md`.
+> `<Typecaast config={config} />` now works in a Server Component with no
+> `"use client"`. The analysis below is kept as the original rationale.
+
+
 Context for a second opinion. Short version: the reported crash is fixed two
 ways (a client-directive on the published packages + a `"use client"` embed),
 and I **rejected** the "resolve skins by id inside the renderer" idea because it

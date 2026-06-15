@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { createEngine, type ResolvedTheme } from "@typecaast/core";
 import { configSchema, type Config } from "@typecaast/schema";
-import { Typecaast, TypecaastStage } from "@typecaast/react";
+import { TypecaastStage } from "@typecaast/skin-kit";
 import { cursor } from "./index.js";
 
 const config: Config = configSchema.parse({
@@ -81,13 +81,4 @@ export const DarkComplete: Story = {
 export const LightComplete: Story = {
   name: "Light · Complete",
   render: () => <Frozen frac={1} theme="light" />,
-};
-
-export const Animated: Story = {
-  name: "Animated · Dark (loop)",
-  render: () => (
-    <Window>
-      <Typecaast config={config} skin={cursor} theme="dark" autoplay loop />
-    </Window>
-  ),
 };

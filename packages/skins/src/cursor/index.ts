@@ -39,3 +39,6 @@ export const cursor = defineSkin({
   components: cursorComponents,
   tokens: cursorTokens,
 });
+
+/** Default export so `@typecaast/skins/cursor` can be lazy-imported uniformly. */
+export default cursor;

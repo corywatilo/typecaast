@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { createEngine } from "@typecaast/core";
 import { configSchema, type Config } from "@typecaast/schema";
-import { Typecaast, TypecaastStage } from "@typecaast/react";
+import { TypecaastStage } from "@typecaast/skin-kit";
 import { discord } from "./index.js";
 
 const config: Config = configSchema.parse({
@@ -70,13 +70,4 @@ type Story = StoryObj;
 export const Complete: Story = {
   name: "Complete",
   render: () => <Frozen frac={1} />,
-};
-
-export const Animated: Story = {
-  name: "Animated (loop)",
-  render: () => (
-    <Window>
-      <Typecaast config={config} skin={discord} theme="dark" autoplay loop />
-    </Window>
-  ),
 };

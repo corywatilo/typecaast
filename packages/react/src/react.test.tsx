@@ -12,9 +12,8 @@ import {
   buildMockBillingToastState,
   mockParticipants,
 } from "@typecaast/core/mocks";
-import type { Skin } from "@typecaast/skin-kit";
+import { TypecaastStage, type Skin } from "@typecaast/skin-kit";
 import { useTypecaast } from "./use-typecaast.js";
-import { TypecaastStage } from "./stage.js";
 
 afterEach(cleanup);
 

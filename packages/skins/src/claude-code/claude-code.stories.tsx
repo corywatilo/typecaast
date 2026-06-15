@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { createEngine } from "@typecaast/core";
 import { configSchema, type Config } from "@typecaast/schema";
-import { Typecaast, TypecaastStage } from "@typecaast/react";
+import { TypecaastStage } from "@typecaast/skin-kit";
 import { claudeCode } from "./index.js";
 
 const config: Config = configSchema.parse({
@@ -83,13 +83,4 @@ export const Complete: Story = {
 export const Streaming: Story = {
   name: "Streaming (mid)",
   render: () => <Frozen frac={0.62} />,
-};
-
-export const Animated: Story = {
-  name: "Animated (loop)",
-  render: () => (
-    <Window>
-      <Typecaast config={config} skin={claudeCode} theme="dark" autoplay loop />
-    </Window>
-  ),
 };

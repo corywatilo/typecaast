@@ -1,22 +1,34 @@
-import { useEffect, useMemo, type CSSProperties, type ReactNode } from "react";
+import {
+  Suspense,
+  use,
+  useEffect,
+  useMemo,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import type { Config, FitMode, ThemeMode } from "@typecaast/schema";
-import type { Skin } from "@typecaast/skin-kit";
+import {
+  TypecaastStage,
+  type ComposerMode,
+  type Skin,
+} from "@typecaast/skin-kit";
 import { useTypecaast } from "./use-typecaast.js";
 import { useSkinFonts } from "./use-skin-fonts.js";
 import { useReducedMotion } from "./use-reduced-motion.js";
 import { buildTranscript } from "./transcript.js";
-import { TypecaastStage, type ComposerMode } from "./stage.js";
 import { FitBox } from "./fit-box.js";
+import { loadBuiltinSkin } from "./builtin-skins.js";
 
 export interface TypecaastProps {
   config: Config;
   /**
-   * The skin to render with (a `Skin` from `@typecaast/skins` or a custom one).
-   * `@typecaast/react` stays decoupled from the concrete skins, so import the
-   * skin you need and pass it. `<Typecaast>` is a client component; in an RSC
-   * framework (Next.js App Router) put the embed in a `"use client"` module.
+   * The skin to render with. **Optional** — by default the built-in skin named
+   * by `config.meta.skin.id` is resolved and lazy-loaded (only that skin's chunk
+   * is fetched), so the config is the single source of truth and the embed stays
+   * fully serializable (works in a React Server Component, no `"use client"`).
+   * Pass a `Skin` object only to use a custom skin not in `@typecaast/skins`.
    */
-  skin: Skin;
+  skin?: Skin;
   /** Force a theme; otherwise resolved from `config.meta.theme`. */
   theme?: ThemeMode;
   autoplay?: boolean;
@@ -45,12 +57,45 @@ const SR_ONLY: CSSProperties = {
 };
 
 /**
- * Mounts the real-time player and renders the resolved skin from live state.
- * The animated visuals are `aria-hidden`; an accessible transcript carries the
- * conversation for screen readers, and `prefers-reduced-motion` snaps to the
- * final state instead of animating (PLAN §20).
+ * Renders a `<Typecaast>` from a config. The skin defaults to the built-in named
+ * by `config.meta.skin.id` (lazy-loaded by id — see `builtin-skins.ts`); pass an
+ * explicit `skin` to use a custom one. `<Typecaast>` is a client component, but
+ * since the default path takes only the serializable `config`, the embed drops
+ * straight into a React Server Component.
  */
-export function Typecaast({
+export function Typecaast(props: TypecaastProps): ReactNode {
+  // Explicit skin object → render synchronously, no lazy load.
+  if (props.skin) return <Player {...props} skin={props.skin} />;
+  // Otherwise resolve (and lazy-load) the built-in named in the config.
+  return (
+    <Suspense
+      fallback={
+        <SkinFallback
+          config={props.config}
+          fit={props.fit}
+          label={props.label}
+          className={props.className}
+          style={props.style}
+        />
+      }
+    >
+      <ResolvedPlayer {...props} />
+    </Suspense>
+  );
+}
+
+function ResolvedPlayer(props: TypecaastProps): ReactNode {
+  const skin = use(loadBuiltinSkin(props.config.meta.skin.id));
+  return <Player {...props} skin={skin} />;
+}
+
+/**
+ * The actual player. The animated visuals are `aria-hidden`; an accessible
+ * transcript carries the conversation for screen readers, and
+ * `prefers-reduced-motion` snaps to the final state instead of animating
+ * (PLAN §20).
+ */
+function Player({
   config,
   skin,
   theme,
@@ -62,7 +107,7 @@ export function Typecaast({
   label,
   className,
   style,
-}: TypecaastProps): ReactNode {
+}: TypecaastProps & { skin: Skin }): ReactNode {
   const reduced = useReducedMotion();
   const tc = useTypecaast(config, {
     theme,
@@ -104,6 +149,43 @@ export function Typecaast({
             participants={config.participants}
             options={config.meta.skin.options}
             composer={composer ?? config.meta.composer}
+          />
+        </FitBox>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A same-size placeholder shown while a built-in skin's chunk loads, so there's
+ * no layout shift between fallback and the rendered skin. (On static/prerendered
+ * pages the skin resolves before HTML is emitted, so this never paints.)
+ */
+function SkinFallback({
+  config,
+  fit,
+  label,
+  className,
+  style,
+}: Pick<TypecaastProps, "config" | "fit" | "label" | "className" | "style">) {
+  return (
+    <div
+      className={className}
+      style={{ position: "relative", ...style }}
+      data-typecaast=""
+      data-typecaast-loading=""
+      role="figure"
+      aria-label={label ?? "Chat simulation"}
+      aria-busy="true"
+    >
+      <div aria-hidden="true" style={{ height: "100%" }}>
+        <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              background: "var(--tc-skin-loading-bg, transparent)",
+            }}
           />
         </FitBox>
       </div>

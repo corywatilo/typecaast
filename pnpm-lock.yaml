@@ -236,6 +236,9 @@ importers:
       '@typecaast/skin-kit':
         specifier: workspace:*
         version: link:../skin-kit
+      '@typecaast/skins':
+        specifier: workspace:*
+        version: link:../skins
     devDependencies:
       '@testing-library/react':
         specifier: ^16.1.0
@@ -354,9 +357,6 @@ importers:
       '@storybook/react-vite':
         specifier: ^8.4.7
         version: 8.6.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rollup@4.61.1)(storybook@8.6.18(prettier@3.8.4))(typescript@5.9.3)(vite@6.4.3(@types/node@22.19.21)(terser@5.48.0))
-      '@typecaast/react':
-        specifier: workspace:*
-        version: link:../react
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.17

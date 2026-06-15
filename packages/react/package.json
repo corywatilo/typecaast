@@ -29,7 +29,8 @@
   "dependencies": {
     "@typecaast/core": "workspace:*",
     "@typecaast/schema": "workspace:*",
-    "@typecaast/skin-kit": "workspace:*"
+    "@typecaast/skin-kit": "workspace:*",
+    "@typecaast/skins": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18"

@@ -27,3 +27,6 @@ export const messagesMacos = defineSkin({
   components: macosComponents,
   tokens: imessageTokens,
 });
+
+/** Default export so `@typecaast/skins/messages-macos` can be lazy-imported uniformly. */
+export default messagesMacos;

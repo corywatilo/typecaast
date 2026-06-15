@@ -18,26 +18,24 @@ export function toJSON(config: ConfigInput): string {
 
 /** The npm install line for the packages the embed snippet imports. */
 export function installSnippet(): string {
-  return `npm install @typecaast/react @typecaast/skins`;
+  // `@typecaast/skins` comes along as a dependency of `@typecaast/react` (the
+  // skin is lazy-loaded by id), so the embed only needs the one package.
+  return `npm install @typecaast/react`;
 }
 
-/** A React embed snippet for the config. */
-export function embedSnippet(config: ConfigInput): string {
-  const id = config.meta.skin.id;
-  const v = skinVar(id);
+/**
+ * A React embed snippet for the config. Zero-config: the skin is taken from
+ * `config.meta.skin.id` and lazy-loaded by `<Typecaast>`, so only the
+ * serializable `config` is passed — the embed drops straight into a React Server
+ * Component (Next.js App Router) with no skin import and no `"use client"`.
+ */
+export function embedSnippet(_config: ConfigInput): string {
   return [
-    // `<Typecaast>` is interactive (hooks + theme context), so the embed is a
-    // client component. Required in React Server Component frameworks (e.g. the
-    // Next.js App Router), harmless elsewhere — and it keeps the skin (which
-    // holds component functions) from crossing a server→client prop boundary.
-    `"use client";`,
-    ``,
     `import { Typecaast } from "@typecaast/react";`,
-    `import { ${v} } from "@typecaast/skins";`,
     `import config from "./typecaast.json";`,
     ``,
     `export default function Demo() {`,
-    `  return <Typecaast config={config} skin={${v}} autoplay loop />;`,
+    `  return <Typecaast config={config} autoplay loop />;`,
     `}`,
   ].join("\n");
 }

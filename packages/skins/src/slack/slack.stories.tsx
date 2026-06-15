@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { createEngine, type ResolvedTheme } from "@typecaast/core";
 import { configSchema, type Config } from "@typecaast/schema";
-import { Typecaast, TypecaastStage } from "@typecaast/react";
+import { TypecaastStage } from "@typecaast/skin-kit";
 import { slack } from "./index.js";
 
 /** The real billing-toast thread — compiled by the engine (no mock). */
@@ -112,22 +112,4 @@ export const MidThread: Story = {
 export const DarkMidThread: Story = {
   name: "Dark · Mid-thread",
   render: () => <Frozen frac={0.55} theme="dark" />,
-};
-
-export const Animated: Story = {
-  name: "Animated · Light (loop)",
-  render: () => (
-    <Window theme="light">
-      <Typecaast config={config} skin={slack} theme="light" autoplay loop />
-    </Window>
-  ),
-};
-
-export const AnimatedDark: Story = {
-  name: "Animated · Dark (loop)",
-  render: () => (
-    <Window theme="dark">
-      <Typecaast config={config} skin={slack} theme="dark" autoplay loop />
-    </Window>
-  ),
 };

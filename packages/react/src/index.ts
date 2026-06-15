@@ -16,14 +16,21 @@ export {
   type UseTypecaastOptions,
   type TypecaastControls,
 } from "./use-typecaast.js";
+// TypecaastStage now lives in skin-kit (the contract layer); re-exported here
+// for back-compat so existing `@typecaast/react` imports keep working.
 export {
   TypecaastStage,
   type TypecaastStageProps,
   type ComposerMode,
-} from "./stage.js";
+} from "@typecaast/skin-kit";
 export { resolveTheme } from "./resolve-theme.js";
 export { useResolvedTheme, usePrefersDark } from "./use-resolved-theme.js";
 export { useReducedMotion } from "./use-reduced-motion.js";
 export { useSkinFonts, type FontLoadState } from "./use-skin-fonts.js";
 export { FitBox, type FitBoxProps } from "./fit-box.js";
 export { buildTranscript, type TranscriptLine } from "./transcript.js";
+export {
+  BUILTIN_SKIN_LOADERS,
+  builtinSkinIds,
+  loadBuiltinSkin,
+} from "./builtin-skins.js";

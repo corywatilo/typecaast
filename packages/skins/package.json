@@ -16,6 +16,46 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./slack": {
+      "types": "./dist/slack/index.d.ts",
+      "import": "./dist/slack/index.js",
+      "require": "./dist/slack/index.cjs"
+    },
+    "./telegram": {
+      "types": "./dist/telegram/index.d.ts",
+      "import": "./dist/telegram/index.js",
+      "require": "./dist/telegram/index.cjs"
+    },
+    "./claude-code": {
+      "types": "./dist/claude-code/index.d.ts",
+      "import": "./dist/claude-code/index.js",
+      "require": "./dist/claude-code/index.cjs"
+    },
+    "./imessage": {
+      "types": "./dist/imessage/index.d.ts",
+      "import": "./dist/imessage/index.js",
+      "require": "./dist/imessage/index.cjs"
+    },
+    "./whatsapp": {
+      "types": "./dist/whatsapp/index.d.ts",
+      "import": "./dist/whatsapp/index.js",
+      "require": "./dist/whatsapp/index.cjs"
+    },
+    "./cursor": {
+      "types": "./dist/cursor/index.d.ts",
+      "import": "./dist/cursor/index.js",
+      "require": "./dist/cursor/index.cjs"
+    },
+    "./messages-macos": {
+      "types": "./dist/messages-macos/index.d.ts",
+      "import": "./dist/messages-macos/index.js",
+      "require": "./dist/messages-macos/index.cjs"
+    },
+    "./discord": {
+      "types": "./dist/discord/index.d.ts",
+      "import": "./dist/discord/index.js",
+      "require": "./dist/discord/index.cjs"
     }
   },
   "scripts": {
@@ -43,7 +83,6 @@
     "@playwright/test": "^1.49.1",
     "@storybook/react": "^8.4.7",
     "@storybook/react-vite": "^8.4.7",
-    "@typecaast/react": "workspace:*",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",

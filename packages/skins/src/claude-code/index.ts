@@ -22,3 +22,6 @@ export const claudeCode = defineSkin({
   },
   components: tuiComponents,
 });
+
+/** Default export so `@typecaast/skins/claude-code` can be lazy-imported uniformly. */
+export default claudeCode;

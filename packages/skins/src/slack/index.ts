@@ -25,3 +25,6 @@ export const slack = defineSkin({
   components: slackComponents,
   tokens: slackTokens,
 });
+
+/** Default export so `@typecaast/skins/slack` can be lazy-imported uniformly. */
+export default slack;

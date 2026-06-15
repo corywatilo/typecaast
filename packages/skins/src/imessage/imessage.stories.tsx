@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { createEngine, type ResolvedTheme } from "@typecaast/core";
 import { configSchema, type Config } from "@typecaast/schema";
-import { Typecaast, TypecaastStage } from "@typecaast/react";
+import { TypecaastStage } from "@typecaast/skin-kit";
 import { imessage } from "./index.js";
 
 const config: Config = configSchema.parse({
@@ -79,22 +79,4 @@ export const DarkComplete: Story = {
 export const Typing: Story = {
   name: "Light · Typing",
   render: () => <Frozen frac={0.6} theme="light" />,
-};
-
-export const Animated: Story = {
-  name: "Animated · Light (loop)",
-  render: () => (
-    <Window>
-      <Typecaast config={config} skin={imessage} theme="light" autoplay loop />
-    </Window>
-  ),
-};
-
-export const AnimatedDark: Story = {
-  name: "Animated · Dark (loop)",
-  render: () => (
-    <Window>
-      <Typecaast config={config} skin={imessage} theme="dark" autoplay loop />
-    </Window>
-  ),
 };

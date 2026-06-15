@@ -14,3 +14,8 @@ export * from "./theme.js";
 export * from "./fonts.js";
 export * from "./animation.js";
 export * from "./content.js";
+export {
+  TypecaastStage,
+  type TypecaastStageProps,
+  type ComposerMode,
+} from "./stage.js";

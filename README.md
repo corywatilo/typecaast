@@ -19,16 +19,11 @@ A visual **builder** assembles the timeline and emits the JSON config; a **hoste
 Embed a live, animated conversation in React:
 
 ```bash
-pnpm add @typecaast/react @typecaast/skins react
+pnpm add @typecaast/react react
 ```
 
 ```tsx
-// In a React Server Component framework (e.g. the Next.js App Router) this must
-// be a client component — `<Typecaast>` is interactive. Omit elsewhere (Vite/CRA).
-"use client";
-
 import { Typecaast } from "@typecaast/react";
-import { slack } from "@typecaast/skins";
 
 const config = {
   version: 1,
@@ -46,8 +41,14 @@ const config = {
   ],
 };
 
-export default () => <Typecaast config={config} skin={slack} autoplay loop />;
+export default () => <Typecaast config={config} autoplay loop />;
 ```
+
+The skin comes from `meta.skin.id` — one source of truth — and only that skin's
+chunk is loaded. Pass only the serializable `config`, so the embed works as-is in
+a React Server Component (Next.js App Router); no `"use client"` needed. (Using a
+**custom** skin? Pass it explicitly — `<Typecaast config={config} skin={mySkin} />`
+— inside a `"use client"` module.)
 
 No build step or design work required — the skin renders the platform's exact look in light and dark. Don't want to write JSON by hand? Build it visually in the [playground](https://typecaast.com/playground) and copy the config or embed snippet.
 

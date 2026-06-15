@@ -24,3 +24,6 @@ export const whatsapp = defineSkin({
   components: whatsappComponents,
   tokens: whatsappTokens,
 });
+
+/** Default export so `@typecaast/skins/whatsapp` can be lazy-imported uniformly. */
+export default whatsapp;

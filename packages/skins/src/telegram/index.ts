@@ -28,3 +28,6 @@ export const telegram = defineSkin({
   components: telegramComponents,
   tokens: telegramTokens,
 });
+
+/** Default export so `@typecaast/skins/telegram` can be lazy-imported uniformly. */
+export default telegram;
