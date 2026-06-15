@@ -15,6 +15,18 @@
       "verified": "2026-Q2"
     },
     {
+      "id": "telegram",
+      "name": "Telegram",
+      "official": true,
+      "author": "Typecaast",
+      "package": "@typecaast/skins",
+      "export": "telegram",
+      "themes": ["light", "dark"],
+      "intendedFonts": ["Roboto"],
+      "summary": "Telegram chat: bubbles with tails, reactions, bot inline buttons.",
+      "verified": "2026-Q2"
+    },
+    {
       "id": "claude-code",
       "name": "Claude Code (TUI)",
       "official": true,
