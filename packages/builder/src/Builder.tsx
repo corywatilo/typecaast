@@ -261,7 +261,17 @@ export function Builder({
                   update(deleteStep(config, i));
                   setSelected(null);
                 }}
-                onMove={(from, to) => update(moveStep(config, from, to))}
+                onMove={(from, to) => {
+                  update(moveStep(config, from, to));
+                  // Keep the expanded editor pointed at the same step.
+                  setSelected((s) => {
+                    if (s === null) return s;
+                    if (s === from) return to;
+                    if (from < s && to >= s) return s - 1;
+                    if (from > s && to <= s) return s + 1;
+                    return s;
+                  });
+                }}
                 onDuplicate={(i) => update(duplicateStep(config, i))}
                 onUpdateStep={(i, patch) =>
                   commit(updateStep(config, i, patch as never), true)
