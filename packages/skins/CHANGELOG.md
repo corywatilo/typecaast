@@ -1,5 +1,41 @@
 # @typecaast/skins
 
+## 0.2.0
+
+### Minor Changes
+
+- a857c1e: Add a Telegram skin (Day/Night themes): bubble layout with tails and grouping,
+  in-bubble time + read ticks, sender names on incoming, reaction pills with a
+  who-reacted tooltip, an animated typing bubble, a paper-plane composer, and bot
+  cards rendered as a message plus inline-keyboard buttons.
+- b2a8215: Zero-config skin resolution: `<Typecaast config={config} />` now resolves the
+  skin from `config.meta.skin.id` (single source of truth) — the `skin` prop is
+  optional and only needed for custom skins. Only the referenced skin's chunk is
+  loaded (lazy per-skin via new `@typecaast/skins/<id>` subpath exports), and
+  because just the serializable `config` is passed, the embed works directly in a
+  React Server Component (Next.js App Router) with no `"use client"`.
+
+  - `@typecaast/react`: `skin` is now optional; adds `loadBuiltinSkin`,
+    `builtinSkinIds`, `BUILTIN_SKIN_LOADERS`; depends on `@typecaast/skins`.
+  - `@typecaast/skins`: per-skin subpath exports (`@typecaast/skins/slack`, …),
+    each with a default export.
+  - `@typecaast/skin-kit`: `TypecaastStage` (+ `TypecaastStageProps`,
+    `ComposerMode`) now live here; still re-exported from `@typecaast/react`.
+
+### Patch Changes
+
+- 2c9eb3a: Ship these packages as React **client modules** (a `"use client"` directive at
+  the top of the built output). They use hooks and theme context (`createContext`
+  at module scope), so loading them in a React Server Component graph (e.g. the
+  Next.js App Router) previously crashed with `createContext is not a function`.
+  The directive is added post-bundle because esbuild strips in-source/banner
+  directives when bundling.
+- Updated dependencies [2c9eb3a]
+- Updated dependencies [a857c1e]
+- Updated dependencies [b2a8215]
+  - @typecaast/skin-kit@0.2.0
+  - @typecaast/core@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
