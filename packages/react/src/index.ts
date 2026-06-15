@@ -10,7 +10,12 @@
  * esbuild's bundle pass, hence the post-build step.)
  */
 
-export { Typecaast, type TypecaastProps } from "./typecaast.js";
+export {
+  Typecaast,
+  type TypecaastProps,
+  type TypecaastConfig,
+  type RawConfig,
+} from "./typecaast.js";
 export {
   useTypecaast,
   type UseTypecaastOptions,

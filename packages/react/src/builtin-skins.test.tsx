@@ -60,4 +60,19 @@ describe("<Typecaast>", () => {
     // The accessible transcript carries the conversation regardless of playback.
     expect(screen.getByText(/shipping it/)).toBeTruthy();
   });
+
+  it("normalizes a raw (unparsed) config — e.g. an imported typecaast.json", () => {
+    // A raw config with no `pacing` etc. (as exported JSON). Previously this
+    // crashed in the engine reading `config.pacing.startDelayMs`; the component
+    // now applies schema defaults internally.
+    const raw = {
+      version: 1,
+      meta: { canvas: { width: 480, height: 640 }, skin: { id: "slack" } },
+      participants: [{ id: "a", name: "Ada", isSelf: true }],
+      timeline: [{ type: "message", from: "a", text: "raw config works" }],
+    };
+    render(<Typecaast config={raw} skin={slack} />);
+    expect(screen.getByText("Thread")).toBeTruthy();
+    expect(screen.getByText(/raw config works/)).toBeTruthy();
+  });
 });

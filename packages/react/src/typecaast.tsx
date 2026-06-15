@@ -6,7 +6,13 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import type { Config, FitMode, ThemeMode } from "@typecaast/schema";
+import {
+  configSchema,
+  type Config,
+  type ConfigInput,
+  type FitMode,
+  type ThemeMode,
+} from "@typecaast/schema";
 import {
   TypecaastStage,
   type ComposerMode,
@@ -19,8 +25,39 @@ import { buildTranscript } from "./transcript.js";
 import { FitBox } from "./fit-box.js";
 import { loadBuiltinSkin } from "./builtin-skins.js";
 
+/**
+ * A loosely-typed config shape that a raw `import`ed `typecaast.json` satisfies —
+ * TypeScript widens JSON literals (e.g. `version: number`, `type: string`), so it
+ * matches neither `Config` nor `ConfigInput`. It's validated and normalized at
+ * runtime, so this stays a convenience surface, not a bypass.
+ */
+export interface RawConfig {
+  version: number;
+  meta: {
+    canvas: { width: number; height: number };
+    skin: { id: string; options?: Record<string, unknown> };
+    [key: string]: unknown;
+  };
+  participants: Array<{ id: string; name: string; [key: string]: unknown }>;
+  timeline: Array<{ type: string; [key: string]: unknown }>;
+  pacing?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/**
+ * What `<Typecaast config>` accepts: a precise `ConfigInput`/`Config` (full
+ * intellisense when hand-authoring) or a raw config object such as an imported
+ * `typecaast.json`. All forms are normalized through the schema at runtime.
+ */
+export type TypecaastConfig = ConfigInput | Config | RawConfig;
+
 export interface TypecaastProps {
-  config: Config;
+  /**
+   * The conversation config. Accepts your exported `typecaast.json` directly (or
+   * a hand-authored `ConfigInput`); it's validated and defaulted at runtime, so
+   * you never need to pre-parse it.
+   */
+  config: TypecaastConfig;
   /**
    * The skin to render with. **Optional** — by default the built-in skin named
    * by `config.meta.skin.id` is resolved and lazy-loaded (only that skin's chunk
@@ -64,14 +101,22 @@ const SR_ONLY: CSSProperties = {
  * straight into a React Server Component.
  */
 export function Typecaast(props: TypecaastProps): ReactNode {
+  // Normalize once: validate and apply schema defaults (pacing, fit, theme, …)
+  // so a raw exported `typecaast.json` works without the caller pre-parsing it.
+  const config = useMemo<Config>(
+    () => configSchema.parse(props.config),
+    [props.config],
+  );
+
   // Explicit skin object → render synchronously, no lazy load.
-  if (props.skin) return <Player {...props} skin={props.skin} />;
+  if (props.skin)
+    return <Player {...props} config={config} skin={props.skin} />;
   // Otherwise resolve (and lazy-load) the built-in named in the config.
   return (
     <Suspense
       fallback={
         <SkinFallback
-          config={props.config}
+          config={config}
           fit={props.fit}
           label={props.label}
           className={props.className}
@@ -79,12 +124,14 @@ export function Typecaast(props: TypecaastProps): ReactNode {
         />
       }
     >
-      <ResolvedPlayer {...props} />
+      <ResolvedPlayer {...props} config={config} />
     </Suspense>
   );
 }
 
-function ResolvedPlayer(props: TypecaastProps): ReactNode {
+function ResolvedPlayer(
+  props: Omit<TypecaastProps, "config"> & { config: Config },
+): ReactNode {
   const skin = use(loadBuiltinSkin(props.config.meta.skin.id));
   return <Player {...props} skin={skin} />;
 }
@@ -107,7 +154,10 @@ function Player({
   label,
   className,
   style,
-}: TypecaastProps & { skin: Skin }): ReactNode {
+}: Omit<TypecaastProps, "config"> & {
+  config: Config;
+  skin: Skin;
+}): ReactNode {
   const reduced = useReducedMotion();
   const tc = useTypecaast(config, {
     theme,
@@ -167,7 +217,9 @@ function SkinFallback({
   label,
   className,
   style,
-}: Pick<TypecaastProps, "config" | "fit" | "label" | "className" | "style">) {
+}: Pick<TypecaastProps, "fit" | "label" | "className" | "style"> & {
+  config: Config;
+}) {
   return (
     <div
       className={className}
