@@ -26,6 +26,8 @@ describe("export helpers", () => {
 
   it("emits a React embed snippet with the right skin import", () => {
     const s = embedSnippet(config);
+    // Must lead with the client directive (RSC frameworks) — see embedSnippet.
+    expect(s.startsWith('"use client";')).toBe(true);
     expect(s).toContain("@typecaast/react");
     expect(s).toContain("import { messagesMacos }");
     expect(s).toContain("skin={messagesMacos}");

@@ -23,6 +23,10 @@ pnpm add @typecaast/react @typecaast/skins react
 ```
 
 ```tsx
+// In a React Server Component framework (e.g. the Next.js App Router) this must
+// be a client component — `<Typecaast>` is interactive. Omit elsewhere (Vite/CRA).
+"use client";
+
 import { Typecaast } from "@typecaast/react";
 import { slack } from "@typecaast/skins";
 

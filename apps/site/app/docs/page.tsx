@@ -46,11 +46,15 @@ export default function DocsPage() {
         <Heading level={2} style={{ marginTop: 28 }}>
           Embed it
         </Heading>
-        <Code>{`import { Typecaast } from "@typecaast/react";
+        <Code>{`"use client"; // required in RSC frameworks (Next.js App Router); omit in Vite/CRA
+
+import { Typecaast } from "@typecaast/react";
 import { slack } from "@typecaast/skins";
 import config from "./billing-toast.json";
 
-<Typecaast config={config} skin={slack} theme="auto" autoplay loop />;`}</Code>
+export default () => (
+  <Typecaast config={config} skin={slack} theme="auto" autoplay loop />
+);`}</Code>
 
         <Heading level={2} style={{ marginTop: 28 }}>
           Render it to video

@@ -26,6 +26,12 @@ export function embedSnippet(config: ConfigInput): string {
   const id = config.meta.skin.id;
   const v = skinVar(id);
   return [
+    // `<Typecaast>` is interactive (hooks + theme context), so the embed is a
+    // client component. Required in React Server Component frameworks (e.g. the
+    // Next.js App Router), harmless elsewhere — and it keeps the skin (which
+    // holds component functions) from crossing a server→client prop boundary.
+    `"use client";`,
+    ``,
     `import { Typecaast } from "@typecaast/react";`,
     `import { ${v} } from "@typecaast/skins";`,
     `import config from "./typecaast.json";`,
