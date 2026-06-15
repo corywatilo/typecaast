@@ -1,5 +1,13 @@
 # @typecaast/core
 
+## 0.1.1
+
+### Patch Changes
+
+- a857c1e: Fix: a sent message inherits the composer's sender. `send` commits whatever's in
+  the composer, so the message is now always from whoever was typing — previously a
+  stray `from` on the send step (e.g. a self-default) could mis-attribute it.
+
 ## 0.1.0
 
 ### Minor Changes
