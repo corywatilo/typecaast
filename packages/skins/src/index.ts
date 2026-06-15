@@ -1,6 +1,10 @@
 /**
  * `@typecaast/skins` — the built-in, pixel-faithful presets. Each is a `Skin`
  * (see `@typecaast/skin-kit`) usable by both the React and Remotion renderers.
+ *
+ * Client module: the build prepends `"use client"` to the bundled output (see
+ * tsup.config + scripts/prepend-use-client.mjs) since skin components render
+ * with hooks and pull in skin-kit's theme context — so it loads in RSC trees.
  */
 
 export { slack } from "./slack/index.js";

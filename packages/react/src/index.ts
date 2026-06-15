@@ -2,6 +2,12 @@
  * `@typecaast/react` — the embeddable real-time renderer. `<Typecaast>` mounts
  * the player and renders a skin from live `SimState`; `useTypecaast` exposes
  * the controls for custom UIs (and the builder's preview-as-you-go editing).
+ *
+ * Client module: the build prepends a `"use client"` directive to the bundled
+ * output (see tsup.config + scripts/prepend-use-client.mjs), so `<Typecaast>`
+ * drops straight into a Server Component (e.g. the Next.js App Router) without
+ * the consumer marking anything. (An in-source directive is stripped by
+ * esbuild's bundle pass, hence the post-build step.)
  */
 
 export { Typecaast, type TypecaastProps } from "./typecaast.js";

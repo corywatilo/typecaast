@@ -10,6 +10,12 @@ import { FitBox } from "./fit-box.js";
 
 export interface TypecaastProps {
   config: Config;
+  /**
+   * The skin to render with (a `Skin` from `@typecaast/skins` or a custom one).
+   * `@typecaast/react` stays decoupled from the concrete skins, so import the
+   * skin you need and pass it. `<Typecaast>` is a client component; in an RSC
+   * framework (Next.js App Router) put the embed in a `"use client"` module.
+   */
   skin: Skin;
   /** Force a theme; otherwise resolved from `config.meta.theme`. */
   theme?: ThemeMode;
