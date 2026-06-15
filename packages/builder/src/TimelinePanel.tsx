@@ -270,13 +270,21 @@ export function TimelinePanel({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 8 }}>
+      <div
+        style={{
+          flex: "1 1 auto",
+          overflowY: "auto",
+          scrollbarGutter: "stable",
+          padding: 8,
+        }}
+      >
         {config.timeline.length === 0 ? (
           <p className="tc-muted" style={{ padding: 12, fontSize: 13 }}>
             No steps yet — add one to start.
           </p>
         ) : null}
         <DndContext
+          id="tc-timeline-dnd"
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={onDragEnd}

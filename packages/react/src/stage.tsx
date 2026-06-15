@@ -76,10 +76,13 @@ export function TypecaastStage({
           {state.messages.map((message, i) => {
             const author = byId.get(message.from);
             if (!author) return null;
+            // Index-disambiguated so a config with duplicate message ids can't
+            // collide React keys (the builder can produce them transiently).
+            const key = `${message.id}-${i}`;
             if (message.variant === "system") {
               return (
                 <SystemMessage
-                  key={message.id}
+                  key={key}
                   theme={theme}
                   message={message}
                   author={author}
@@ -90,7 +93,7 @@ export function TypecaastStage({
             const previousAuthor = prev ? byId.get(prev.from) : undefined;
             return (
               <Message
-                key={message.id}
+                key={key}
                 theme={theme}
                 message={message}
                 author={author}

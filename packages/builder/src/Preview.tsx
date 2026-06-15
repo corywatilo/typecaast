@@ -98,6 +98,7 @@ export function Preview({
             skin={skin}
             participants={config.participants}
             options={config.meta.skin.options}
+            composer={config.meta.composer}
           />
         </div>
       </div>

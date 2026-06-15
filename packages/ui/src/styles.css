@@ -274,6 +274,9 @@
 /* Segmented control */
 .tc-segmented {
   display: inline-flex;
+  /* Size to content even inside a flex column (don't stretch full-width). */
+  width: fit-content;
+  max-width: 100%;
   padding: 2px;
   gap: 2px;
   background: var(--tc-bg-subtle);
@@ -412,6 +415,9 @@
   font-size: 12px;
   line-height: 1.45;
   font-weight: 400;
+  /* Don't inherit the uppercasing/letter-spacing of a `.tc-label` parent. */
+  text-transform: none;
+  letter-spacing: normal;
   text-align: left;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   pointer-events: none;

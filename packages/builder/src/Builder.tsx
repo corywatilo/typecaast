@@ -228,7 +228,7 @@ export function Builder({
         <aside
           aria-label="Timeline and cast"
           style={{
-            flex: "0 0 300px",
+            flex: "0 0 320px",
             display: "flex",
             flexDirection: "column",
             borderRight: "1px solid var(--tc-border)",
@@ -269,7 +269,14 @@ export function Builder({
                 onImport={() => setModal("import")}
               />
             ) : (
-              <div style={{ flex: 1, overflowY: "auto", padding: 16 }}>
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  scrollbarGutter: "stable",
+                  padding: 16,
+                }}
+              >
                 <CastPanel config={config} onChange={update} />
               </div>
             )}
@@ -340,7 +347,14 @@ export function Builder({
               ]}
             />
           </div>
-          <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 16 }}>
+          <div
+            style={{
+              flex: "1 1 auto",
+              overflowY: "auto",
+              scrollbarGutter: "stable",
+              padding: 16,
+            }}
+          >
             {rightTab === "app" ? (
               <SkinPanel config={config} skins={skins} onChange={update} />
             ) : (

@@ -71,7 +71,14 @@ export function deleteStep(config: ConfigInput, index: number): ConfigInput {
 export function duplicateStep(config: ConfigInput, index: number): ConfigInput {
   const step = config.timeline[index];
   if (!step) return config;
-  return addStep(config, { ...step }, index + 1);
+  // Drop the id so the copy gets a fresh auto id — duplicate ids collide in
+  // the renderer (React keys) and break reaction/edit targeting.
+  const { id: _id, ...rest } = step as { id?: string } & Record<
+    string,
+    unknown
+  >;
+  void _id;
+  return addStep(config, rest as unknown as Step, index + 1);
 }
 
 export function moveStep(
