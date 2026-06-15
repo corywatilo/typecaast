@@ -246,7 +246,11 @@ export function Builder({
             <div
               style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}
             >
-              <Button size="sm" variant="ghost" onClick={() => setModal("import")}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setModal("import")}
+              >
                 Import
               </Button>
             </div>

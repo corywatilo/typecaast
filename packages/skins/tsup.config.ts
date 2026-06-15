@@ -15,10 +15,7 @@ const SKINS = [
 ];
 
 export default defineConfig((options) => ({
-  entry: [
-    "src/index.ts",
-    ...SKINS.map((s) => `src/${s}/index.ts`),
-  ],
+  entry: ["src/index.ts", ...SKINS.map((s) => `src/${s}/index.ts`)],
   format: ["esm", "cjs"],
   dts: !options.watch,
   clean: !options.watch,

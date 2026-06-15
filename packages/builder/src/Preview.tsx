@@ -150,7 +150,9 @@ export function Preview({
   };
 
   const pct =
-    zoom === "responsive" ? "Auto" : `${Math.round((scale || fitScale) * 100)}%`;
+    zoom === "responsive"
+      ? "Auto"
+      : `${Math.round((scale || fitScale) * 100)}%`;
 
   return (
     <div
@@ -181,10 +183,7 @@ export function Preview({
           {cw}×{ch}
         </span>
         <div style={{ display: "flex", gap: 6 }}>
-          <ZoomButton
-            active={zoom === "fit"}
-            onClick={() => setZoom("fit")}
-          >
+          <ZoomButton active={zoom === "fit"} onClick={() => setZoom("fit")}>
             Fit
           </ZoomButton>
           <ZoomButton

@@ -11,10 +11,7 @@ type SkinModule = { default: Skin };
  * Adding a built-in skin = add one line here + the subpath export in
  * `@typecaast/skins`.
  */
-export const BUILTIN_SKIN_LOADERS: Record<
-  string,
-  () => Promise<SkinModule>
-> = {
+export const BUILTIN_SKIN_LOADERS: Record<string, () => Promise<SkinModule>> = {
   slack: () => import("@typecaast/skins/slack"),
   telegram: () => import("@typecaast/skins/telegram"),
   "claude-code": () => import("@typecaast/skins/claude-code"),

@@ -59,7 +59,11 @@ function markStyles(c: TelegramColors): ContentStyles {
   };
 }
 
-const Avatar: FC<AvatarProps> = ({ theme, participant, size = AVATAR_SIZE }) => {
+const Avatar: FC<AvatarProps> = ({
+  theme,
+  participant,
+  size = AVATAR_SIZE,
+}) => {
   if (participant.avatar) {
     return (
       <img
@@ -203,9 +207,11 @@ const TypingIndicator: FC<TypingProps> = ({ theme, author }) => {
           boxShadow: c.shadow,
         }}
       >
-        <style>{
-          "@keyframes tc-tg-typing{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-2px)}}"
-        }</style>
+        <style>
+          {
+            "@keyframes tc-tg-typing{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-2px)}}"
+          }
+        </style>
         <Dot c={c} delay={0} />
         <Dot c={c} delay={160} />
         <Dot c={c} delay={320} />
@@ -228,7 +234,13 @@ const Caret: FC<{ color: string }> = ({ color }) => (
 );
 
 const PaperPlane: FC<{ color: string }> = ({ color }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill={color} aria-hidden="true">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill={color}
+    aria-hidden="true"
+  >
     <path d="M2.5 12 21 3.5 17 21l-5.2-4.6L9 20l-.6-5.1L2.5 12Z" />
   </svg>
 );
@@ -338,7 +350,9 @@ const Message: FC<MessageProps> = ({ theme, message, author }) => {
           {grouped ? null : <Avatar theme={theme} participant={author} />}
         </div>
       )}
-      <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column" }}>
+      <div
+        style={{ maxWidth: "78%", display: "flex", flexDirection: "column" }}
+      >
         <div
           style={{
             background: outgoing ? c.outgoingBg : c.incomingBg,
@@ -407,7 +421,9 @@ const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
       <div style={{ width: AVATAR_SIZE, flex: "0 0 auto" }}>
         {author ? <Avatar theme={theme} participant={author} /> : null}
       </div>
-      <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column" }}>
+      <div
+        style={{ maxWidth: "78%", display: "flex", flexDirection: "column" }}
+      >
         <div
           style={{
             background: c.incomingBg,

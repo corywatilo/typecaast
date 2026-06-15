@@ -392,16 +392,16 @@ export function TimelinePanel({
                   {t}
                 </Button>
               ))}
-              <Button size="sm" variant="ghost" onClick={() => setAdding(false)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setAdding(false)}
+              >
                 cancel
               </Button>
             </div>
           ) : (
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={() => setAdding(true)}
-            >
+            <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
               + Step
             </Button>
           )}

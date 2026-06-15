@@ -1,13 +1,12 @@
 # Embedding `<Typecaast>` in React Server Component frameworks — decision digest
 
-> **Update:** the "Open question" below was answered — we *did* build zero-config
+> **Update:** the "Open question" below was answered — we _did_ build zero-config
 > resolution, but cleanly: the renderer depends on `@typecaast/skins` only after
 > breaking the cycle (moved `TypecaastStage` to `skin-kit`, decoupled the
 > stories), and it **lazy-loads one skin by id** via per-skin subpath exports
 > rather than bundling all of them. See `docs/notes/zero-config-refactor.md`.
 > `<Typecaast config={config} />` now works in a Server Component with no
 > `"use client"`. The analysis below is kept as the original rationale.
-
 
 Context for a second opinion. Short version: the reported crash is fixed two
 ways (a client-directive on the published packages + a `"use client"` embed),
@@ -37,18 +36,20 @@ Two distinct RSC constraints are in play:
 
 1. **Client-only module loaded server-side** → `createContext` crash.
 2. **Non-serializable props across the server→client boundary** → a `Skin`
-   object holds component *functions*, which can't be passed from a Server
+   object holds component _functions_, which can't be passed from a Server
    Component to a Client Component even once #1 is solved.
 
 ## What shipped (the fix)
 
 ### 1. Publish the client packages as real client modules
+
 `@typecaast/react`, `@typecaast/skin-kit`, `@typecaast/skins` now carry a
 `"use client"` directive at the top of their **built** output.
 
 Implementation note (the part worth reviewing): esbuild **strips module-level
 directives when bundling** (it even warns `Module level directives cause errors
 when bundled … was ignored`). So none of these worked:
+
 - `"use client"` in `src/index.ts` → stripped on bundle.
 - tsup `banner: { js: '"use client";' }` → stripped the same way.
 - `esbuild-plugin-preserve-directives` → still stripped in this tsup@8.5 + esbuild setup.
@@ -60,6 +61,7 @@ for the esbuild limitation, not a bespoke hack. Verified: the directive is at
 line 1 of every published ESM + CJS bundle.
 
 ### 2. Embed snippet leads with `"use client"`
+
 The builder's exported snippet (and the README/docs quickstarts) start with
 `"use client";`. This is idiomatic for an interactive component (Recharts,
 Framer Motion, etc. all require it) and sidesteps constraint #2: the whole embed
@@ -70,7 +72,9 @@ runs client-side, so the `Skin` object never crosses a boundary.
 import { Typecaast } from "@typecaast/react";
 import { telegram } from "@typecaast/skins";
 import config from "./typecaast.json";
-export default () => <Typecaast config={config} skin={telegram} autoplay loop />;
+export default () => (
+  <Typecaast config={config} skin={telegram} autoplay loop />
+);
 ```
 
 ## The idea I rejected: resolve skins by id inside `<Typecaast>`
