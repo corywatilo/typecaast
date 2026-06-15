@@ -5,6 +5,8 @@
 
 export { slack } from "./slack/index.js";
 export { SLACK_COLORS, type SlackColors } from "./slack/tokens.js";
+export { telegram } from "./telegram/index.js";
+export { TELEGRAM_COLORS, type TelegramColors } from "./telegram/tokens.js";
 export { claudeCode } from "./claude-code/index.js";
 export { imessage } from "./imessage/index.js";
 export { whatsapp } from "./whatsapp/index.js";

@@ -11,6 +11,7 @@ import { track } from "../../lib/analytics";
 
 const SAMPLE_OPTIONS: Record<string, Record<string, unknown>> = {
   slack: { channel: "#team" },
+  telegram: { title: "Team", status: "online" },
   discord: { channel: "team" },
   "claude-code": { title: "claude — zsh" },
   cursor: { title: "Chat" },

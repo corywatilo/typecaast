@@ -1,5 +1,6 @@
 import type { Skin } from "@typecaast/skin-kit";
 import { slack } from "./slack/index.js";
+import { telegram } from "./telegram/index.js";
 import { claudeCode } from "./claude-code/index.js";
 import { imessage } from "./imessage/index.js";
 import { whatsapp } from "./whatsapp/index.js";
@@ -10,6 +11,7 @@ import { discord } from "./discord/index.js";
 /** The built-in skins, keyed by id (matches `meta.skin.id` in a config). */
 export const builtinSkins: Record<string, Skin> = {
   slack,
+  telegram,
   "claude-code": claudeCode,
   imessage,
   whatsapp,
