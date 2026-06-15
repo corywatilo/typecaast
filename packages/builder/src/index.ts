@@ -11,12 +11,5 @@ export { Modal } from "./Modal.js";
 export { StepEditor } from "./StepEditor.js";
 export { capabilityLint, type LintWarning } from "./lint.js";
 export { toJSON, embedSnippet, renderSnippet, skinVar } from "./exporting.js";
-export {
-  saveLocal,
-  loadLocal,
-  clearLocal,
-  updateUrl,
-  loadFromUrl,
-  shareUrl,
-} from "./persistence.js";
+export { saveLocal, loadLocal, clearLocal } from "./persistence.js";
 export * from "./store.js";

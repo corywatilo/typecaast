@@ -42,7 +42,7 @@ import {
   moveStep,
   updateStep,
 } from "./store.js";
-import { loadFromUrl, loadLocal, saveLocal, updateUrl } from "./persistence.js";
+import { loadLocal, saveLocal } from "./persistence.js";
 import { canRedo, canUndo, historyReducer, initHistory } from "./history.js";
 
 /**
@@ -55,7 +55,6 @@ export type BuilderEvent =
   | "preview_played"
   | "json_exported"
   | "embed_copied"
-  | "share_link_created"
   | "render_snippet_copied";
 
 export interface BuilderProps {
@@ -110,7 +109,7 @@ export function Builder({
   const [history, dispatch] = useReducer(historyReducer, undefined, () =>
     initHistory(
       persist
-        ? (loadFromUrl() ?? loadLocal() ?? (initialConfig as ConfigInput))
+        ? (loadLocal() ?? (initialConfig as ConfigInput))
         : (initialConfig as ConfigInput),
     ),
   );
@@ -139,10 +138,7 @@ export function Builder({
       firstRun.current = false;
       return;
     }
-    if (persist) {
-      saveLocal(config);
-      updateUrl(config);
-    }
+    if (persist) saveLocal(config);
     onChange?.(config);
   }, [config, persist, onChange]);
 

@@ -1,11 +1,10 @@
 import type { ConfigInput } from "@typecaast/schema";
 
 const KEY = "typecaast:config";
-const HASH_PREFIX = "#c=";
 
 const hasWindow = (): boolean => typeof window !== "undefined";
 
-/** Auto-save the working config to localStorage. */
+/** Auto-save the working config to localStorage (the only persistence). */
 export function saveLocal(config: ConfigInput): void {
   if (!hasWindow()) return;
   try {
@@ -32,30 +31,4 @@ export function clearLocal(): void {
   } catch {
     /* ignore */
   }
-}
-
-/** Encode the config into the URL hash (replaceState — no history pollution). */
-export function updateUrl(config: ConfigInput): void {
-  if (!hasWindow()) return;
-  const hash = HASH_PREFIX + encodeURIComponent(JSON.stringify(config));
-  const { pathname, search } = window.location;
-  window.history.replaceState(null, "", pathname + search + hash);
-}
-
-export function loadFromUrl(): ConfigInput | null {
-  if (!hasWindow()) return null;
-  const hash = window.location.hash;
-  if (!hash.startsWith(HASH_PREFIX)) return null;
-  try {
-    return JSON.parse(
-      decodeURIComponent(hash.slice(HASH_PREFIX.length)),
-    ) as ConfigInput;
-  } catch {
-    return null;
-  }
-}
-
-/** The current shareable URL (config lives in the hash after `updateUrl`). */
-export function shareUrl(): string {
-  return hasWindow() ? window.location.href : "";
 }

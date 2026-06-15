@@ -3,7 +3,6 @@ import type { ConfigInput } from "@typecaast/schema";
 import { Button, Field, Segmented } from "@typecaast/ui";
 import { updateMeta } from "../store.js";
 import { embedSnippet, renderSnippet, toJSON } from "../exporting.js";
-import { shareUrl } from "../persistence.js";
 import type { BuilderEvent } from "../Builder.js";
 
 function copy(text: string): void {
@@ -120,11 +119,6 @@ export function ExportPanel({
           text={toJSON(config)}
           label="Copy JSON"
           onCopied={() => onEvent?.("json_exported")}
-        />
-        <CopyButton
-          text={shareUrl()}
-          label="🔗 Share link"
-          onCopied={() => onEvent?.("share_link_created")}
         />
       </div>
 

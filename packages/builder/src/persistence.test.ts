@@ -1,12 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ConfigInput } from "@typecaast/schema";
-import {
-  clearLocal,
-  loadFromUrl,
-  loadLocal,
-  saveLocal,
-  updateUrl,
-} from "./persistence.js";
+import { clearLocal, loadLocal, saveLocal } from "./persistence.js";
 
 // Node's experimental localStorage can shadow jsdom's in the test env; install
 // a reliable in-memory Storage so we exercise the persistence logic directly.
@@ -32,7 +26,6 @@ const config: ConfigInput = {
 
 afterEach(() => {
   clearLocal();
-  window.history.replaceState(null, "", "/");
 });
 
 describe("persistence", () => {
@@ -42,16 +35,9 @@ describe("persistence", () => {
     expect(loadLocal()).toEqual(config);
   });
 
-  it("round-trips through the URL hash (unicode-safe)", () => {
-    expect(loadFromUrl()).toBeNull();
-    updateUrl(config);
-    expect(window.location.hash.startsWith("#c=")).toBe(true);
-    expect(loadFromUrl()).toEqual(config);
-  });
-
-  it("uses replaceState (no history entry added)", () => {
-    const before = window.history.length;
-    updateUrl(config);
-    expect(window.history.length).toBe(before);
+  it("clears the saved config", () => {
+    saveLocal(config);
+    clearLocal();
+    expect(loadLocal()).toBeNull();
   });
 });

@@ -1,13 +1,37 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import type { ConfigInput } from "@typecaast/schema";
-import { Builder } from "@typecaast/builder";
 import { builtinSkins } from "@typecaast/skins";
 import { billingToast } from "../../lib/configs";
 import { track } from "../../lib/analytics";
 import { useResolvedSiteTheme } from "../../lib/theme";
 import { ThemeToggle } from "../../components/ThemeToggle";
+
+// The builder reads localStorage to restore the working config, so it can only
+// render correctly on the client — render it client-only to avoid an
+// SSR/client hydration mismatch (the server can't see localStorage).
+const Builder = dynamic(
+  () => import("@typecaast/builder").then((m) => m.Builder),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "var(--tc-text-muted)",
+          fontSize: 13,
+        }}
+      >
+        Loading builder…
+      </div>
+    ),
+  },
+);
 
 export default function PlaygroundPage() {
   const prevConfig = useRef<ConfigInput | null>(null);

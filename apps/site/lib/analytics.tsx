@@ -29,7 +29,6 @@ export type TcEvent =
   | "preview_played"
   | "json_exported"
   | "embed_copied"
-  | "share_link_created"
   | "render_snippet_copied"
   | "gallery_viewed"
   | "docs_viewed";

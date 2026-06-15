@@ -32,7 +32,6 @@ All site/builder events are an allowlist (`TcEvent`). Builder-package events rea
 | `preview_played`        | Preview play pressed                   | builder `onEvent`                  |
 | `json_exported`         | JSON downloaded or copied              | builder `onEvent`                  |
 | `embed_copied`          | Embed snippet copied                   | builder `onEvent`                  |
-| `share_link_created`    | Share link copied                      | builder `onEvent`                  |
 | `render_snippet_copied` | CLI render command copied              | builder `onEvent`                  |
 
 No event carries authored content while opted out. Property values are structural (ids, counts, sizes, types) — never message text.
