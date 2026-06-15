@@ -3,6 +3,11 @@
   "version": "0.0.2",
   "description": "Capture tooling: distill a chat UI subtree into a sanitized, slotted SkinDraft + TemplateSkinAdapter (Apache-2.0).",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/corywatilo/typecaast.git",
+    "directory": "packages/capture"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [

@@ -3,6 +3,11 @@
   "version": "0.2.0",
   "description": "Skin authoring kit: defineSkin, Skin/Capabilities/SkinTokens types, theme context, font loader.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/corywatilo/typecaast.git",
+    "directory": "packages/skin-kit"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [

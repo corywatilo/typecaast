@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "Versioned, Zod-validated config schema for Typecaast (JSON Schema + TS types).",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/corywatilo/typecaast.git",
+    "directory": "packages/schema"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [
