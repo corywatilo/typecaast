@@ -169,7 +169,10 @@ export function compile(config: Config): CompiledTimeline {
         if (lastComposer) {
           lastComposer.sendMs = sendAt;
           const id = nextId(step.id);
-          const sendFrom = step.from ?? lastComposer.from;
+          // A send commits whatever's in the composer, so the message is always
+          // from whoever was typing — never the step's own `from` (a stray
+          // self-default there used to mis-attribute the sent message).
+          const sendFrom = lastComposer.from;
           const msg: CompiledMessage = {
             id,
             from: sendFrom,

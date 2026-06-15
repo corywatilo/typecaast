@@ -135,7 +135,8 @@ export function blankStep(type: Step["type"], from: string): Step {
     case "composerType":
       return { type: "composerType", from, text: "Typing…" };
     case "send":
-      return { type: "send", from };
+      // No `from` — a send commits the preceding composer, inheriting its sender.
+      return { type: "send" };
     case "system":
       return { type: "system", from, text: "System message" };
     case "edit":

@@ -69,13 +69,11 @@ export function StepEditor({
   onChange: (patch: Record<string, unknown>) => void;
 }) {
   const type = step.type;
-  const hasFrom = [
-    "message",
-    "typing",
-    "composerType",
-    "send",
-    "system",
-  ].includes(type);
+  // `send` deliberately has no From — it commits the preceding composer and
+  // inherits whoever was typing (see compile.ts).
+  const hasFrom = ["message", "typing", "composerType", "system"].includes(
+    type,
+  );
   const hasText = ["message", "composerType", "system", "edit"].includes(type);
   const hasTarget = ["reaction", "edit", "delete"].includes(type);
 
@@ -84,6 +82,13 @@ export function StepEditor({
       <Field label="Type">
         <Input value={type} disabled />
       </Field>
+
+      {type === "send" ? (
+        <p className="tc-muted" style={{ fontSize: 12, margin: 0 }}>
+          Commits the preceding <code>composerType</code> as a message, sent by
+          whoever was typing.
+        </p>
+      ) : null}
 
       {hasFrom ? (
         <Field label="From">

@@ -98,6 +98,18 @@ describe("compile", () => {
     expect(t.messages[0]!.from).toBe("a");
   });
 
+  it("the sent message inherits the composer's sender, ignoring a stray send.from", () => {
+    const t = compile(
+      cfg([
+        { type: "composerType", from: "b", text: "from b" },
+        // A stray `from` on the send (e.g. a self-default) must not win.
+        { type: "send", from: "a" },
+      ]),
+    );
+    expect(t.messages).toHaveLength(1);
+    expect(t.messages[0]!.from).toBe("b");
+  });
+
   it("advances the cursor by a beat's duration", () => {
     const withBeat = compile(
       cfg([
