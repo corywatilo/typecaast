@@ -1,8 +1,8 @@
-# @typecaast/builder
+# @typecaast/ui
 
-## 0.2.0
+## 0.0.1
 
-### Minor Changes
+### Patch Changes
 
 - fd9c061: Builder restructure + capability-aware UI.
 
@@ -56,15 +56,6 @@ allowed`). The `composerType` step editor now actually explains what the
   darkens the border instead of flipping the background, with the icon and
   type tinted accent on hover.
 
-- 79daf09: Playground/builder polish: the preview now reliably opens on the final frame;
-  the Timeline/Participants column no longer changes width between tabs; the
-  Participants panel (renamed from "Cast") gains participant **avatars** (upload
-  an image → inlined data URL, or paste a hosted image URL → kept as a link) and
-  a single-select **viewer** radio (was a checkbox), and "Kind" is relabeled
-  "Type". Options tooltips no longer clip against the scrolling column, the
-  redundant "Swap orientation" button is gone, and the Fit option reads
-  "Responsive". Export drops `loop` from the default embed, adds npm/yarn/pnpm
-  install tabs, and a "Preview JSON" toggle.
 - e9b30e9: Timeline redesign in the builder: a wider column with two-line rows — each step
   shows a per-type **icon** and its type on line 1 and the full content preview on
   line 2 (no more one-line truncation). The step **Type** is now editable (a
@@ -72,47 +63,3 @@ allowed`). The `composerType` step editor now actually explains what the
   from/text/id/delay). The add-step picker is grouped (Messages / Composing /
   Reactions & edits / Receipts & timing) with an icon + name + one-line description
   per type. Adds inline step-type icons and `.tc-steppick*` styles to `@typecaast/ui`.
-
-### Patch Changes
-
-- Updated dependencies [fd9c061]
-- Updated dependencies [e9b30e9]
-  - @typecaast/ui@0.0.1
-
-## 0.1.1
-
-### Patch Changes
-
-- Updated dependencies [97da731]
-  - @typecaast/react@0.2.1
-
-## 0.1.0
-
-### Minor Changes
-
-- a857c1e: Builder/playground UX: preview zoom with Fit/Responsive modes (large canvases no
-  longer render tiny), the `+ Step` control sits below the steps and sticks to the
-  pane only on overflow (and scrolls the new step into view), Import moved to the
-  Timeline/Cast row, and the exported embed snippet is now zero-config
-  (`<Typecaast config={config} />` — no skin import, no `"use client"`) with an
-  `npm install @typecaast/react` line. The `send` step editor drops the redundant
-  From field (it inherits the composer's sender).
-
-### Patch Changes
-
-- Updated dependencies [2c9eb3a]
-- Updated dependencies [a857c1e]
-- Updated dependencies [b2a8215]
-  - @typecaast/react@0.2.0
-  - @typecaast/skin-kit@0.2.0
-  - @typecaast/core@0.1.1
-
-## 0.0.1
-
-### Patch Changes
-
-- Updated dependencies [27bf6bc]
-  - @typecaast/schema@0.1.0
-  - @typecaast/core@0.1.0
-  - @typecaast/react@0.1.0
-  - @typecaast/skin-kit@0.1.0

@@ -1,5 +1,15 @@
 # @typecaast/site
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [fd9c061]
+- Updated dependencies [79daf09]
+- Updated dependencies [e9b30e9]
+  - @typecaast/builder@0.2.0
+  - @typecaast/ui@0.0.1
+
 ## 0.0.3
 
 ### Patch Changes
