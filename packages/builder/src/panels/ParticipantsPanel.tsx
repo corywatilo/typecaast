@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import type { ConfigInput } from "@typecaast/schema";
 import { Button, Field, IconButton, Input, Panel, Select } from "@typecaast/ui";
+import { Tooltip } from "../Tooltip.js";
 import {
   addParticipant,
   removeParticipant,
@@ -172,13 +173,15 @@ export function ParticipantsPanel({
             <strong style={{ fontSize: 13, flex: 1, minWidth: 0 }}>
               {p.name || p.id}
             </strong>
-            <IconButton
-              aria-label="Remove participant"
-              onClick={() => onChange(removeParticipant(config, i))}
-              style={{ width: 24, height: 24 }}
-            >
-              ✕
-            </IconButton>
+            <Tooltip text="Remove participant">
+              <IconButton
+                aria-label="Remove participant"
+                onClick={() => onChange(removeParticipant(config, i))}
+                style={{ width: 24, height: 24 }}
+              >
+                ✕
+              </IconButton>
+            </Tooltip>
           </div>
           <div
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}

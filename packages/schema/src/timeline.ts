@@ -113,8 +113,21 @@ export const systemStepSchema = z.object({
   from: z.string().optional(),
   /** Named card variant the skin renders, e.g. `"pr-opened"`. */
   card: z.string().optional(),
+  /**
+   * Buttons rendered alongside the system message. When `href` is set the
+   * skin should render the button as a link that opens in a new tab; when
+   * absent it should be visibly inert (e.g. `cursor: not-allowed`). `variant`
+   * controls visual emphasis; if omitted the first action defaults to
+   * `"primary"` and the rest to `"secondary"`.
+   */
   actions: z
-    .array(z.object({ label: z.string(), href: z.string().optional() }))
+    .array(
+      z.object({
+        label: z.string(),
+        href: z.string().optional(),
+        variant: z.enum(["primary", "secondary"]).optional(),
+      }),
+    )
     .optional(),
   ...bodyShape,
   ...stepBaseShape,

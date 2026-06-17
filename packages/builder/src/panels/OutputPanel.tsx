@@ -160,6 +160,33 @@ export function OutputPanel({
             }
           />
         </Field>
+        <Field
+          label={
+            <L tip="Auto-replay when the timeline reaches the end. Honored by the preview and zero-prop embeds.">
+              Loop
+            </L>
+          }
+        >
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              height: 32,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={config.meta.loop === true}
+              onChange={(e) =>
+                onChange(updateMeta(config, { loop: e.currentTarget.checked }))
+              }
+            />
+            <span className="tc-muted" style={{ fontSize: 12 }}>
+              auto-replay
+            </span>
+          </label>
+        </Field>
       </div>
 
       <div style={{ paddingTop: 8, borderTop: "1px solid var(--tc-border)" }}>

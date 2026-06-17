@@ -63,6 +63,12 @@ export const metaSchema = z.object({
   assets: assetModeSchema.default("inline"),
   /** Reply-box visibility (see `composerModeSchema`). */
   composer: composerModeSchema.default("auto"),
+  /**
+   * Auto-replay when the timeline reaches the end. Honored by the builder
+   * preview and by `<Typecaast>` when the consumer doesn't pass an explicit
+   * `loop` prop.
+   */
+  loop: z.boolean().default(false),
 });
 
 /** `meta` as it appears after parsing (defaults applied). */

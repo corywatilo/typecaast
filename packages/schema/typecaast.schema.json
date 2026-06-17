@@ -101,6 +101,10 @@
             "always",
             "never"
           ]
+        },
+        "loop": {
+          "default": false,
+          "type": "boolean"
         }
       },
       "required": [
@@ -112,7 +116,8 @@
         "seed",
         "background",
         "assets",
-        "composer"
+        "composer",
+        "loop"
       ],
       "additionalProperties": false
     },
@@ -828,6 +833,13 @@
                     },
                     "href": {
                       "type": "string"
+                    },
+                    "variant": {
+                      "type": "string",
+                      "enum": [
+                        "primary",
+                        "secondary"
+                      ]
                     }
                   },
                   "required": [

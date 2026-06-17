@@ -15,6 +15,7 @@ describe("metaSchema", () => {
     expect(meta.seed).toBe(42);
     expect(meta.background).toBe("transparent");
     expect(meta.assets).toBe("inline");
+    expect(meta.loop).toBe(false);
   });
 
   it("rejects a missing canvas", () => {

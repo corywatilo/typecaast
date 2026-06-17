@@ -3,6 +3,14 @@ import type { Config, ThemeMode } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import { TypecaastStage, useTypecaast } from "@typecaast/react";
 import { IconButton, Segmented, Slider } from "@typecaast/ui";
+import { Tooltip } from "./Tooltip.js";
+import {
+  IconPause,
+  IconPlay,
+  IconRestart,
+  IconStepBack,
+  IconStepForward,
+} from "./icons.js";
 
 function fmt(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
@@ -81,22 +89,19 @@ export function Preview({
   skin,
   previewTheme,
   onPreviewThemeChange,
-  loop,
-  onLoopChange,
   onPlay,
 }: {
   config: Config;
   skin: Skin;
   previewTheme: ThemeMode;
   onPreviewThemeChange: (t: ThemeMode) => void;
-  loop: boolean;
-  onLoopChange: (loop: boolean) => void;
   onPlay?: () => void;
 }) {
+  // `loop` lives on `config.meta.loop` (set in the Options panel) and is
+  // honored by `useTypecaast` automatically when no prop overrides it.
   const tc = useTypecaast(config, {
     theme: previewTheme,
     capabilities: skin.meta.capabilities,
-    loop,
   });
 
   // Preview-as-you-go: the builder opens on the **final** frame (full thread),
@@ -141,6 +146,13 @@ export function Preview({
   const stepNext = () => {
     tc.stepNext();
     remember(tc.currentMs);
+  };
+  /** Jump to t=0 and play in one click. */
+  const restart = () => {
+    tc.seek(0);
+    remember(0);
+    tc.play();
+    onPlay?.();
   };
 
   const { width: cw, height: ch } = config.meta.canvas;
@@ -204,51 +216,60 @@ export function Preview({
           {cw}×{ch}
         </span>
         <div style={{ display: "flex", gap: 6 }}>
-          <ZoomButton active={zoom === "fit"} onClick={() => setZoom("fit")}>
-            Fit
-          </ZoomButton>
-          <ZoomButton
-            active={zoom === "responsive"}
-            onClick={() => setZoom("responsive")}
-          >
-            Responsive
-          </ZoomButton>
+          <Tooltip text="Scale the canvas down to fit the preview pane (never up past 100%).">
+            <ZoomButton active={zoom === "fit"} onClick={() => setZoom("fit")}>
+              Fit
+            </ZoomButton>
+          </Tooltip>
+          <Tooltip text="Reflow the skin to the pane width — no scaling, fonts stay their authored size.">
+            <ZoomButton
+              active={zoom === "responsive"}
+              onClick={() => setZoom("responsive")}
+            >
+              Responsive
+            </ZoomButton>
+          </Tooltip>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <IconButton
-            aria-label="Zoom out"
-            disabled={zoom === "responsive"}
-            onClick={() => stepZoom(-1)}
-            style={{ width: 26, height: 26 }}
-          >
-            −
-          </IconButton>
-          <button
-            type="button"
-            disabled={zoom === "responsive"}
-            onClick={() => setZoom(1)}
-            title="Reset to 100%"
-            className="tc-mono"
-            style={{
-              minWidth: 44,
-              fontSize: 12,
-              fontWeight: 600,
-              border: 0,
-              background: "transparent",
-              color: "var(--tc-text)",
-              cursor: zoom === "responsive" ? "default" : "pointer",
-            }}
-          >
-            {pct}
-          </button>
-          <IconButton
-            aria-label="Zoom in"
-            disabled={zoom === "responsive"}
-            onClick={() => stepZoom(1)}
-            style={{ width: 26, height: 26 }}
-          >
-            +
-          </IconButton>
+          <Tooltip text="Zoom out">
+            <IconButton
+              aria-label="Zoom out"
+              disabled={zoom === "responsive"}
+              onClick={() => stepZoom(-1)}
+              style={{ width: 26, height: 26 }}
+            >
+              −
+            </IconButton>
+          </Tooltip>
+          <Tooltip text="Reset to 100%">
+            <button
+              type="button"
+              disabled={zoom === "responsive"}
+              onClick={() => setZoom(1)}
+              className="tc-mono"
+              style={{
+                minWidth: 44,
+                fontSize: 12,
+                fontWeight: 600,
+                border: 0,
+                background: "transparent",
+                color: "var(--tc-text)",
+                cursor: zoom === "responsive" ? "default" : "pointer",
+              }}
+            >
+              {pct}
+            </button>
+          </Tooltip>
+          <Tooltip text="Zoom in">
+            <IconButton
+              aria-label="Zoom in"
+              disabled={zoom === "responsive"}
+              onClick={() => stepZoom(1)}
+              style={{ width: 26, height: 26 }}
+            >
+              +
+            </IconButton>
+          </Tooltip>
         </div>
       </div>
 
@@ -334,29 +355,29 @@ export function Preview({
           background: "var(--tc-panel)",
         }}
       >
-        <IconButton aria-label="Previous step" onClick={stepPrev}>
-          ⏮
-        </IconButton>
-        <IconButton
-          aria-label={tc.playing ? "Pause" : atEnd ? "Replay" : "Play"}
-          onClick={togglePlay}
-        >
-          {tc.playing ? "⏸" : atEnd ? "↺" : "▶"}
-        </IconButton>
-        <IconButton aria-label="Next step" onClick={stepNext}>
-          ⏭
-        </IconButton>
-        <IconButton
-          aria-label="Loop"
-          onClick={() => onLoopChange(!loop)}
-          style={
-            loop
-              ? { borderColor: "var(--tc-accent)", color: "var(--tc-accent)" }
-              : undefined
-          }
-        >
-          🔁
-        </IconButton>
+        <Tooltip text="Restart from the beginning">
+          <IconButton aria-label="Restart" onClick={restart}>
+            <IconRestart size={18} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip text="Previous step">
+          <IconButton aria-label="Previous step" onClick={stepPrev}>
+            <IconStepBack size={18} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip text={tc.playing ? "Pause" : "Play"}>
+          <IconButton
+            aria-label={tc.playing ? "Pause" : "Play"}
+            onClick={togglePlay}
+          >
+            {tc.playing ? <IconPause size={18} /> : <IconPlay size={18} />}
+          </IconButton>
+        </Tooltip>
+        <Tooltip text="Next step">
+          <IconButton aria-label="Next step" onClick={stepNext}>
+            <IconStepForward size={18} />
+          </IconButton>
+        </Tooltip>
         <Slider
           min={0}
           max={Math.max(1, Math.round(tc.duration))}

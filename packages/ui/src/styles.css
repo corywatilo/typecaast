@@ -312,13 +312,22 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
 
-/* Builder step row — inset baseline; hover darkens the border (overrides the
-   inline `border` + `borderBottom`, hence !important). */
+/* Builder step row — inset baseline; hover darkens the border + tints the
+   icon/type label with the accent color. !important is required because the
+   row sets `border` + `borderBottom` inline and the children have inline color. */
 .tc-step-row {
   transition: border-color var(--tc-dur) var(--tc-ease);
 }
+.tc-step-row .tc-step-icon,
+.tc-step-row .tc-step-type {
+  transition: color var(--tc-dur) var(--tc-ease);
+}
 .tc-step-row:not([data-active]):hover {
   border-color: var(--tc-border-strong) !important;
+}
+.tc-step-row:not([data-active]):hover .tc-step-icon,
+.tc-step-row:not([data-active]):hover .tc-step-type {
+  color: var(--tc-accent) !important;
 }
 .tc-step-grip {
   display: inline-flex;

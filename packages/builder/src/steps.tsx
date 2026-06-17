@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { STEP_TYPES, type StepType } from "@typecaast/schema";
 import { IconButton } from "@typecaast/ui";
 import { IconClose } from "./icons.js";
+import { Tooltip } from "./Tooltip.js";
 
 /**
  * One source of truth for how each timeline step type is presented: a small
@@ -56,7 +57,7 @@ export const STEP_META: Record<StepType, StepMeta> = {
   },
   composerType: {
     description:
-      "Animate text being typed into the reply box (use only for type-pause-retype choreography).",
+      "Animate text being typed into the reply box, separate from sending. Use when typing should overlap other timeline events.",
     group: "Advanced",
   },
   send: {
@@ -195,13 +196,15 @@ export function StepPicker({
     <div className="tc-steppick">
       <div className="tc-steppick-header">
         <span className="tc-steppick-title">Add step</span>
-        <IconButton
-          aria-label="Close"
-          onClick={onClose}
-          style={{ width: 24, height: 24 }}
-        >
-          <IconClose size={12} />
-        </IconButton>
+        <Tooltip text="Close">
+          <IconButton
+            aria-label="Close"
+            onClick={onClose}
+            style={{ width: 24, height: 24 }}
+          >
+            <IconClose size={12} />
+          </IconButton>
+        </Tooltip>
       </div>
       {STEP_GROUPS.map((g) => (
         <div key={g.name}>

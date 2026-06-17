@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import type { ConfigInput, StepType } from "@typecaast/schema";
-import { Field, Input, Select } from "@typecaast/ui";
+import { Button, Field, IconButton, Input, Select } from "@typecaast/ui";
 import { STEP_GROUPS } from "./steps.js";
-import { InfoTip } from "./Tooltip.js";
+import { InfoTip, Tooltip } from "./Tooltip.js";
+import { IconTrash } from "./icons.js";
 
 /**
  * Inline label + builder-side `InfoTip`. We use the JS-positioned tooltip from
@@ -21,6 +22,11 @@ function L({ children, tip }: { children: ReactNode; tip: string }) {
 
 type Step = ConfigInput["timeline"][number];
 type Participants = ConfigInput["participants"];
+type SystemAction = {
+  label: string;
+  href?: string;
+  variant?: "primary" | "secondary";
+};
 
 function get(step: Step, key: string): unknown {
   return (step as Record<string, unknown>)[key];
@@ -82,6 +88,87 @@ function NumberField({
   );
 }
 
+function ActionsEditor({
+  actions,
+  onChange,
+}: {
+  actions: SystemAction[];
+  onChange: (actions: SystemAction[]) => void;
+}) {
+  const update = (i: number, patch: Partial<SystemAction>) => {
+    onChange(actions.map((a, j) => (i === j ? { ...a, ...patch } : a)));
+  };
+  const remove = (i: number) => onChange(actions.filter((_, j) => j !== i));
+  const add = () => onChange([...actions, { label: "" }]);
+
+  return (
+    <Field
+      label={
+        <L tip="Buttons rendered alongside the system message. Add a URL to make a button open in a new tab; without one it shows a 'not-allowed' cursor. Variant controls visual emphasis.">
+          Actions
+        </L>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {actions.map((a, i) => (
+          <div
+            key={i}
+            style={{
+              // Two rows; URL spans the full label+variant span on row 2 so it
+              // has room to breathe. Trash column lines up across both rows
+              // and is visually empty on the URL row.
+              display: "grid",
+              gridTemplateColumns: "1fr 110px auto",
+              rowGap: 4,
+              columnGap: 6,
+              alignItems: "center",
+            }}
+          >
+            <Input
+              placeholder="Label"
+              value={a.label}
+              onChange={(e) => update(i, { label: e.currentTarget.value })}
+            />
+            <Select
+              value={a.variant ?? (i === 0 ? "primary" : "secondary")}
+              onChange={(e) =>
+                update(i, {
+                  variant: e.currentTarget.value as "primary" | "secondary",
+                })
+              }
+            >
+              <option value="primary">Primary</option>
+              <option value="secondary">Secondary</option>
+            </Select>
+            <Tooltip text="Remove action">
+              <IconButton
+                aria-label="Remove action"
+                onClick={() => remove(i)}
+              >
+                <IconTrash size={14} />
+              </IconButton>
+            </Tooltip>
+            <div style={{ gridColumn: "1 / span 2" }}>
+              <Input
+                placeholder="https://… (optional, opens in a new tab)"
+                value={a.href ?? ""}
+                onChange={(e) =>
+                  update(i, { href: e.currentTarget.value || undefined })
+                }
+              />
+            </div>
+          </div>
+        ))}
+        <div>
+          <Button size="sm" variant="outline" onClick={add}>
+            + Add action
+          </Button>
+        </div>
+      </div>
+    </Field>
+  );
+}
+
 export function StepEditor({
   step,
   participants,
@@ -130,10 +217,17 @@ export function StepEditor({
       ) : null}
 
       {type === "composerType" ? (
-        <p className="tc-muted" style={{ fontSize: 12, margin: 0 }}>
-          Advanced: only needed for type-pause-retype choreography. A plain{" "}
-          <code>message</code> from the viewer auto-renders through the
-          composer.
+        <p
+          className="tc-muted"
+          style={{ fontSize: 12, margin: 0, lineHeight: 1.45 }}
+        >
+          Animates text being typed into the reply box, separately from{" "}
+          <code>send</code>. Use this when you need typing to overlap with
+          other timeline events — e.g. another participant sends a message
+          while the viewer is mid-sentence, or the viewer types, pauses,
+          edits, then sends. For a simple &ldquo;viewer types and sends&rdquo;
+          a plain <code>message</code> from the viewer auto-animates through
+          the composer.
         </p>
       ) : null}
 
@@ -216,6 +310,15 @@ export function StepEditor({
             onChange={(e) => onChange({ card: e.currentTarget.value })}
           />
         </Field>
+      ) : null}
+
+      {type === "system" ? (
+        <ActionsEditor
+          actions={(get(step, "actions") as SystemAction[] | undefined) ?? []}
+          onChange={(actions) =>
+            onChange({ actions: actions.length > 0 ? actions : undefined })
+          }
+        />
       ) : null}
 
       {type === "delay" ? (

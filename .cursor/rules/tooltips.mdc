@@ -1,0 +1,54 @@
+---
+description: Use the builder's <Tooltip> primitive for hover hints — never the native title attribute
+globs: packages/builder/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Tooltips
+
+Every icon-only / non-self-explanatory control in the builder must have a
+hover-hint. Use the JS-positioned `Tooltip` from `packages/builder/src/Tooltip.tsx`
+— **never** the browser's native `title` attribute.
+
+Why:
+
+- Native tooltips show after a long delay, can't be styled, are inconsistent
+  across OSes, and disappear when the cursor moves.
+- The custom `Tooltip` is `position: fixed`, so it escapes the scrolling
+  Options/Timeline columns' `overflow:auto` clip.
+- It anchors above the trigger and survives keyboard focus (`onFocus`/`onBlur`).
+
+## Rules
+
+1. Wrap the trigger element with `<Tooltip text="…">…</Tooltip>` instead of
+   passing `title="…"`. Use `Tooltip` for icon buttons, drag grips, segmented
+   buttons that need extra context, anything where the rendered content alone
+   doesn't communicate the action.
+2. For inline help next to a form label, use `<InfoTip text="…" />` (the ⓘ
+   button), or pass `hint="…"` to a `Field` if SSR safety matters more than
+   clip-escape.
+3. Keep `aria-label` on icon-only triggers — the tooltip is a visual
+   augmentation, not a replacement for an accessible name.
+4. Don't use the native `title` attribute. CI / lint shouldn't grep up new
+   `title="..."` usages in this directory.
+
+## Examples
+
+```tsx
+// ✅ GOOD
+<Tooltip text="Restart from the start and play">
+  <IconButton aria-label="Restart" onClick={restart}>
+    ↻
+  </IconButton>
+</Tooltip>
+
+// ❌ BAD — native title; styled inconsistently and gets clipped on slow hover.
+<IconButton aria-label="Restart" title="Restart" onClick={restart}>
+  ↻
+</IconButton>
+
+// ✅ GOOD — inline help on a form label.
+<Field label={<L tip="Random seed for jitter/humanize.">Seed</L>}>
+  <Input … />
+</Field>
+```

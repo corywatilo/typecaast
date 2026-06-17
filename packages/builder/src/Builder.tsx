@@ -29,6 +29,7 @@ import {
 import { Preview } from "./Preview.js";
 import { TimelinePanel } from "./TimelinePanel.js";
 import { Modal } from "./Modal.js";
+import { Tooltip } from "./Tooltip.js";
 import { IconRedo, IconUndo } from "./icons.js";
 import { ParticipantsPanel } from "./panels/ParticipantsPanel.js";
 import { SkinPanel } from "./panels/SkinPanel.js";
@@ -120,7 +121,6 @@ export function Builder({
   const [previewTheme, setPreviewTheme] = useState<ThemeMode>(
     (initialConfig.meta?.theme as ThemeMode) ?? "auto",
   );
-  const [loop, setLoop] = useState(false);
   const [leftTab, setLeftTab] = useState<LeftTab>("timeline");
   const [rightTab, setRightTab] = useState<RightTab>("app");
   const [modal, setModal] = useState<null | "export" | "import">(null);
@@ -201,22 +201,24 @@ export function Builder({
           {config.timeline.length} steps · {config.participants.length}{" "}
           participants
         </span>
-        <IconButton
-          aria-label="Undo"
-          title="Undo (⌘Z)"
-          disabled={!canUndo(history)}
-          onClick={() => dispatch({ type: "undo" })}
-        >
-          <IconUndo size={15} />
-        </IconButton>
-        <IconButton
-          aria-label="Redo"
-          title="Redo (⇧⌘Z)"
-          disabled={!canRedo(history)}
-          onClick={() => dispatch({ type: "redo" })}
-        >
-          <IconRedo size={15} />
-        </IconButton>
+        <Tooltip text="Undo (⌘Z)">
+          <IconButton
+            aria-label="Undo"
+            disabled={!canUndo(history)}
+            onClick={() => dispatch({ type: "undo" })}
+          >
+            <IconUndo size={15} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip text="Redo (⇧⌘Z)">
+          <IconButton
+            aria-label="Redo"
+            disabled={!canRedo(history)}
+            onClick={() => dispatch({ type: "redo" })}
+          >
+            <IconRedo size={15} />
+          </IconButton>
+        </Tooltip>
         {headerActions}
         <Button size="sm" variant="primary" onClick={() => setModal("export")}>
           Export
@@ -322,8 +324,6 @@ export function Builder({
               skin={skin}
               previewTheme={previewTheme}
               onPreviewThemeChange={setPreviewTheme}
-              loop={loop}
-              onLoopChange={setLoop}
               onPlay={() => onEvent?.("preview_played")}
             />
           ) : (

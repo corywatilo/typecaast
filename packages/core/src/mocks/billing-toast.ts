@@ -41,7 +41,11 @@ interface MockMessageEvent {
   start: number;
   content: ReturnType<typeof toContentNodes>;
   card?: string;
-  actions?: { label: string; href?: string }[];
+  actions?: {
+    label: string;
+    href?: string;
+    variant?: "primary" | "secondary";
+  }[];
 }
 
 interface MockReactionEvent {

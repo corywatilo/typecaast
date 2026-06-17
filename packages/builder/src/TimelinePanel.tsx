@@ -25,6 +25,7 @@ import { Button, IconButton } from "@typecaast/ui";
 import { stepLabel } from "./format.js";
 import { StepEditor } from "./StepEditor.js";
 import { StepIcon, StepPicker } from "./steps.js";
+import { Tooltip } from "./Tooltip.js";
 import {
   IconArrowDown,
   IconArrowUp,
@@ -108,15 +109,17 @@ function SortableStepRow({
       style={style}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <button
-          type="button"
-          className="tc-step-grip"
-          aria-label="Drag to reorder"
-          {...attributes}
-          {...listeners}
-        >
-          ⠿
-        </button>
+        <Tooltip text="Drag to reorder">
+          <button
+            type="button"
+            className="tc-step-grip"
+            aria-label="Drag to reorder"
+            {...attributes}
+            {...listeners}
+          >
+            ⠿
+          </button>
+        </Tooltip>
         <button
           type="button"
           aria-expanded={active}
@@ -137,6 +140,7 @@ function SortableStepRow({
           }}
         >
           <span
+            className="tc-step-icon"
             style={{
               display: "inline-flex",
               flex: "0 0 auto",
@@ -146,7 +150,7 @@ function SortableStepRow({
             <StepIcon type={step.type} />
           </span>
           <span
-            className="tc-mono"
+            className="tc-mono tc-step-type"
             style={{
               fontSize: 12.5,
               fontWeight: 560,
@@ -160,36 +164,44 @@ function SortableStepRow({
           </span>
         </button>
         <span style={{ display: "flex", gap: 2, flex: "0 0 auto" }}>
-          <IconButton
-            aria-label="Move up"
-            disabled={index === 0}
-            onClick={() => onMove(index, index - 1)}
-            style={{ width: 24, height: 24 }}
-          >
-            <IconArrowUp size={14} />
-          </IconButton>
-          <IconButton
-            aria-label="Move down"
-            disabled={index === count - 1}
-            onClick={() => onMove(index, index + 1)}
-            style={{ width: 24, height: 24 }}
-          >
-            <IconArrowDown size={14} />
-          </IconButton>
-          <IconButton
-            aria-label="Duplicate"
-            onClick={() => onDuplicate(index)}
-            style={{ width: 24, height: 24 }}
-          >
-            <IconDuplicate size={14} />
-          </IconButton>
-          <IconButton
-            aria-label="Delete step"
-            onClick={() => onDelete(index)}
-            style={{ width: 24, height: 24 }}
-          >
-            <IconTrash size={14} />
-          </IconButton>
+          <Tooltip text="Move step up">
+            <IconButton
+              aria-label="Move up"
+              disabled={index === 0}
+              onClick={() => onMove(index, index - 1)}
+              style={{ width: 24, height: 24 }}
+            >
+              <IconArrowUp size={14} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip text="Move step down">
+            <IconButton
+              aria-label="Move down"
+              disabled={index === count - 1}
+              onClick={() => onMove(index, index + 1)}
+              style={{ width: 24, height: 24 }}
+            >
+              <IconArrowDown size={14} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip text="Duplicate this step">
+            <IconButton
+              aria-label="Duplicate"
+              onClick={() => onDuplicate(index)}
+              style={{ width: 24, height: 24 }}
+            >
+              <IconDuplicate size={14} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip text="Delete this step">
+            <IconButton
+              aria-label="Delete step"
+              onClick={() => onDelete(index)}
+              style={{ width: 24, height: 24 }}
+            >
+              <IconTrash size={14} />
+            </IconButton>
+          </Tooltip>
         </span>
       </div>
       {showPreview ? (
@@ -323,9 +335,7 @@ export function TimelinePanel({
           flex: "1 1 auto",
           overflowY: "auto",
           scrollbarGutter: "stable",
-          // Reserve room for the sticky "+ Step" bar at the bottom so the last
-          // row can scroll fully into view rather than being painted over.
-          padding: "8px 8px 56px",
+          padding: 8,
         }}
       >
         {config.timeline.length === 0 ? (
@@ -395,36 +405,32 @@ export function TimelinePanel({
             })}
           </SortableContext>
         </DndContext>
+      </div>
 
-        {/* The end-of-list add control sits directly below the steps, and
-            sticks to the bottom of the pane once the list overflows. */}
-        <div
-          style={{
-            position: "sticky",
-            bottom: 0,
-            // Negative side/bottom margins span past the scroll container's own
-            // 8px padding so the bar reaches the full column width.
-            margin: "4px -8px -8px",
-            padding: "10px 12px",
-            borderTop: "1px solid var(--tc-border)",
-            background: "var(--tc-panel)",
-          }}
-        >
-          {adding ? (
-            <StepPicker
-              onAdd={(t) => {
-                scrollToEnd.current = true;
-                onAdd(t);
-                setAdding(false);
-              }}
-              onClose={() => setAdding(false)}
-            />
-          ) : (
-            <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
-              + Step
-            </Button>
-          )}
-        </div>
+      {/* End-of-list add control. Outside the scroll container so it always
+          pins to the bottom of the column without overlapping the editor. */}
+      <div
+        style={{
+          flex: "0 0 auto",
+          padding: "10px 12px",
+          borderTop: "1px solid var(--tc-border)",
+          background: "var(--tc-panel)",
+        }}
+      >
+        {adding ? (
+          <StepPicker
+            onAdd={(t) => {
+              scrollToEnd.current = true;
+              onAdd(t);
+              setAdding(false);
+            }}
+            onClose={() => setAdding(false)}
+          />
+        ) : (
+          <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
+            + Step
+          </Button>
+        )}
       </div>
     </div>
   );

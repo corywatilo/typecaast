@@ -319,15 +319,25 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
   );
 };
 
-function buttonStyle(c: SlackColors, primary: boolean): CSSProperties {
+function buttonStyle(
+  c: SlackColors,
+  primary: boolean,
+  linked: boolean,
+): CSSProperties {
   const base: CSSProperties = {
     borderRadius: 4,
     padding: "7px 12px",
     fontWeight: 700,
     fontSize: 13,
-    cursor: "default",
+    // Linked actions feel clickable; un-linked actions advertise that they
+    // aren't via the standard "no-entry" cursor so authors and viewers can
+    // tell at a glance the button is decorative.
+    cursor: linked ? "pointer" : "not-allowed",
     fontFamily: "inherit",
     lineHeight: 1,
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
   };
   return primary
     ? { ...base, background: c.primary, color: c.primaryText, border: "none" }
@@ -379,11 +389,33 @@ const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
           </div>
           {actions.length > 0 ? (
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              {actions.map((a, i) => (
-                <button key={i} type="button" style={buttonStyle(c, i === 0)}>
-                  {a.label}
-                </button>
-              ))}
+              {actions.map((a, i) => {
+                // First action defaults to primary unless explicitly overridden.
+                const primary = (a.variant ?? (i === 0 ? "primary" : "secondary"))
+                  === "primary";
+                const style = buttonStyle(c, primary, !!a.href);
+                return a.href ? (
+                  <a
+                    key={i}
+                    href={a.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    style={style}
+                  >
+                    {a.label}
+                  </a>
+                ) : (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-disabled
+                    style={style}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    {a.label}
+                  </button>
+                );
+              })}
             </div>
           ) : null}
         </div>

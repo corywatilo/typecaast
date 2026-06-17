@@ -54,7 +54,9 @@ export function useTypecaast(
   const {
     theme,
     autoplay = false,
-    loop = false,
+    // `loop` falls back to `config.meta.loop` so a config authored with looping
+    // behaves the same in the builder preview and in zero-prop embeds.
+    loop = config.meta.loop ?? false,
     rate = 1,
     capabilities,
   } = options;

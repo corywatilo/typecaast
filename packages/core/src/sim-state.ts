@@ -16,7 +16,11 @@ export type MessageVariant = "message" | "system";
 export interface SystemCard {
   /** Named card variant the skin renders, e.g. `"pr-opened"`. */
   card?: string;
-  actions?: { label: string; href?: string }[];
+  actions?: {
+    label: string;
+    href?: string;
+    variant?: "primary" | "secondary";
+  }[];
 }
 
 /** A reaction currently shown on a message. */
