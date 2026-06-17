@@ -150,8 +150,11 @@ export function Preview({
   const [zoom, setZoom] = useState<Zoom>("fit");
 
   const measured = area.w > 0 && area.h > 0;
+  // "Fit" only ever scales **down** — a small canvas in a big pane stays at 100%
+  // (it never blows up past its authored size). The user can still zoom past
+  // 100% explicitly via the +/− buttons.
   const fitScale = measured
-    ? clamp(Math.min(area.w / cw, area.h / ch), MIN_SCALE, MAX_SCALE)
+    ? clamp(Math.min(area.w / cw, area.h / ch, 1), MIN_SCALE, MAX_SCALE)
     : 1;
   // Until the pane is measured (first paint / SSR-less mount), fall back to the
   // responsive layout so the preview is never blank.
