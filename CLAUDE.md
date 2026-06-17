@@ -49,11 +49,11 @@ Filter a package: `pnpm --filter @typecaast/<pkg> run <script>`.
   `scripts/prepend-use-client.mjs` (tsup `onSuccess`) re-adds it to the built output. Don't add a source
   directive or tsup `banner` expecting it to survive; don't remove the onSuccess step.
 - **Skins resolve lazily by id.** `<Typecaast config={config} />` reads `config.meta.skin.id` and lazy-imports
-  that one skin via a per-skin subpath (`@typecaast/skins/<id>`). Adding a built-in skin =
-  folder under `packages/skins/src/<id>/` + a default export + `registry.ts` + a `./<id>` entry in skins
-  `package.json` `exports` + a `BUILTIN_SKIN_LOADERS` line in `packages/react/src/builtin-skins.ts`
-  - a row in `registry/skins.json` (CI `check:registry`) + builder `steps.tsx` if it's a step icon.
-    The `/create-skin` skill automates most of this.
+  that one skin via a per-skin subpath (`@typecaast/skins/<id>`). Adding a built-in skin touches several
+  places: a folder under `packages/skins/src/<id>/` with a default export, the `packages/skins/src/registry.ts`
+  registry, a `./<id>` entry in the skins `package.json` `exports`, a `BUILTIN_SKIN_LOADERS` line in
+  `packages/react/src/builtin-skins.ts`, a row in `registry/skins.json` (CI `check:registry`), and builder
+  `steps.tsx` for the timeline icon. The `/create-skin` skill automates most of this.
 - `<Typecaast>` **normalizes the config at runtime** (`configSchema.parse`) and accepts a raw/imported JSON —
   never require a pre-parsed `Config` at the prop boundary.
 - **The builder is client-only** (mounted `ssr:false` in the site). Builder-local tooltips use `position:fixed`
