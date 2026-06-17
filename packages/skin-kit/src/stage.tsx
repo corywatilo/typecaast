@@ -74,6 +74,9 @@ export function TypecaastStage({
             flex: "1 1 auto",
             minHeight: 0,
             overflow: "hidden",
+            // Breathing room beneath the last message — keeps it off the
+            // composer (when shown) and the Frame's bottom edge (when hidden).
+            paddingBottom: 16,
           }}
         >
           {state.messages.map((message, i) => {

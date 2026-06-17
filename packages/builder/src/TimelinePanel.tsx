@@ -77,8 +77,13 @@ function SortableStepRow({
     padding: "7px 8px 9px",
     borderRadius: active ? "8px 8px 0 0" : 8,
     border: `1px solid ${active ? "var(--tc-accent)" : "var(--tc-border)"}`,
-    borderBottom: active ? "none" : undefined,
-    background: active ? "var(--tc-bg-subtle)" : "var(--tc-panel)",
+    // React converts `undefined` values in `style` to `""`, which CLEARS the
+    // border-bottom longhands the `border` shorthand just set — leaving the
+    // card with three sides. Always specify `borderBottom` explicitly.
+    borderBottom: active ? "none" : "1px solid var(--tc-border)",
+    // Subtle baseline so the cards feel "inset" against the panel; the hover
+    // state darkens the border instead of the background (see styles.css).
+    background: "var(--tc-bg-subtle)",
     // Tilt slightly while dragging (Shopify-style).
     transform: isDragging ? `${t} rotate(2deg)` : t,
     transition,
