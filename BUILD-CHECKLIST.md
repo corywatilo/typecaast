@@ -126,7 +126,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done.
 - [x] M4.1 Design system: tokens (type scale, spacing, radius, motion), core components (bespoke, not stock)
 - [x] M4.2 `@typecaast/builder`: harden the M1-UI builder shell into the full timeline track editor (add/reorder/delete, drag-retime, per-step overrides)
 - [x] M4.3 builder: preview-as-you-go — scrub, step, loop range, inline timing/pacing edits with live re-pace
-- [x] M4.4 builder: participant manager; skin picker + auto options form; capability/lint panel
+- [x] M4.4 builder: participants manager; skin picker + auto options form; capability-aware UI throughout (greyed picker rows, disabled type-select options, inline ⚠ chips on stranded rows, "Won't render in this skin" panel + Supported features checklist on the App tab)
 - [x] M4.5 builder: output controls — aspect presets + scale, editable mid-script with live reflow; fit/fps/seed
 - [x] M4.6 builder: theme toggle; import/paste JSON (round-trip); export JSON + embed snippet (inline vs url assets)
 - [x] M4.7 builder: state persisted to URL + localStorage

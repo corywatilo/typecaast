@@ -7,6 +7,8 @@ import {
 } from "react";
 import type { ConfigInput } from "@typecaast/schema";
 import { type StepType } from "@typecaast/schema";
+import type { Skin } from "@typecaast/skin-kit";
+import { stepCapability } from "./lint.js";
 import {
   DndContext,
   PointerSensor,
@@ -46,6 +48,7 @@ function SortableStepRow({
   onDuplicate,
   onDelete,
   count,
+  unsupportedReason,
 }: {
   id: string;
   step: Step;
@@ -56,6 +59,9 @@ function SortableStepRow({
   onDuplicate: (index: number) => void;
   onDelete: (index: number) => void;
   count: number;
+  /** When set, the active skin won't render this step type — the row shows
+   *  a small warning chip with this string as the tooltip. */
+  unsupportedReason?: string;
 }) {
   const {
     attributes,
@@ -162,6 +168,17 @@ function SortableStepRow({
           >
             {step.type}
           </span>
+          {unsupportedReason ? (
+            <Tooltip text={unsupportedReason}>
+              <span
+                className="tc-step-warn"
+                role="img"
+                aria-label="Not supported by the active skin"
+              >
+                ⚠
+              </span>
+            </Tooltip>
+          ) : null}
         </button>
         <span style={{ display: "flex", gap: 2, flex: "0 0 auto" }}>
           <Tooltip text="Move step up">
@@ -234,17 +251,23 @@ function InsertZone({
   onOpen,
   onClose,
   onAdd,
+  skin,
 }: {
   index: number;
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
   onAdd: (type: StepType, at: number) => void;
+  skin?: Skin;
 }) {
   if (open) {
     return (
       <div style={{ margin: "4px 0" }}>
-        <StepPicker onAdd={(tp) => onAdd(tp, index)} onClose={onClose} />
+        <StepPicker
+          onAdd={(tp) => onAdd(tp, index)}
+          onClose={onClose}
+          skin={skin}
+        />
       </div>
     );
   }
@@ -259,6 +282,7 @@ function InsertZone({
 
 export function TimelinePanel({
   config,
+  skin,
   selected,
   onSelect,
   onAdd,
@@ -269,6 +293,8 @@ export function TimelinePanel({
   onChangeType,
 }: {
   config: ConfigInput;
+  /** Active skin — drives capability-aware UI on rows and the picker. */
+  skin?: Skin;
   selected: number | null;
   onSelect: (index: number | null) => void;
   /** Add a step; `atIndex` inserts in place (default appends). */
@@ -357,10 +383,12 @@ export function TimelinePanel({
                 onOpen={() => setInsertAt(0)}
                 onClose={() => setInsertAt(null)}
                 onAdd={insert}
+                skin={skin}
               />
             ) : null}
             {config.timeline.map((step, i) => {
               const active = i === selected;
+              const cap = stepCapability(step.type, skin);
               return (
                 <Fragment key={ids[i]}>
                   <SortableStepRow
@@ -369,6 +397,9 @@ export function TimelinePanel({
                     index={i}
                     active={active}
                     count={config.timeline.length}
+                    unsupportedReason={
+                      cap.support === "unsupported" ? cap.reason : undefined
+                    }
                     onSelect={onSelect}
                     onMove={onMove}
                     onDuplicate={onDuplicate}
@@ -388,6 +419,7 @@ export function TimelinePanel({
                       <StepEditor
                         step={step}
                         participants={config.participants}
+                        skin={skin}
                         onChange={(patch) => onUpdateStep(i, patch)}
                         onChangeType={(type) => onChangeType(i, type)}
                       />
@@ -399,6 +431,7 @@ export function TimelinePanel({
                     onOpen={() => setInsertAt(i + 1)}
                     onClose={() => setInsertAt(null)}
                     onAdd={insert}
+                    skin={skin}
                   />
                 </Fragment>
               );
@@ -425,6 +458,7 @@ export function TimelinePanel({
               setAdding(false);
             }}
             onClose={() => setAdding(false)}
+            skin={skin}
           />
         ) : (
           <Button size="sm" variant="primary" onClick={() => setAdding(true)}>

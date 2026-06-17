@@ -9,7 +9,14 @@ export { Preview } from "./Preview.js";
 export { TimelinePanel } from "./TimelinePanel.js";
 export { Modal } from "./Modal.js";
 export { StepEditor } from "./StepEditor.js";
-export { capabilityLint, type LintWarning } from "./lint.js";
+export {
+  capabilityLint,
+  isStepUnsupported,
+  stepCapability,
+  type LintWarning,
+  type StepCapability,
+  type StepSupport,
+} from "./lint.js";
 export {
   toJSON,
   installSnippet,

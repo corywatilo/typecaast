@@ -329,6 +329,21 @@
 .tc-step-row:not([data-active]):hover .tc-step-type {
   color: var(--tc-accent) !important;
 }
+/* Warning chip on rows whose step type the active skin doesn't render. */
+.tc-step-warn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  margin-left: 2px;
+  padding: 0 4px;
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 4px;
+  background: var(--tc-warn-bg, rgba(250, 176, 5, 0.18));
+  color: var(--tc-warn, #d18d00);
+}
 .tc-step-grip {
   display: inline-flex;
   align-items: center;
@@ -449,6 +464,17 @@
 .tc-steppick-item:focus-visible {
   background: var(--tc-bg-subtle);
   outline: none;
+}
+/* Step types the active skin doesn't support: dimmed and inert, with a
+   not-allowed cursor advertising why the row can't be clicked. The Tooltip
+   wrapper supplies the actual explanation. */
+.tc-steppick-item[data-unsupported] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.tc-steppick-item[data-unsupported]:hover,
+.tc-steppick-item[data-unsupported]:focus-visible {
+  background: transparent;
 }
 .tc-steppick-icon {
   display: inline-flex;

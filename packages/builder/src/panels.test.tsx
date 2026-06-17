@@ -53,7 +53,7 @@ describe("Builder inspector tabs", () => {
     expect(screen.getByDisplayValue("New person")).toBeTruthy();
   });
 
-  it("Skin tab switches skins and shows the capability lint", () => {
+  it("App tab switches skins and shows the won't-render warning", () => {
     render(
       <Builder
         initialConfig={config}
@@ -64,7 +64,7 @@ describe("Builder inspector tabs", () => {
     // Switch to the TUI → its lint warns about the reaction step.
     const select = screen.getByDisplayValue("Slack");
     act(() => fireEvent.change(select, { target: { value: "claude-code" } }));
-    expect(screen.getByText("Capability lint")).toBeTruthy();
+    expect(screen.getByText(/Won't render in this skin/)).toBeTruthy();
     expect(screen.getByText(/drops "reaction"/)).toBeTruthy();
   });
 });

@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { STEP_TYPES, type StepType } from "@typecaast/schema";
+import type { Skin } from "@typecaast/skin-kit";
 import { IconButton } from "@typecaast/ui";
 import { IconClose } from "./icons.js";
 import { Tooltip } from "./Tooltip.js";
+import { stepCapability } from "./lint.js";
 
 /**
  * One source of truth for how each timeline step type is presented: a small
@@ -188,9 +190,12 @@ export function StepIcon({
 export function StepPicker({
   onAdd,
   onClose,
+  skin,
 }: {
   onAdd: (type: StepType) => void;
   onClose: () => void;
+  /** Active skin — used to disable picker rows the skin doesn't support. */
+  skin?: Skin;
 }) {
   return (
     <div className="tc-steppick">
@@ -209,24 +214,38 @@ export function StepPicker({
       {STEP_GROUPS.map((g) => (
         <div key={g.name}>
           <div className="tc-steppick-group">{g.name}</div>
-          {g.types.map((t) => (
-            <button
-              key={t}
-              type="button"
-              className="tc-steppick-item"
-              onClick={() => onAdd(t)}
-            >
-              <span className="tc-steppick-icon">
-                <StepIcon type={t} />
-              </span>
-              <span className="tc-steppick-text">
-                <span className="tc-steppick-name tc-mono">{t}</span>
-                <span className="tc-steppick-desc">
-                  {STEP_META[t].description}
+          {g.types.map((t) => {
+            const cap = stepCapability(t, skin);
+            const disabled = cap.support === "unsupported";
+            const item = (
+              <button
+                key={t}
+                type="button"
+                className="tc-steppick-item"
+                disabled={disabled}
+                aria-disabled={disabled}
+                data-unsupported={disabled || undefined}
+                onClick={() => !disabled && onAdd(t)}
+              >
+                <span className="tc-steppick-icon">
+                  <StepIcon type={t} />
                 </span>
-              </span>
-            </button>
-          ))}
+                <span className="tc-steppick-text">
+                  <span className="tc-steppick-name tc-mono">{t}</span>
+                  <span className="tc-steppick-desc">
+                    {STEP_META[t].description}
+                  </span>
+                </span>
+              </button>
+            );
+            return disabled && cap.reason ? (
+              <Tooltip key={t} text={cap.reason}>
+                {item}
+              </Tooltip>
+            ) : (
+              item
+            );
+          })}
         </div>
       ))}
     </div>

@@ -79,8 +79,7 @@ export interface BuilderProps {
   style?: CSSProperties;
 }
 
-type LeftTab = "timeline" | "participants";
-type RightTab = "app" | "options";
+type LeftTab = "app" | "timeline" | "participants";
 
 const layout: CSSProperties = {
   display: "flex",
@@ -93,10 +92,37 @@ const layout: CSSProperties = {
 const columnHeader: CSSProperties = {
   flex: "0 0 auto",
   display: "flex",
-  justifyContent: "center",
+  // Tabs sit at the left edge to match the section headers in the right
+  // column; trailing controls (Import) get pushed to the right by a flex
+  // spacer rather than a justifyContent: space-between.
+  alignItems: "center",
   padding: "10px 12px",
   borderBottom: "1px solid var(--tc-border)",
 };
+
+/**
+ * Section divider used in the right column. The right column has no tab bar —
+ * Options and Export are stacked sections, separated by a sticky-feeling
+ * heading bar (Figma-style).
+ */
+function SectionHeader({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        padding: "10px 16px",
+        borderBottom: "1px solid var(--tc-border)",
+        background: "var(--tc-bg-subtle)",
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
+        color: "var(--tc-muted)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export function Builder({
   initialConfig,
@@ -122,8 +148,12 @@ export function Builder({
     (initialConfig.meta?.theme as ThemeMode) ?? "auto",
   );
   const [leftTab, setLeftTab] = useState<LeftTab>("timeline");
-  const [rightTab, setRightTab] = useState<RightTab>("app");
-  const [modal, setModal] = useState<null | "export" | "import">(null);
+  const [modal, setModal] = useState<null | "import">(null);
+  // Which export pipeline the user is targeting. Drives the Export panel tabs
+  // and conditionally enables/disables Options fields whose behaviour only
+  // applies to one path (FPS only matters for video; Loop only for live code
+  // embeds, etc).
+  const [exportMode, setExportMode] = useState<"code" | "video">("code");
 
   // Commit a config change to history. `coalesce` collapses rapid text edits.
   const commit = useCallback(
@@ -192,10 +222,22 @@ export function Builder({
           background: "var(--tc-panel)",
         }}
       >
-        <Heading level={2} style={{ fontSize: 15 }}>
-          Typecaast
-        </Heading>
-        <Badge tone="accent">Builder</Badge>
+        <a
+          href="/"
+          aria-label="Typecaast home"
+          style={{
+            color: "inherit",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <Heading level={2} style={{ fontSize: 15, margin: 0 }}>
+            Typecaast
+          </Heading>
+          <Badge tone="accent">Builder</Badge>
+        </a>
         <span style={{ flex: 1 }} />
         <span className="tc-muted" style={{ fontSize: 12 }}>
           {config.timeline.length} steps · {config.participants.length}{" "}
@@ -220,9 +262,6 @@ export function Builder({
           </IconButton>
         </Tooltip>
         {headerActions}
-        <Button size="sm" variant="primary" onClick={() => setModal("export")}>
-          Export
-        </Button>
       </header>
 
       <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
@@ -241,32 +280,55 @@ export function Builder({
           }}
         >
           <div style={columnHeader}>
-            <div style={{ flex: 1 }} />
             <Segmented<LeftTab>
               aria-label="Left panel"
               value={leftTab}
               onChange={setLeftTab}
               options={[
+                { value: "app", label: "App" },
                 { value: "timeline", label: "Timeline" },
                 { value: "participants", label: "Participants" },
               ]}
             />
-            <div
-              style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}
-            >
+            <span style={{ flex: 1 }} />
+            <Tooltip text="Load a typecaast.json file (or paste raw JSON). This replaces the entire current config — undo if you change your mind.">
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => setModal("import")}
               >
-                Import
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                  Import
+                  <span
+                    aria-hidden
+                    style={{
+                      fontSize: 12,
+                      lineHeight: 1,
+                      opacity: 0.55,
+                    }}
+                  >
+                    ⓘ
+                  </span>
+                </span>
               </Button>
-            </div>
+            </Tooltip>
           </div>
           <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
-            {leftTab === "timeline" ? (
+            {leftTab === "app" ? (
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  scrollbarGutter: "stable",
+                  padding: 16,
+                }}
+              >
+                <SkinPanel config={config} skins={skins} onChange={update} />
+              </div>
+            ) : leftTab === "timeline" ? (
               <TimelinePanel
                 config={config}
+                skin={skin}
                 selected={selected}
                 onSelect={setSelected}
                 onAdd={(t, at) => {
@@ -358,7 +420,7 @@ export function Builder({
         </main>
 
         <aside
-          aria-label="App and options"
+          aria-label="Options and export"
           style={{
             flex: "0 0 360px",
             display: "flex",
@@ -369,39 +431,35 @@ export function Builder({
             minWidth: 0,
           }}
         >
-          <div style={columnHeader}>
-            <Segmented<RightTab>
-              aria-label="Right panel"
-              value={rightTab}
-              onChange={setRightTab}
-              options={[
-                { value: "app", label: "App" },
-                { value: "options", label: "Options" },
-              ]}
-            />
-          </div>
           <div
             style={{
               flex: "1 1 auto",
               overflowY: "auto",
               scrollbarGutter: "stable",
-              padding: 16,
             }}
           >
-            {rightTab === "app" ? (
-              <SkinPanel config={config} skins={skins} onChange={update} />
-            ) : (
-              <OutputPanel config={config} onChange={update} />
-            )}
+            <SectionHeader>Options</SectionHeader>
+            <div style={{ padding: "12px 16px 18px" }}>
+              <OutputPanel
+                config={config}
+                onChange={update}
+                exportMode={exportMode}
+              />
+            </div>
+            <SectionHeader>Export</SectionHeader>
+            <div style={{ padding: "12px 16px 18px" }}>
+              <ExportPanel
+                config={config}
+                onChange={update}
+                onEvent={onEvent}
+                exportMode={exportMode}
+                onExportModeChange={setExportMode}
+              />
+            </div>
           </div>
         </aside>
       </div>
 
-      {modal === "export" ? (
-        <Modal title="Export" onClose={() => setModal(null)} width={560}>
-          <ExportPanel config={config} onChange={update} onEvent={onEvent} />
-        </Modal>
-      ) : null}
       {modal === "import" ? (
         <Modal title="Import config" onClose={() => setModal(null)}>
           <ImportPanel

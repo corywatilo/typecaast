@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import type { ConfigInput, StepType } from "@typecaast/schema";
-import { Button, Field, IconButton, Input, Select } from "@typecaast/ui";
+import type { Skin } from "@typecaast/skin-kit";
+import { Badge, Button, Field, IconButton, Input, Select } from "@typecaast/ui";
 import { STEP_GROUPS } from "./steps.js";
 import { InfoTip, Tooltip } from "./Tooltip.js";
 import { IconTrash } from "./icons.js";
+import { stepCapability } from "./lint.js";
 
 /**
  * Inline label + builder-side `InfoTip`. We use the JS-positioned tooltip from
@@ -172,11 +174,14 @@ function ActionsEditor({
 export function StepEditor({
   step,
   participants,
+  skin,
   onChange,
   onChangeType,
 }: {
   step: Step;
   participants: Participants;
+  /** Active skin — drives the disabled state of unsupported step types. */
+  skin?: Skin;
   onChange: (patch: Record<string, unknown>) => void;
   /** Change the step's type (transforms the step, preserving compatible fields). */
   onChangeType: (type: StepType) => void;
@@ -190,8 +195,34 @@ export function StepEditor({
   const hasText = ["message", "composerType", "system", "edit"].includes(type);
   const hasTarget = ["reaction", "edit", "delete"].includes(type);
 
+  // What the active skin does (or doesn't do) with the current step type. We
+  // use this both to decorate the row and to grey out unsupported types in the
+  // "switch type" picker — but we never block the user from leaving the type
+  // alone, so existing data is never silently mangled when the skin changes.
+  const currentCap = stepCapability(type, skin);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {currentCap.support === "unsupported" ? (
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "flex-start",
+            padding: 10,
+            border: "1px solid var(--tc-border)",
+            borderRadius: 8,
+            background: "var(--tc-warn-bg, rgba(250, 176, 5, 0.10))",
+          }}
+        >
+          <Badge tone="warn">drop</Badge>
+          <span className="tc-muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
+            {currentCap.reason} It will be skipped at render time until you
+            change the skin or this step.
+          </span>
+        </div>
+      ) : null}
+
       <Field label={<L tip="What this step does on the timeline.">Type</L>}>
         <Select
           value={type}
@@ -199,11 +230,24 @@ export function StepEditor({
         >
           {STEP_GROUPS.map((g) => (
             <optgroup key={g.name} label={g.name}>
-              {g.types.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
+              {g.types.map((t) => {
+                const cap = stepCapability(t, skin);
+                const unsupported = cap.support === "unsupported";
+                // Keep the current value selectable so React doesn't snap the
+                // select to the first enabled option — only flag the *other*
+                // unsupported types as disabled.
+                const isCurrent = t === type;
+                return (
+                  <option
+                    key={t}
+                    value={t}
+                    disabled={unsupported && !isCurrent}
+                  >
+                    {t}
+                    {unsupported && skin ? ` — not in ${skin.meta.name}` : ""}
+                  </option>
+                );
+              })}
             </optgroup>
           ))}
         </Select>

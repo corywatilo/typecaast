@@ -50,7 +50,7 @@ a React Server Component (Next.js App Router); no `"use client"` needed. (Using 
 **custom** skin? Pass it explicitly — `<Typecaast config={config} skin={mySkin} />`
 — inside a `"use client"` module.)
 
-No build step or design work required — the skin renders the platform's exact look in light and dark. Don't want to write JSON by hand? Build it visually in the [playground](https://typecaast.com/playground) and copy the config or embed snippet.
+No build step or design work required — the skin renders the platform's exact look in light and dark. Don't want to write JSON by hand? Build it visually in the [playground](https://typecaast.com/playground) and copy the config or embed snippet — see [`docs/playground.md`](./docs/playground.md) for a tour of the builder.
 
 ## Export to video
 

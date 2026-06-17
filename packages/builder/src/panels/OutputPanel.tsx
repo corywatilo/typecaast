@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import type { ConfigInput } from "@typecaast/schema";
 import { Field, Input, Select, Slider } from "@typecaast/ui";
-import { InfoTip } from "../Tooltip.js";
+import { DisabledWrap, InfoTip } from "../Tooltip.js";
 import { setCanvas, updateMeta, updatePacing } from "../store.js";
+import type { ExportMode } from "./ExportPanel.js";
 
 export const ASPECT_PRESETS: Record<string, { width: number; height: number }> =
   {
@@ -30,12 +31,18 @@ function L({ children, tip }: { children: ReactNode; tip: string }) {
 export function OutputPanel({
   config,
   onChange,
+  exportMode,
 }: {
   config: ConfigInput;
   onChange: (next: ConfigInput) => void;
+  /** Active export pipeline. Drives which fields are disabled — FPS only
+   *  applies to video, Loop only applies to live code embeds, etc. */
+  exportMode: ExportMode;
 }) {
   const { width, height } = config.meta.canvas;
   const pacing = config.pacing ?? {};
+  const fpsDisabled = exportMode === "code";
+  const loopDisabled = exportMode === "video";
   // Reflect the active preset in the label until the dimensions deviate.
   const currentPreset =
     Object.entries(ASPECT_PRESETS).find(
@@ -110,23 +117,29 @@ export function OutputPanel({
             <option value="fixed">Fixed size</option>
           </Select>
         </Field>
-        <Field
-          label={
-            <L tip="Frames per second for video export only — it has no effect on the live web preview.">
-              FPS
-            </L>
-          }
+        <DisabledWrap
+          disabled={fpsDisabled}
+          reason="FPS only applies when rendering video — the live code embed plays at the browser's frame rate."
         >
-          <Input
-            type="number"
-            value={config.meta.fps ?? 30}
-            onChange={(e) =>
-              onChange(
-                updateMeta(config, { fps: Number(e.currentTarget.value) }),
-              )
+          <Field
+            label={
+              <L tip="Frames per second for video export only — it has no effect on the live web preview.">
+                FPS
+              </L>
             }
-          />
-        </Field>
+          >
+            <Input
+              type="number"
+              disabled={fpsDisabled}
+              value={config.meta.fps ?? 30}
+              onChange={(e) =>
+                onChange(
+                  updateMeta(config, { fps: Number(e.currentTarget.value) }),
+                )
+              }
+            />
+          </Field>
+        </DisabledWrap>
         <Field
           label={
             <L tip="Random seed for jitter/humanize. The same seed always replays identically — change it to reshuffle the timing.">
@@ -160,33 +173,41 @@ export function OutputPanel({
             }
           />
         </Field>
-        <Field
-          label={
-            <L tip="Auto-replay when the timeline reaches the end. Honored by the preview and zero-prop embeds.">
-              Loop
-            </L>
-          }
+        <DisabledWrap
+          disabled={loopDisabled}
+          reason="Loop is a live-playback setting — it doesn't apply to a one-shot video render."
         >
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              height: 32,
-            }}
+          <Field
+            label={
+              <L tip="Auto-replay when the timeline reaches the end. Honored by the preview and zero-prop embeds.">
+                Loop
+              </L>
+            }
           >
-            <input
-              type="checkbox"
-              checked={config.meta.loop === true}
-              onChange={(e) =>
-                onChange(updateMeta(config, { loop: e.currentTarget.checked }))
-              }
-            />
-            <span className="tc-muted" style={{ fontSize: 12 }}>
-              auto-replay
-            </span>
-          </label>
-        </Field>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                height: 32,
+              }}
+            >
+              <input
+                type="checkbox"
+                disabled={loopDisabled}
+                checked={config.meta.loop === true}
+                onChange={(e) =>
+                  onChange(
+                    updateMeta(config, { loop: e.currentTarget.checked }),
+                  )
+                }
+              />
+              <span className="tc-muted" style={{ fontSize: 12 }}>
+                auto-replay
+              </span>
+            </label>
+          </Field>
+        </DisabledWrap>
       </div>
 
       <div style={{ paddingTop: 8, borderTop: "1px solid var(--tc-border)" }}>

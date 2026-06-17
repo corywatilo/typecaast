@@ -77,6 +77,14 @@ typecaast render billing-toast.json --aspect 9:16 --scale 2 --theme dark`}</Code
         <ul style={{ fontSize: 14.5, lineHeight: 2 }}>
           <li>
             <Link
+              style={{ color: "var(--tc-accent)" }}
+              href={`${REPO}/docs/playground.md`}
+            >
+              Playground tour →
+            </Link>
+          </li>
+          <li>
+            <Link
               className="tc-link"
               style={{ color: "var(--tc-accent)" }}
               href={`${REPO}/docs/authoring-skins.md`}

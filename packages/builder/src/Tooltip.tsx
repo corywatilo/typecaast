@@ -2,11 +2,13 @@ import {
   cloneElement,
   isValidElement,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
+  type RefObject,
 } from "react";
 
 /**
@@ -48,15 +50,28 @@ const popStyle: CSSProperties = {
   pointerEvents: "none",
 };
 
+type Placement = "above" | "below";
+type PopoverCoords = {
+  left: number;
+  /** Set when placement is `above`; absent for `below`. */
+  bottom?: number;
+  /** Set when placement is `below`; absent for `above`. */
+  top?: number;
+  placement: Placement;
+};
+
 /**
- * Compute viewport-clamped coords that anchor the popover above a trigger's
- * bounding rect. The popover is centred over the trigger via `translateX(-50%)`
- * by the caller; we just clamp `left` so the popover never overflows the
- * viewport (using `POP_MAX_WIDTH` as a safe upper-bound on its real width).
+ * Compute viewport-clamped coords for a popover anchored to the given trigger
+ * rect. We default to `above` and let the caller flip to `below` (after a
+ * post-render height measurement) when the popover would clip off the top of
+ * the viewport. `left` is centred on the trigger and clamped using
+ * `POP_MAX_WIDTH` as a safe upper-bound on the popover's real width — the
+ * caller centres horizontally with `translateX(-50%)`.
  */
-function popoverCoordsAbove(
+function popoverCoords(
   rect: DOMRect,
-): { left: number; bottom: number } | null {
+  placement: Placement,
+): PopoverCoords | null {
   if (typeof window === "undefined") return null;
   const margin = 8;
   const triggerCenter = rect.left + rect.width / 2;
@@ -65,10 +80,48 @@ function popoverCoordsAbove(
     margin + halfMax,
     Math.min(triggerCenter, window.innerWidth - margin - halfMax),
   );
-  return { left, bottom: window.innerHeight - rect.top + 6 };
+  if (placement === "above") {
+    return { left, bottom: window.innerHeight - rect.top + 6, placement };
+  }
+  return { left, top: rect.bottom + 6, placement };
 }
 
 const popTransform: CSSProperties = { transform: "translateX(-50%)" };
+
+/**
+ * Shared hover/focus + viewport-flip behaviour for `Tooltip` and `InfoTip`.
+ * The popover is rendered above the trigger by default; if its measured top
+ * would overflow above the viewport we re-render below the trigger instead.
+ */
+function usePopoverPlacement(triggerRef: RefObject<HTMLElement | null>) {
+  const popRef = useRef<HTMLSpanElement | null>(null);
+  const [coords, setCoords] = useState<PopoverCoords | null>(null);
+
+  const show = () => {
+    const el = triggerRef.current;
+    if (!el) return;
+    setCoords(popoverCoords(el.getBoundingClientRect(), "above"));
+  };
+  const hide = () => setCoords(null);
+
+  // After the first paint of the popover, measure it. If the `above`
+  // placement clips off the top of the viewport, flip to `below`. We only do
+  // this when transitioning into `above` so the layout effect doesn't
+  // ping-pong between placements.
+  useLayoutEffect(() => {
+    if (!coords || coords.placement !== "above") return;
+    const pop = popRef.current;
+    const trigger = triggerRef.current;
+    if (!pop || !trigger) return;
+    if (pop.getBoundingClientRect().top < 8) {
+      setCoords(popoverCoords(trigger.getBoundingClientRect(), "below"));
+    }
+    // We deliberately omit `triggerRef` from deps — it's stable across renders
+    // and React's exhaustive-deps lint allows refs.
+  }, [coords, triggerRef]);
+
+  return { coords, show, hide, popRef };
+}
 
 /**
  * Wraps any single React element and shows a tooltip popover on hover/focus.
@@ -85,17 +138,7 @@ export function Tooltip({
 }) {
   const wrapperRef = useRef<HTMLSpanElement>(null);
   const tipId = useId();
-  const [coords, setCoords] = useState<{
-    left: number;
-    bottom: number;
-  } | null>(null);
-
-  const show = () => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    setCoords(popoverCoordsAbove(el.getBoundingClientRect()));
-  };
-  const hide = () => setCoords(null);
+  const { coords, show, hide, popRef } = usePopoverPlacement(wrapperRef);
 
   // Wire `aria-describedby` onto the trigger when the popover is open so
   // assistive tech can pick up the supplemental description in addition to
@@ -118,9 +161,16 @@ export function Tooltip({
       {trigger}
       {coords ? (
         <span
+          ref={popRef}
           id={tipId}
           role="tooltip"
-          style={{ ...popStyle, ...popTransform, ...coords }}
+          style={{
+            ...popStyle,
+            ...popTransform,
+            left: coords.left,
+            top: coords.top,
+            bottom: coords.bottom,
+          }}
         >
           {text}
         </span>
@@ -141,17 +191,7 @@ export function InfoTip({
   label?: string;
 }): ReactNode {
   const ref = useRef<HTMLButtonElement>(null);
-  const [coords, setCoords] = useState<{
-    left: number;
-    bottom: number;
-  } | null>(null);
-
-  const show = () => {
-    const el = ref.current;
-    if (!el) return;
-    setCoords(popoverCoordsAbove(el.getBoundingClientRect()));
-  };
-  const hide = () => setCoords(null);
+  const { coords, show, hide, popRef } = usePopoverPlacement(ref);
 
   return (
     <span
@@ -171,12 +211,52 @@ export function InfoTip({
       </button>
       {coords ? (
         <span
+          ref={popRef}
           role="tooltip"
-          style={{ ...popStyle, ...popTransform, ...coords }}
+          style={{
+            ...popStyle,
+            ...popTransform,
+            left: coords.left,
+            top: coords.top,
+            bottom: coords.bottom,
+          }}
         >
           {text}
         </span>
       ) : null}
     </span>
+  );
+}
+
+/**
+ * Visually de-emphasises a child (a field, a control row, …) when it doesn't
+ * apply to the current context — e.g. FPS while exporting Code, Loop while
+ * exporting Video. The wrapper itself receives hover/focus events so the
+ * `reason` tooltip is reachable; inner controls should still get their own
+ * `disabled` so they can't be mutated. When `disabled` is false the wrapper
+ * is a pass-through.
+ */
+export function DisabledWrap({
+  disabled,
+  reason,
+  children,
+}: {
+  disabled: boolean;
+  reason: string;
+  children: ReactElement;
+}) {
+  if (!disabled) return children;
+  return (
+    <Tooltip text={reason}>
+      <span
+        style={{
+          display: "block",
+          opacity: 0.55,
+          cursor: "not-allowed",
+        }}
+      >
+        {children}
+      </span>
+    </Tooltip>
   );
 }
