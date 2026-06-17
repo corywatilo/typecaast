@@ -88,8 +88,8 @@ describe("sampleState", () => {
 
   it("groups consecutive same-author messages", () => {
     const c = build([
-      { type: "message", from: "a", text: "one", instant: true, delay: 0 },
-      { type: "message", from: "a", text: "two", instant: true, delay: 0 },
+      { type: "message", from: "a", text: "one", instant: true },
+      { type: "message", from: "a", text: "two", instant: true },
     ]);
     const s = sampleState(c, c.durationMs, "light");
     expect(s.messages[0]!.isGrouped).toBe(false);

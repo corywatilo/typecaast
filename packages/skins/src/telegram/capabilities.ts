@@ -12,7 +12,7 @@ export const telegramCapabilities: Capabilities = {
     delete: "native",
     readReceipt: "unsupported", // shown as double-ticks on the bubble, not a step
     system: "native", // bot message + inline keyboard
-    beat: "native",
+    delay: "native",
   },
   content: {
     text: true,

@@ -72,8 +72,6 @@ describe("pacingSchema", () => {
     expect(pacing).toEqual({
       readingWpm: 240,
       typingCps: 14,
-      reactionDelayMs: 700,
-      interMessageGapMs: 900,
       humanize: 0.15,
       startDelayMs: 400,
     });

@@ -67,7 +67,7 @@ typecaast render billing-toast.json --aspect 9:16 --scale 2 --theme dark`}</Code
           fps, fit, theme, skin), <code>participants</code>, optional{" "}
           <code>pacing</code>, and a <code>timeline</code> of steps — message,
           reaction, typing, composerType, send, edit, delete, readReceipt,
-          system, beat. Validate it with{" "}
+          system, delay. Validate it with{" "}
           <code className="tc-mono">typecaast validate</code>.
         </p>
 

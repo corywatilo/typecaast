@@ -226,6 +226,11 @@
   flex-direction: column;
   gap: 5px;
 }
+.tc-field-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .tc-label {
   font-size: 11px;
   font-weight: 560;
@@ -338,10 +343,13 @@
 
 /* Insert-between-rows "+" (revealed on hover, Shopify-style). */
 .tc-insert-zone {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 10px;
+  /* Tall enough to fully contain the 16px "+" without it being clipped by
+     adjacent row backgrounds. */
+  height: 20px;
   margin: 1px 0;
   padding: 0 2px;
   cursor: pointer;
@@ -357,6 +365,8 @@
   background: var(--tc-accent);
 }
 .tc-insert-plus {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -375,13 +385,32 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 4px;
+  padding: 0 4px 4px;
   border: 1px solid var(--tc-border);
   border-radius: 10px;
   background: var(--tc-panel);
   box-shadow: var(--tc-shadow);
   max-height: 360px;
   overflow-y: auto;
+}
+.tc-steppick-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Pull through the parent's 4px side padding so the header reaches edge-to-edge. */
+  margin: 0 -4px;
+  padding: 8px 10px 8px 12px;
+  border-bottom: 1px solid var(--tc-border);
+  background: var(--tc-panel);
+}
+.tc-steppick-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tc-text);
 }
 .tc-steppick-group {
   padding: 8px 8px 2px;
@@ -433,23 +462,6 @@
   line-height: 1.35;
   color: var(--tc-text-muted);
 }
-.tc-steppick-cancel {
-  margin: 2px 4px 2px;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--tc-text-muted);
-  font: inherit;
-  font-size: 12px;
-  text-align: left;
-  cursor: pointer;
-}
-.tc-steppick-cancel:hover {
-  background: var(--tc-bg-subtle);
-  color: var(--tc-text);
-}
-
 /* Two-line timeline step row body. */
 .tc-step-line2 {
   display: -webkit-box;

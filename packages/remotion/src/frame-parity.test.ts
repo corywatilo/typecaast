@@ -31,7 +31,7 @@ const fixtures: Record<string, ConfigInput["timeline"]> = {
     { type: "send" },
   ],
   quick: [
-    { type: "message", from: "cory", text: "ship it?", delay: 200 },
+    { type: "message", from: "cory", text: "ship it?" },
     { type: "reaction", target: "$prev", emoji: "🚀", delay: 300 },
     { type: "message", from: "paul", text: "shipping 🚀" },
   ],

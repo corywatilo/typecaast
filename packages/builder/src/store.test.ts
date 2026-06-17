@@ -3,6 +3,7 @@ import { configSchema, type ConfigInput } from "@typecaast/schema";
 import {
   addParticipant,
   addStep,
+  addStepAutoPaced,
   blankStep,
   deleteStep,
   duplicateStep,
@@ -73,18 +74,18 @@ describe("config store", () => {
     const cfg: ConfigInput = {
       ...base,
       timeline: [
-        { type: "message", from: "b", text: "hi", id: "m1", delay: 500 },
+        { type: "message", from: "b", text: "hi", id: "m1", instant: true },
       ],
     };
-    // message → composerType keeps from/text/id/delay
+    // message → composerType keeps from/text/id/instant
     const ct = changeStepType(cfg, 0, "composerType", "a")
       .timeline[0] as Record<string, unknown>;
     expect(ct.type).toBe("composerType");
     expect(ct.from).toBe("b");
     expect(ct.text).toBe("hi");
     expect(ct.id).toBe("m1");
-    expect(ct.delay).toBe(500);
-    // message → reaction drops text (not a reaction field) but keeps id/delay
+    expect(ct.instant).toBe(true);
+    // message → reaction drops text (not a reaction field) but keeps id
     const rx = changeStepType(cfg, 0, "reaction", "a").timeline[0] as Record<
       string,
       unknown
@@ -105,6 +106,55 @@ describe("config store", () => {
     );
   });
 
+  it("addStepAutoPaced inserts a delay before the new step", () => {
+    // Append: prior step is a non-delay → auto-prepend a delay.
+    const appended = addStepAutoPaced(base, { type: "send", from: "a" }, undefined);
+    expect(appended.config.timeline).toHaveLength(4);
+    expect(appended.config.timeline[2]).toMatchObject({
+      type: "delay",
+      duration: 1000,
+    });
+    expect(appended.config.timeline[3]).toMatchObject({ type: "send" });
+    expect(appended.index).toBe(3);
+
+    // Insert in the middle: delay lands between the prior step and the new one.
+    const middle = addStepAutoPaced(base, { type: "send", from: "a" }, 1);
+    expect(middle.config.timeline).toHaveLength(4);
+    expect(middle.config.timeline[1]).toMatchObject({ type: "delay" });
+    expect(middle.config.timeline[2]).toMatchObject({ type: "send" });
+    expect(middle.index).toBe(2);
+
+    // No prior step (insert at start) → no auto-delay.
+    const atStart = addStepAutoPaced(base, { type: "send", from: "a" }, 0);
+    expect(atStart.config.timeline).toHaveLength(3);
+    expect(atStart.config.timeline[0]).toMatchObject({ type: "send" });
+    expect(atStart.index).toBe(0);
+
+    // Empty timeline → no auto-delay.
+    const empty: ConfigInput = { ...base, timeline: [] };
+    const first = addStepAutoPaced(empty, blankStep("message", "a"), undefined);
+    expect(first.config.timeline).toHaveLength(1);
+    expect(first.index).toBe(0);
+
+    // Adding a delay → no double-delay.
+    const dly = addStepAutoPaced(base, blankStep("delay", "a"), undefined);
+    expect(dly.config.timeline).toHaveLength(3);
+    expect(dly.config.timeline[2]).toMatchObject({ type: "delay" });
+
+    // Prior step is already a delay → no double-delay.
+    const withPriorDelay: ConfigInput = {
+      ...base,
+      timeline: [...base.timeline, { type: "delay", duration: 500 }],
+    };
+    const after = addStepAutoPaced(
+      withPriorDelay,
+      { type: "send", from: "a" },
+      undefined,
+    );
+    expect(after.config.timeline).toHaveLength(4);
+    expect(after.config.timeline[3]).toMatchObject({ type: "send" });
+  });
+
   it("blankStep produces valid steps for every type", () => {
     const types = [
       "message",
@@ -116,7 +166,7 @@ describe("config store", () => {
       "edit",
       "delete",
       "readReceipt",
-      "beat",
+      "delay",
     ] as const;
     for (const t of types) {
       const cfg = { ...base, timeline: [blankStep(t, "a")] };

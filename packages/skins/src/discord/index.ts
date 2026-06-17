@@ -13,7 +13,7 @@ const discordCapabilities: Capabilities = {
     edit: "native",
     delete: "native",
     readReceipt: "unsupported",
-    beat: "native",
+    delay: "native",
   },
   content: { text: true, image: true },
   reactions: true,

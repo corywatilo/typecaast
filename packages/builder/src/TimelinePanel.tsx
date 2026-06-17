@@ -25,6 +25,12 @@ import { Button, IconButton } from "@typecaast/ui";
 import { stepLabel } from "./format.js";
 import { StepEditor } from "./StepEditor.js";
 import { StepIcon, StepPicker } from "./steps.js";
+import {
+  IconArrowDown,
+  IconArrowUp,
+  IconDuplicate,
+  IconTrash,
+} from "./icons.js";
 
 type Step = ConfigInput["timeline"][number];
 
@@ -66,7 +72,9 @@ function SortableStepRow({
     display: "flex",
     flexDirection: "column",
     gap: 3,
-    padding: "7px 8px",
+    // A touch more bottom padding so the second-line preview's descenders
+    // (g, p, y, …) clear the card border instead of kissing it.
+    padding: "7px 8px 9px",
     borderRadius: active ? "8px 8px 0 0" : 8,
     border: `1px solid ${active ? "var(--tc-accent)" : "var(--tc-border)"}`,
     borderBottom: active ? "none" : undefined,
@@ -124,18 +132,6 @@ function SortableStepRow({
           }}
         >
           <span
-            className="tc-muted"
-            style={{ fontSize: 10, width: 10, opacity: 0.7 }}
-          >
-            {active ? "▾" : "▸"}
-          </span>
-          <span
-            className="tc-muted tc-mono"
-            style={{ fontSize: 11, flex: "0 0 16px" }}
-          >
-            {index + 1}
-          </span>
-          <span
             style={{
               display: "inline-flex",
               flex: "0 0 auto",
@@ -165,7 +161,7 @@ function SortableStepRow({
             onClick={() => onMove(index, index - 1)}
             style={{ width: 24, height: 24 }}
           >
-            ↑
+            <IconArrowUp size={14} />
           </IconButton>
           <IconButton
             aria-label="Move down"
@@ -173,21 +169,21 @@ function SortableStepRow({
             onClick={() => onMove(index, index + 1)}
             style={{ width: 24, height: 24 }}
           >
-            ↓
+            <IconArrowDown size={14} />
           </IconButton>
           <IconButton
             aria-label="Duplicate"
             onClick={() => onDuplicate(index)}
             style={{ width: 24, height: 24 }}
           >
-            ⧉
+            <IconDuplicate size={14} />
           </IconButton>
           <IconButton
             aria-label="Delete step"
             onClick={() => onDelete(index)}
             style={{ width: 24, height: 24 }}
           >
-            ✕
+            <IconTrash size={14} />
           </IconButton>
         </span>
       </div>
@@ -322,7 +318,9 @@ export function TimelinePanel({
           flex: "1 1 auto",
           overflowY: "auto",
           scrollbarGutter: "stable",
-          padding: 8,
+          // Reserve room for the sticky "+ Step" bar at the bottom so the last
+          // row can scroll fully into view rather than being painted over.
+          padding: "8px 8px 56px",
         }}
       >
         {config.timeline.length === 0 ? (

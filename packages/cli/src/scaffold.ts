@@ -68,7 +68,7 @@ export const capabilities: Capabilities = {
     edit: "unsupported",
     delete: "unsupported",
     readReceipt: "unsupported",
-    beat: "native",
+    delay: "native",
   },
   content: { text: true, image: false },
   reactions: false,

@@ -12,7 +12,7 @@ export const slackCapabilities: Capabilities = {
     delete: "native",
     readReceipt: "unsupported", // Slack has no per-message read receipts in threads
     system: "native", // app/PR cards
-    beat: "native",
+    delay: "native",
   },
   content: {
     text: true,

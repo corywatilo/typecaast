@@ -32,11 +32,12 @@ describe("compile", () => {
     expect(t.durationMs).toBeGreaterThan(t.messages[1]!.appearMs);
   });
 
-  it("honors an explicit delay override", () => {
+  it("a `delay` step inserts an explicit pause", () => {
     const t = compile(
       cfg([
-        { type: "message", from: "a", text: "hi" },
-        { type: "message", from: "b", text: "later", delay: 5000 },
+        { type: "message", from: "b", text: "hi" },
+        { type: "delay", duration: 5000 },
+        { type: "message", from: "b", text: "later" },
       ]),
     );
     const gap = t.messages[1]!.appearMs - t.messages[0]!.appearMs;
@@ -48,6 +49,65 @@ describe("compile", () => {
       cfg([{ type: "message", from: "a", text: "x", instant: true }]),
     );
     expect(t.messages[0]!.revealMs).toBe(0);
+  });
+
+  it("opens at t=0 when the first step is instant (skipping startDelayMs)", () => {
+    const t = compile(
+      cfg([
+        { type: "message", from: "b", text: "hello", instant: true },
+        { type: "message", from: "b", text: "later" },
+      ]),
+    );
+    expect(t.messages[0]!.appearMs).toBe(0);
+    // The second (non-instant) message still gets paced normally afterwards.
+    expect(t.messages[1]!.appearMs).toBeGreaterThan(0);
+  });
+
+  it("a leading `delay` step pushes the start past startDelayMs", () => {
+    const t = compile(
+      cfg([
+        { type: "delay", duration: 1000 },
+        { type: "message", from: "b", text: "hi", instant: true },
+      ]),
+    );
+    // cursor: startDelayMs + 1000 (delay step) = 1400 (with default 400).
+    expect(t.messages[0]!.appearMs).toBeGreaterThanOrEqual(1000);
+  });
+
+  it("a non-first instant step lands right at the cursor", () => {
+    const t = compile(
+      cfg([
+        { type: "message", from: "b", text: "first" },
+        { type: "message", from: "b", text: "second", instant: true },
+      ]),
+    );
+    expect(t.messages[1]!.appearMs).toBe(
+      t.messages[0]!.appearMs + t.messages[0]!.revealMs,
+    );
+  });
+
+  it("auto-renders a self message through the composer (type-then-send)", () => {
+    const t = compile(
+      cfg([{ type: "message", from: "a", text: "hi from self" }]),
+    );
+    expect(t.composers).toHaveLength(1);
+    expect(t.composers[0]!.from).toBe("a");
+    expect(t.composers[0]!.text).toBe("hi from self");
+    expect(t.composers[0]!.sendMs).toBeDefined();
+    expect(t.messages).toHaveLength(1);
+    expect(t.messages[0]!.from).toBe("a");
+    expect(t.messages[0]!.appearMs).toBe(t.composers[0]!.sendMs!);
+  });
+
+  it("self message + instant skips the composer auto-render", () => {
+    const t = compile(
+      cfg([
+        { type: "message", from: "a", text: "instant self", instant: true },
+      ]),
+    );
+    expect(t.composers).toHaveLength(0);
+    expect(t.messages).toHaveLength(1);
+    expect(t.messages[0]!.appearMs).toBe(0);
   });
 
   it("lands a reaction on its target after the target appears", () => {
@@ -110,15 +170,15 @@ describe("compile", () => {
     expect(t.messages[0]!.from).toBe("b");
   });
 
-  it("advances the cursor by a beat's duration", () => {
-    const withBeat = compile(
+  it("advances the cursor by a `delay` step's duration", () => {
+    const t = compile(
       cfg([
-        { type: "message", from: "a", text: "x", instant: true, delay: 0 },
-        { type: "beat", duration: 3000 },
-        { type: "message", from: "b", text: "y", delay: 0, instant: true },
+        { type: "message", from: "a", text: "x", instant: true },
+        { type: "delay", duration: 3000 },
+        { type: "message", from: "b", text: "y", instant: true },
       ]),
     );
-    const gap = withBeat.messages[1]!.appearMs - withBeat.messages[0]!.appearMs;
+    const gap = t.messages[1]!.appearMs - t.messages[0]!.appearMs;
     expect(gap).toBeGreaterThanOrEqual(3000);
   });
 

@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { STEP_TYPES, type StepType } from "@typecaast/schema";
+import { IconButton } from "@typecaast/ui";
+import { IconClose } from "./icons.js";
 
 /**
  * One source of truth for how each timeline step type is presented: a small
@@ -9,9 +11,9 @@ import { STEP_TYPES, type StepType } from "@typecaast/schema";
 
 export type StepGroup =
   | "Messages"
-  | "Composing"
   | "Reactions & edits"
-  | "Receipts & timing";
+  | "Timing"
+  | "Advanced";
 
 interface StepMeta {
   description: string;
@@ -20,7 +22,8 @@ interface StepMeta {
 
 export const STEP_META: Record<StepType, StepMeta> = {
   message: {
-    description: "A chat message from a participant.",
+    description:
+      "A chat message from a participant. Self messages auto-render via the composer.",
     group: "Messages",
   },
   system: {
@@ -29,15 +32,7 @@ export const STEP_META: Record<StepType, StepMeta> = {
   },
   typing: {
     description: "A “typing…” indicator from someone.",
-    group: "Composing",
-  },
-  composerType: {
-    description: "Animate text being typed into the reply box.",
-    group: "Composing",
-  },
-  send: {
-    description: "Send what's in the reply box as a message.",
-    group: "Composing",
+    group: "Messages",
   },
   reaction: {
     description: "An emoji reaction on a message.",
@@ -53,11 +48,20 @@ export const STEP_META: Record<StepType, StepMeta> = {
   },
   readReceipt: {
     description: "Mark messages as read.",
-    group: "Receipts & timing",
+    group: "Timing",
   },
-  beat: {
-    description: "A timed pause with no visible change.",
-    group: "Receipts & timing",
+  delay: {
+    description: "An explicit pause in the timeline.",
+    group: "Timing",
+  },
+  composerType: {
+    description:
+      "Animate text being typed into the reply box (use only for type-pause-retype choreography).",
+    group: "Advanced",
+  },
+  send: {
+    description: "Commit the preceding composerType as a sent message.",
+    group: "Advanced",
   },
 };
 
@@ -65,9 +69,9 @@ export const STEP_META: Record<StepType, StepMeta> = {
 export const STEP_GROUPS: { name: StepGroup; types: StepType[] }[] = (() => {
   const order: StepGroup[] = [
     "Messages",
-    "Composing",
     "Reactions & edits",
-    "Receipts & timing",
+    "Timing",
+    "Advanced",
   ];
   return order.map((name) => ({
     name,
@@ -160,7 +164,7 @@ const ICONS: Record<StepType, ReactNode> = {
       <path d="M8.2 11l.4.4 5.4-6.4" />
     </>
   ),
-  beat: (
+  delay: (
     <>
       <circle cx="8" cy="8" r="6" />
       <path d="M8 4.6V8l2.4 1.5" />
@@ -189,6 +193,16 @@ export function StepPicker({
 }) {
   return (
     <div className="tc-steppick">
+      <div className="tc-steppick-header">
+        <span className="tc-steppick-title">Add step</span>
+        <IconButton
+          aria-label="Close"
+          onClick={onClose}
+          style={{ width: 24, height: 24 }}
+        >
+          <IconClose size={12} />
+        </IconButton>
+      </div>
       {STEP_GROUPS.map((g) => (
         <div key={g.name}>
           <div className="tc-steppick-group">{g.name}</div>
@@ -212,9 +226,6 @@ export function StepPicker({
           ))}
         </div>
       ))}
-      <button type="button" className="tc-steppick-cancel" onClick={onClose}>
-        Cancel
-      </button>
     </div>
   );
 }

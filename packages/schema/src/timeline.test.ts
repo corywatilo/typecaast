@@ -32,8 +32,8 @@ describe("timelineStepSchema", () => {
   it("covers every declared step type", () => {
     expect([...STEP_TYPES].sort()).toEqual(
       [
-        "beat",
         "composerType",
+        "delay",
         "delete",
         "edit",
         "message",
@@ -53,9 +53,7 @@ describe("timelineStepSchema", () => {
         from: "cory",
         text: "hi",
         typing: { showTypingFor: 1000 },
-        delay: 500,
         instant: false,
-        holdAfter: 300,
         id: "m1",
       }),
     ).not.toThrow();
@@ -79,10 +77,10 @@ describe("timelineStepSchema", () => {
     ).toThrow();
   });
 
-  it("requires duration on a beat", () => {
-    expect(() => timelineStepSchema.parse({ type: "beat" })).toThrow();
+  it("requires duration on a delay", () => {
+    expect(() => timelineStepSchema.parse({ type: "delay" })).toThrow();
     expect(() =>
-      timelineStepSchema.parse({ type: "beat", duration: 800 }),
+      timelineStepSchema.parse({ type: "delay", duration: 800 }),
     ).not.toThrow();
   });
 

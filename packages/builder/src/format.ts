@@ -16,9 +16,9 @@ export function stepLabel(step: TimelineStepInput): string {
   switch (step.type) {
     case "message":
     case "composerType":
-      return truncate(step.text ?? "(content)");
+      return truncate(step.text || "(no text)");
     case "system":
-      return truncate(step.text ?? step.card ?? "card");
+      return truncate(step.text || step.card || "card");
     case "reaction":
       return step.emoji;
     case "typing":
@@ -31,7 +31,7 @@ export function stepLabel(step: TimelineStepInput): string {
       return "delete";
     case "readReceipt":
       return "read";
-    case "beat":
+    case "delay":
       return `wait ${step.duration}ms`;
   }
 }

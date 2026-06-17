@@ -52,7 +52,9 @@ describe("Builder", () => {
     render(<Builder initialConfig={config} skins={{ slack }} />);
     act(() => fireEvent.click(screen.getByText("+ Step")));
     act(() => fireEvent.click(screen.getByText("send")));
-    expect(screen.getByText(/4 steps/)).toBeTruthy();
+    // Adding a step also auto-prepends a `delay` so consecutive steps get a
+    // default beat between them — bumps the count by 2.
+    expect(screen.getByText(/5 steps/)).toBeTruthy();
   });
 
   it("editing a message updates the preview", () => {

@@ -12,7 +12,7 @@ export const imessageCapabilities: Capabilities = {
     edit: "native",
     delete: "native",
     system: "fallback", // rendered as centered grey text, not an app card
-    beat: "native",
+    delay: "native",
   },
   content: {
     text: true,

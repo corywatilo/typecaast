@@ -12,7 +12,7 @@ export const tuiCapabilities: Capabilities = {
     readReceipt: "unsupported",
     edit: "native",
     delete: "native",
-    beat: "native",
+    delay: "native",
   },
   content: {
     text: true,

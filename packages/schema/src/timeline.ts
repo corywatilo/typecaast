@@ -3,17 +3,14 @@ import { contentSchema } from "./content-registry.js";
 
 /**
  * Per-step overrides shared by every step. The engine computes timing from the
- * pacing model; these win over the computed values.
+ * pacing model; these win over the computed values. Use a dedicated `delay`
+ * step type to insert explicit pauses on the timeline.
  */
 const stepBaseShape = {
   /** Optional id so reactions/edits/deletes can target this step's message. */
   id: z.string().optional(),
-  /** Override the computed gap before this step (ms, relative to the prior). */
-  delay: z.number().optional(),
   /** Reveal with no animation and no computed delay. */
   instant: z.boolean().optional(),
-  /** Extra pause held after this step completes (ms). */
-  holdAfter: z.number().nonnegative().optional(),
 };
 
 /** Authoring sugar for an in-message image (compiled to an image node). */
@@ -54,6 +51,8 @@ export const reactionStepSchema = z.object({
   /** Emoji shortcode without colons, e.g. `"eyes"` — shown in skin tooltips. */
   shortcode: z.string().optional(),
   from: z.string().optional(),
+  /** Gap from when the target appears, before the reaction lands (ms). */
+  delay: z.number().nonnegative().optional(),
   ...stepBaseShape,
 });
 
@@ -118,9 +117,9 @@ export const systemStepSchema = z.object({
   ...stepBaseShape,
 });
 
-/** An explicit pause in the timeline. */
-export const beatStepSchema = z.object({
-  type: z.literal("beat"),
+/** An explicit pause in the timeline (formerly `beat`). */
+export const delayStepSchema = z.object({
+  type: z.literal("delay"),
   duration: z.number().nonnegative(),
   ...stepBaseShape,
 });
@@ -135,7 +134,7 @@ export const timelineStepSchema = z.discriminatedUnion("type", [
   deleteStepSchema,
   readReceiptStepSchema,
   systemStepSchema,
-  beatStepSchema,
+  delayStepSchema,
 ]);
 export type TimelineStep = z.infer<typeof timelineStepSchema>;
 export type TimelineStepInput = z.input<typeof timelineStepSchema>;
@@ -153,6 +152,6 @@ export const STEP_TYPES = [
   "delete",
   "readReceipt",
   "system",
-  "beat",
+  "delay",
 ] as const;
 export type StepType = (typeof STEP_TYPES)[number];

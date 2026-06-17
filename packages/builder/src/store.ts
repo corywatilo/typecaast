@@ -53,6 +53,39 @@ export function addStep(
   return { ...config, timeline };
 }
 
+/**
+ * Add a step with an auto-prepended `delay` so consecutive steps get a default
+ * beat between them — without forcing the author to add it manually every time.
+ * Skip the auto-delay when:
+ *  - the timeline is empty (nothing to space from),
+ *  - the new step is itself a `delay` (no double-pause),
+ *  - the prior step is already a `delay` (idem),
+ *  - or we're inserting at the very start (no prior step to space from).
+ *
+ * Returns the new config and the index the **new** step ended up at, so the
+ * caller can keep its selection pointing at the right row.
+ */
+export function addStepAutoPaced(
+  config: ConfigInput,
+  step: Step,
+  atIndex: number | undefined,
+  autoDelayMs = 1000,
+): { config: ConfigInput; index: number } {
+  const at = atIndex ?? config.timeline.length;
+  const prior = at > 0 ? config.timeline[at - 1] : undefined;
+  const shouldAutoDelay =
+    config.timeline.length > 0 &&
+    at > 0 &&
+    step.type !== "delay" &&
+    prior?.type !== "delay";
+  if (!shouldAutoDelay) {
+    return { config: addStep(config, step, atIndex), index: at };
+  }
+  const delayStep: Step = { type: "delay", duration: autoDelayMs };
+  const withDelay = addStep(config, delayStep, at);
+  return { config: addStep(withDelay, step, at + 1), index: at + 1 };
+}
+
 export function updateStep(
   config: ConfigInput,
   index: number,
@@ -134,37 +167,40 @@ export function setSelf(config: ConfigInput, index: number): ConfigInput {
   };
 }
 
-/** A blank step of a given type, for the "add step" menu. */
+/**
+ * A blank step of a given type, for the "add step" menu. Textual fields are
+ * left empty so the editor shows a placeholder instead of pre-filled lorem.
+ */
 export function blankStep(type: Step["type"], from: string): Step {
   switch (type) {
     case "message":
-      return { type: "message", from, text: "New message" };
+      return { type: "message", from, text: "" };
     case "reaction":
       return { type: "reaction", target: "$prev", emoji: "👍" };
     case "typing":
       return { type: "typing", from };
     case "composerType":
-      return { type: "composerType", from, text: "Typing…" };
+      return { type: "composerType", from, text: "" };
     case "send":
       // No `from` — a send commits the preceding composer, inheriting its sender.
       return { type: "send" };
     case "system":
-      return { type: "system", from, text: "System message" };
+      return { type: "system", from, text: "" };
     case "edit":
-      return { type: "edit", target: "$prev", text: "Edited" };
+      return { type: "edit", target: "$prev", text: "" };
     case "delete":
       return { type: "delete", target: "$prev" };
     case "readReceipt":
       return { type: "readReceipt", by: from };
-    case "beat":
-      return { type: "beat", duration: 1000 };
+    case "delay":
+      return { type: "delay", duration: 1000 };
   }
 }
 
 /**
  * Change a step's type in place. Preserves the shared base fields
- * (id/delay/holdAfter/instant) and carries over from/text/target/emoji/card when
- * the new type uses them; type-specific fields reset to `blankStep` defaults.
+ * (id/instant) and carries over from/text/target/emoji/card when the new type
+ * uses them; type-specific fields reset to `blankStep` defaults.
  */
 export function changeStepType(
   config: ConfigInput,
@@ -178,7 +214,7 @@ export function changeStepType(
     newType,
     (old.from as string) ?? defaultFrom,
   ) as Record<string, unknown>;
-  for (const k of ["id", "delay", "holdAfter", "instant"] as const) {
+  for (const k of ["id", "instant"] as const) {
     if (old[k] !== undefined) next[k] = old[k];
   }
   for (const k of ["from", "text", "target", "emoji", "card"] as const) {

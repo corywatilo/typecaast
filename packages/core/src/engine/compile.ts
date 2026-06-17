@@ -51,9 +51,15 @@ const cache = new WeakMap<Config, CompiledTimeline>();
 
 /**
  * Resolve an authored, auto-paced config into an absolute timeline (PLAN §5).
- * Pure and memoized by config reference. Overrides (`delay`, `instant`,
- * `typingDuration`, `showTypingFor`, `holdAfter`) win over computed values; all
- * jitter is seeded from `meta.seed`.
+ * Pure and memoized by config reference. Overrides (`instant`,
+ * `typingDuration`, `showTypingFor`) win over computed values; all jitter is
+ * seeded from `meta.seed`. Use a `delay` step to insert an explicit pause.
+ *
+ * A plain `message` step from the self participant is auto-rendered through
+ * the composer (type-then-send) just like an explicit `composerType` + `send`
+ * pair. Use `instant: true` to skip the composer animation. Use the explicit
+ * `composerType`/`send` primitives only when you need the type-pause-retype
+ * choreography.
  */
 export function compile(config: Config): CompiledTimeline {
   const cached = cache.get(config);
@@ -71,7 +77,15 @@ export function compile(config: Config): CompiledTimeline {
   const stepBoundaries: number[] = [];
   const byId = new Map<string, CompiledMessage>();
 
-  let cursor = pacing.startDelayMs;
+  // If the very first step is a message/system marked `instant`, the player
+  // should open with that message already on screen — i.e. starting at t=0 —
+  // rather than blank for `startDelayMs`.
+  const firstStep = config.timeline[0];
+  const firstStepIsInstantStart =
+    firstStep !== undefined &&
+    (firstStep.type === "message" || firstStep.type === "system") &&
+    firstStep.instant === true;
+  let cursor = firstStepIsInstantStart ? 0 : pacing.startDelayMs;
   let lastMessage: CompiledMessage | undefined;
   let lastComposer: CompiledComposer | undefined;
   let autoId = 0;
@@ -85,17 +99,53 @@ export function compile(config: Config): CompiledTimeline {
     switch (step.type) {
       case "message":
       case "system": {
+        // Self messages are auto-rendered through the composer (type-then-send)
+        // unless `instant` is set. This is pure sugar for an explicit
+        // `composerType` + `send` pair, so timing matches: typing begins right
+        // at the cursor with no auto-paced gap added on top. Keep the explicit
+        // composerType+send pair available for the type-pause-retype case.
+        const isSelfMessage =
+          step.type === "message" && selfIds.has(step.from) && !step.instant;
+        if (isSelfMessage) {
+          const text = plainText(toContentNodes(step));
+          const typingDur = typingDurationMs(text, pacing.typingCps);
+          const sendAt = cursor + typingDur;
+          const id = nextId(step.id);
+          const comp: CompiledComposer = {
+            from: step.from,
+            text,
+            startMs: cursor,
+            endMs: sendAt,
+            sendMs: sendAt,
+          };
+          composers.push(comp);
+          const msg: CompiledMessage = {
+            id,
+            from: step.from,
+            isSelf: true,
+            variant: "message",
+            content: toContentNodes(step),
+            appearMs: sendAt,
+            revealMs: SEND_REVEAL_MS,
+            atMs: sendAt,
+            reactions: [],
+          };
+          messages.push(msg);
+          byId.set(id, msg);
+          lastMessage = msg;
+          lastComposer = undefined;
+          cursor = sendAt + SEND_REVEAL_MS;
+          break;
+        }
+
         let appearAt: number;
-        if (step.delay != null) appearAt = cursor + step.delay;
-        else if (step.instant) appearAt = cursor;
+        if (step.instant) appearAt = cursor;
         else {
-          let gap = pacing.interMessageGapMs;
-          if (lastMessage) {
-            gap += readingDelayMs(
-              plainText(lastMessage.content),
-              pacing.readingWpm,
-            );
-          }
+          // Auto-paced gap = simulated reading time of the prior message. For
+          // explicit beats use a `delay` step.
+          const gap = lastMessage
+            ? readingDelayMs(plainText(lastMessage.content), pacing.readingWpm)
+            : 0;
           appearAt = cursor + withJitter(rng, gap, pacing.humanize);
         }
 
@@ -134,40 +184,37 @@ export function compile(config: Config): CompiledTimeline {
         messages.push(msg);
         byId.set(id, msg);
         lastMessage = msg;
-        cursor = appearAt + reveal + (step.holdAfter ?? 0);
+        cursor = appearAt + reveal;
         break;
       }
 
       case "typing": {
-        const start = cursor + (step.delay ?? 0);
         const dur =
           step.showTypingFor ??
           withJitter(rng, DEFAULT_TYPING_MS, pacing.humanize);
-        typings.push({ from: step.from, startMs: start, endMs: start + dur });
-        cursor = start + dur + (step.holdAfter ?? 0);
+        typings.push({ from: step.from, startMs: cursor, endMs: cursor + dur });
+        cursor += dur;
         break;
       }
 
       case "composerType": {
-        const start = cursor + (step.delay ?? 0);
         const dur =
           step.typingDuration ?? typingDurationMs(step.text, pacing.typingCps);
         const comp: CompiledComposer = {
           from: step.from,
           text: step.text,
-          startMs: start,
-          endMs: start + dur,
+          startMs: cursor,
+          endMs: cursor + dur,
         };
         composers.push(comp);
         lastComposer = comp;
-        cursor = start + dur + (step.holdAfter ?? 0);
+        cursor += dur;
         break;
       }
 
       case "send": {
-        const sendAt = cursor + (step.delay ?? 0);
         if (lastComposer) {
-          lastComposer.sendMs = sendAt;
+          lastComposer.sendMs = cursor;
           const id = nextId(step.id);
           // A send commits whatever's in the composer, so the message is always
           // from whoever was typing — never the step's own `from` (a stray
@@ -179,18 +226,16 @@ export function compile(config: Config): CompiledTimeline {
             isSelf: selfIds.has(sendFrom),
             variant: "message",
             content: toContentNodes({ text: lastComposer.text }),
-            appearMs: sendAt,
+            appearMs: cursor,
             revealMs: SEND_REVEAL_MS,
-            atMs: sendAt,
+            atMs: cursor,
             reactions: [],
           };
           messages.push(msg);
           byId.set(id, msg);
           lastMessage = msg;
-          cursor = sendAt + SEND_REVEAL_MS + (step.holdAfter ?? 0);
+          cursor += SEND_REVEAL_MS;
           lastComposer = undefined;
-        } else {
-          cursor = sendAt + (step.holdAfter ?? 0);
         }
         break;
       }
@@ -198,9 +243,9 @@ export function compile(config: Config): CompiledTimeline {
       case "reaction": {
         const target = resolveTarget(step.target);
         if (target) {
-          const delay =
-            step.delay ??
-            withJitter(rng, pacing.reactionDelayMs, pacing.humanize);
+          // No global default lag — reactions land when the target appears
+          // unless the step specifies its own `delay`.
+          const delay = step.delay ?? 0;
           const appearAt = target.appearMs + target.revealMs + delay;
           const by = step.from ? [step.from] : [];
           target.reactions.push({
@@ -211,9 +256,7 @@ export function compile(config: Config): CompiledTimeline {
             appearMs: appearAt,
             popMs: REACTION_POP_MS,
           });
-          cursor =
-            Math.max(cursor, appearAt + REACTION_POP_MS) +
-            (step.holdAfter ?? 0);
+          cursor = Math.max(cursor, appearAt + REACTION_POP_MS);
         }
         break;
       }
@@ -221,10 +264,11 @@ export function compile(config: Config): CompiledTimeline {
       case "edit": {
         const target = resolveTarget(step.target);
         if (target) {
-          const editAt = cursor + (step.delay ?? pacing.interMessageGapMs);
-          target.editedAtMs = editAt;
+          // Edits/deletes happen at the cursor; insert a `delay` step before
+          // them to add breathing room.
+          target.editedAtMs = cursor;
           target.editedContent = toContentNodes(step);
-          cursor = editAt + REVEAL_MS + (step.holdAfter ?? 0);
+          cursor += REVEAL_MS;
         }
         break;
       }
@@ -232,19 +276,18 @@ export function compile(config: Config): CompiledTimeline {
       case "delete": {
         const target = resolveTarget(step.target);
         if (target) {
-          const delAt = cursor + (step.delay ?? pacing.interMessageGapMs);
-          target.deletedAtMs = delAt;
-          cursor = delAt + (step.holdAfter ?? 0);
+          target.deletedAtMs = cursor;
         }
         break;
       }
 
       case "readReceipt": {
-        cursor += step.delay ?? 0;
+        // No timeline advancement; receipts are visual-only and overlay the
+        // current frame.
         break;
       }
 
-      case "beat": {
+      case "delay": {
         cursor += step.duration;
         break;
       }

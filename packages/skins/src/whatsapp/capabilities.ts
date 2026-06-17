@@ -12,7 +12,7 @@ export const whatsappCapabilities: Capabilities = {
     edit: "native",
     delete: "native",
     system: "fallback", // centred system pill
-    beat: "native",
+    delay: "native",
   },
   content: {
     text: true,

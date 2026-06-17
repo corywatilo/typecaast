@@ -173,7 +173,7 @@ export function OutputPanel({
           }}
         >
           Pacing{" "}
-          <InfoTip text="Auto-timing for the conversation. Per-step delays in the timeline override these defaults." />
+          <InfoTip text="Auto-timing for the conversation. Insert `delay` steps in the timeline to add explicit pauses." />
         </p>
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}
@@ -211,44 +211,6 @@ export function OutputPanel({
                 onChange(
                   updatePacing(config, {
                     typingCps: Number(e.currentTarget.value),
-                  }),
-                )
-              }
-            />
-          </Field>
-          <Field
-            label={
-              <L tip="Default pause between consecutive messages from different people.">
-                Inter-message gap (ms)
-              </L>
-            }
-          >
-            <Input
-              type="number"
-              value={num(pacing.interMessageGapMs, 900)}
-              onChange={(e) =>
-                onChange(
-                  updatePacing(config, {
-                    interMessageGapMs: Number(e.currentTarget.value),
-                  }),
-                )
-              }
-            />
-          </Field>
-          <Field
-            label={
-              <L tip="How long after a message before its reaction lands.">
-                Reaction lag (ms)
-              </L>
-            }
-          >
-            <Input
-              type="number"
-              value={num(pacing.reactionDelayMs, 700)}
-              onChange={(e) =>
-                onChange(
-                  updatePacing(config, {
-                    reactionDelayMs: Number(e.currentTarget.value),
                   }),
                 )
               }

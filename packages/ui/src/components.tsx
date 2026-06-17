@@ -93,11 +93,14 @@ export function Select({
 
 export function Field({
   label,
+  hint,
   htmlFor,
   children,
   className,
 }: {
   label?: ReactNode;
+  /** Optional explanatory tooltip shown via an `ⓘ` next to the label. */
+  hint?: string;
   htmlFor?: string;
   children?: ReactNode;
   className?: string;
@@ -120,9 +123,17 @@ export function Field({
   return (
     <div className={cx("tc-field", className)}>
       {label ? (
-        <label className="tc-label" htmlFor={labelFor}>
-          {label}
-        </label>
+        <div className="tc-field-label-row">
+          <label className="tc-label" htmlFor={labelFor}>
+            {label}
+          </label>
+          {hint ? (
+            <InfoTip
+              text={hint}
+              label={typeof label === "string" ? `${label}: more info` : undefined}
+            />
+          ) : null}
+        </div>
       ) : null}
       {control}
     </div>

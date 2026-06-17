@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { IconButton } from "@typecaast/ui";
+import { IconClose } from "./icons.js";
 
 /** A lightweight centered modal with a backdrop. Esc / backdrop click closes. */
 export function Modal({
@@ -68,7 +69,7 @@ export function Modal({
           </span>
           <span style={{ flex: 1 }} />
           <IconButton aria-label="Close" onClick={onClose}>
-            ✕
+            <IconClose size={13} />
           </IconButton>
         </div>
         <div style={{ padding: 16 }}>{children}</div>

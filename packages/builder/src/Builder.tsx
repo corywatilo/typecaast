@@ -29,13 +29,14 @@ import {
 import { Preview } from "./Preview.js";
 import { TimelinePanel } from "./TimelinePanel.js";
 import { Modal } from "./Modal.js";
+import { IconRedo, IconUndo } from "./icons.js";
 import { CastPanel } from "./panels/CastPanel.js";
 import { SkinPanel } from "./panels/SkinPanel.js";
 import { OutputPanel } from "./panels/OutputPanel.js";
 import { ExportPanel } from "./panels/ExportPanel.js";
 import { ImportPanel } from "./panels/ImportPanel.js";
 import {
-  addStep,
+  addStepAutoPaced,
   blankStep,
   changeStepType,
   deleteStep,
@@ -205,7 +206,7 @@ export function Builder({
           disabled={!canUndo(history)}
           onClick={() => dispatch({ type: "undo" })}
         >
-          ↶
+          <IconUndo size={15} />
         </IconButton>
         <IconButton
           aria-label="Redo"
@@ -213,7 +214,7 @@ export function Builder({
           disabled={!canRedo(history)}
           onClick={() => dispatch({ type: "redo" })}
         >
-          ↷
+          <IconRedo size={15} />
         </IconButton>
         {headerActions}
         <Button size="sm" variant="primary" onClick={() => setModal("export")}>
@@ -266,8 +267,13 @@ export function Builder({
                 selected={selected}
                 onSelect={setSelected}
                 onAdd={(t, at) => {
-                  update(addStep(config, blankStep(t, defaultFrom), at));
-                  setSelected(at ?? config.timeline.length);
+                  const result = addStepAutoPaced(
+                    config,
+                    blankStep(t, defaultFrom),
+                    at,
+                  );
+                  update(result.config);
+                  setSelected(result.index);
                 }}
                 onDelete={(i) => {
                   update(deleteStep(config, i));

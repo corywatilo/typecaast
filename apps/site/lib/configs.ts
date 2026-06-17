@@ -37,11 +37,11 @@ export const billingToast: ConfigInput = {
       from: "posthog-bot",
       delay: 900,
     },
+    { type: "delay", duration: 1400 },
     {
       type: "message",
       from: "posthog-bot",
       text: "Let me check how exceptions are captured in the frontend.",
-      delay: 1400,
     },
     {
       type: "system",

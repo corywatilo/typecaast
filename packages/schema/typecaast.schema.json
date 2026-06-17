@@ -159,8 +159,6 @@
       "default": {
         "readingWpm": 240,
         "typingCps": 14,
-        "reactionDelayMs": 700,
-        "interMessageGapMs": 900,
         "humanize": 0.15,
         "startDelayMs": 400
       },
@@ -175,16 +173,6 @@
           "default": 14,
           "type": "number",
           "exclusiveMinimum": 0
-        },
-        "reactionDelayMs": {
-          "default": 700,
-          "type": "number",
-          "minimum": 0
-        },
-        "interMessageGapMs": {
-          "default": 900,
-          "type": "number",
-          "minimum": 0
         },
         "humanize": {
           "default": 0.15,
@@ -201,8 +189,6 @@
       "required": [
         "readingWpm",
         "typingCps",
-        "reactionDelayMs",
-        "interMessageGapMs",
         "humanize",
         "startDelayMs"
       ],
@@ -433,15 +419,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -469,18 +448,15 @@
               "from": {
                 "type": "string"
               },
+              "delay": {
+                "type": "number",
+                "minimum": 0
+              },
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -507,15 +483,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -544,15 +513,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -575,15 +537,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -795,15 +750,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -825,15 +773,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -858,15 +799,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -1099,15 +1033,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [
@@ -1120,7 +1047,7 @@
             "properties": {
               "type": {
                 "type": "string",
-                "const": "beat"
+                "const": "delay"
               },
               "duration": {
                 "type": "number",
@@ -1129,15 +1056,8 @@
               "id": {
                 "type": "string"
               },
-              "delay": {
-                "type": "number"
-              },
               "instant": {
                 "type": "boolean"
-              },
-              "holdAfter": {
-                "type": "number",
-                "minimum": 0
               }
             },
             "required": [

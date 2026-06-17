@@ -14,7 +14,7 @@ const cursorCapabilities: Capabilities = {
     readReceipt: "unsupported",
     edit: "native",
     delete: "native",
-    beat: "native",
+    delay: "native",
   },
   content: { text: true, image: true },
   reactions: false,
