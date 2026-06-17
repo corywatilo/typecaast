@@ -21,9 +21,16 @@ pnpm --filter @typecaast/extension build      # → extension/dist
 
 Load `extension/dist` unpacked (`chrome://extensions` → Developer mode → Load
 unpacked). Then on the target page: click the toolbar icon → **Pick & capture**
-→ hover to highlight the thread container → click. A `…-skin-draft.json`
-downloads. Nothing leaves your machine — the extension has no host permissions
-and makes no network requests.
+→ hover to highlight the thread container → click (or **Esc** to cancel). A
+`…-skin-draft.json` downloads, and the popup keeps the most recent capture so
+you can hit **Download last draft** to grab it again without re-picking.
+Nothing leaves your machine — the extension has no host permissions and makes
+no network requests.
+
+Works on **authenticated screens**: the picker runs as a content script in
+your already-logged-in tab via `activeTab`, so DMs, internal tools, or anything
+behind SSO captures the same way a public page does — no credentials, cookies,
+or URLs are read or sent anywhere.
 
 ### B. The saved-page importer (headless)
 

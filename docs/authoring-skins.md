@@ -9,6 +9,12 @@ This guide takes you from zero to a working, theme-aware skin. The contract is
 small — seven components plus metadata — and the same skin renders in both the
 live React player and the Remotion video export.
 
+> **Just want to grab an existing UI?** If you have a real chat page (including
+> ones behind a login) and want a skin draft from it in one click, jump to
+> [Capture a skin](./capturing-skins.md) — it documents the Chrome extension
+> and the saved-page importer. Come back here to polish the result or to build
+> a skin from scratch.
+
 > **Heads-up on trademarks.** Reproduce _layout, type, spacing, and color_ —
 > not logos or proprietary fonts. Name skins `"<Platform>-style"`. See
 > [`TRADEMARKS.md`](../TRADEMARKS.md). Community skins are untrusted code and are
