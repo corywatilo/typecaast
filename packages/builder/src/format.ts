@@ -4,7 +4,9 @@ export function formatMs(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-function truncate(text: string, max = 28): string {
+// Generous cap — the timeline row clamps to two lines via CSS, so this only
+// guards pathologically long text rather than hard-cutting at one line.
+function truncate(text: string, max = 96): string {
   const t = text.trim();
   return t.length > max ? `${t.slice(0, max - 1)}…` : t;
 }

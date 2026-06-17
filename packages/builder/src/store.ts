@@ -160,3 +160,32 @@ export function blankStep(type: Step["type"], from: string): Step {
       return { type: "beat", duration: 1000 };
   }
 }
+
+/**
+ * Change a step's type in place. Preserves the shared base fields
+ * (id/delay/holdAfter/instant) and carries over from/text/target/emoji/card when
+ * the new type uses them; type-specific fields reset to `blankStep` defaults.
+ */
+export function changeStepType(
+  config: ConfigInput,
+  index: number,
+  newType: Step["type"],
+  defaultFrom: string,
+): ConfigInput {
+  const old = config.timeline[index] as Record<string, unknown> | undefined;
+  if (!old) return config;
+  const next = blankStep(
+    newType,
+    (old.from as string) ?? defaultFrom,
+  ) as Record<string, unknown>;
+  for (const k of ["id", "delay", "holdAfter", "instant"] as const) {
+    if (old[k] !== undefined) next[k] = old[k];
+  }
+  for (const k of ["from", "text", "target", "emoji", "card"] as const) {
+    if (k in next && old[k] !== undefined) next[k] = old[k];
+  }
+  const timeline = config.timeline.map((s, i) =>
+    i === index ? (next as unknown as Step) : s,
+  );
+  return { ...config, timeline };
+}

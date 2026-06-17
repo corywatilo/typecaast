@@ -1,5 +1,6 @@
-import type { ConfigInput } from "@typecaast/schema";
+import type { ConfigInput, StepType } from "@typecaast/schema";
 import { Field, Input, Select } from "@typecaast/ui";
+import { STEP_GROUPS } from "./steps.js";
 
 type Step = ConfigInput["timeline"][number];
 type Participants = ConfigInput["participants"];
@@ -63,10 +64,13 @@ export function StepEditor({
   step,
   participants,
   onChange,
+  onChangeType,
 }: {
   step: Step;
   participants: Participants;
   onChange: (patch: Record<string, unknown>) => void;
+  /** Change the step's type (transforms the step, preserving compatible fields). */
+  onChangeType: (type: StepType) => void;
 }) {
   const type = step.type;
   // `send` deliberately has no From — it commits the preceding composer and
@@ -80,7 +84,20 @@ export function StepEditor({
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <Field label="Type">
-        <Input value={type} disabled />
+        <Select
+          value={type}
+          onChange={(e) => onChangeType(e.currentTarget.value as StepType)}
+        >
+          {STEP_GROUPS.map((g) => (
+            <optgroup key={g.name} label={g.name}>
+              {g.types.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </Select>
       </Field>
 
       {type === "send" ? (

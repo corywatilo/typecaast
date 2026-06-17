@@ -6,7 +6,7 @@ import {
   type CSSProperties,
 } from "react";
 import type { ConfigInput } from "@typecaast/schema";
-import { STEP_TYPES, type StepType } from "@typecaast/schema";
+import { type StepType } from "@typecaast/schema";
 import {
   DndContext,
   PointerSensor,
@@ -21,9 +21,10 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Badge, Button, IconButton } from "@typecaast/ui";
+import { Button, IconButton } from "@typecaast/ui";
 import { stepLabel } from "./format.js";
 import { StepEditor } from "./StepEditor.js";
+import { StepIcon, StepPicker } from "./steps.js";
 
 type Step = ConfigInput["timeline"][number];
 
@@ -63,8 +64,8 @@ function SortableStepRow({
     : "";
   const style: CSSProperties = {
     display: "flex",
-    alignItems: "center",
-    gap: 6,
+    flexDirection: "column",
+    gap: 3,
     padding: "7px 8px",
     borderRadius: active ? "8px 8px 0 0" : 8,
     border: `1px solid ${active ? "var(--tc-accent)" : "var(--tc-border)"}`,
@@ -79,6 +80,13 @@ function SortableStepRow({
     opacity: isDragging ? 0.97 : 1,
   };
 
+  const toggle = () => onSelect(active ? null : index);
+  const preview = stepLabel(step);
+  // Hide the second line when it'd just repeat the type name (send/edit/…).
+  const showPreview =
+    !!preview && preview.toLowerCase() !== step.type.toLowerCase();
+  const accent = active ? "var(--tc-accent)" : undefined;
+
   return (
     <div
       ref={setNodeRef}
@@ -86,89 +94,122 @@ function SortableStepRow({
       data-active={active ? "" : undefined}
       style={style}
     >
-      <button
-        type="button"
-        className="tc-step-grip"
-        aria-label="Drag to reorder"
-        {...attributes}
-        {...listeners}
-      >
-        ⠿
-      </button>
-      <button
-        type="button"
-        aria-expanded={active}
-        onClick={() => onSelect(active ? null : index)}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          flex: 1,
-          minWidth: 0,
-          padding: 0,
-          border: 0,
-          background: "transparent",
-          cursor: "pointer",
-          color: "inherit",
-          font: "inherit",
-          textAlign: "left",
-        }}
-      >
-        <span
-          className="tc-muted"
-          style={{ fontSize: 10, width: 10, opacity: 0.7 }}
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <button
+          type="button"
+          className="tc-step-grip"
+          aria-label="Drag to reorder"
+          {...attributes}
+          {...listeners}
         >
-          {active ? "▾" : "▸"}
-        </span>
-        <span className="tc-muted tc-mono" style={{ fontSize: 11, width: 16 }}>
-          {index + 1}
-        </span>
-        <Badge tone={active ? "accent" : "neutral"}>{step.type}</Badge>
-        <span
+          ⠿
+        </button>
+        <button
+          type="button"
+          aria-expanded={active}
+          onClick={toggle}
           style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
             flex: 1,
             minWidth: 0,
-            fontSize: 13,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
+            padding: 0,
+            border: 0,
+            background: "transparent",
+            cursor: "pointer",
+            color: "inherit",
+            font: "inherit",
+            textAlign: "left",
           }}
         >
-          {stepLabel(step)}
+          <span
+            className="tc-muted"
+            style={{ fontSize: 10, width: 10, opacity: 0.7 }}
+          >
+            {active ? "▾" : "▸"}
+          </span>
+          <span
+            className="tc-muted tc-mono"
+            style={{ fontSize: 11, flex: "0 0 16px" }}
+          >
+            {index + 1}
+          </span>
+          <span
+            style={{
+              display: "inline-flex",
+              flex: "0 0 auto",
+              color: accent ?? "var(--tc-text-muted)",
+            }}
+          >
+            <StepIcon type={step.type} />
+          </span>
+          <span
+            className="tc-mono"
+            style={{
+              fontSize: 12.5,
+              fontWeight: 560,
+              color: accent ?? "var(--tc-text)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {step.type}
+          </span>
+        </button>
+        <span style={{ display: "flex", gap: 2, flex: "0 0 auto" }}>
+          <IconButton
+            aria-label="Move up"
+            disabled={index === 0}
+            onClick={() => onMove(index, index - 1)}
+            style={{ width: 24, height: 24 }}
+          >
+            ↑
+          </IconButton>
+          <IconButton
+            aria-label="Move down"
+            disabled={index === count - 1}
+            onClick={() => onMove(index, index + 1)}
+            style={{ width: 24, height: 24 }}
+          >
+            ↓
+          </IconButton>
+          <IconButton
+            aria-label="Duplicate"
+            onClick={() => onDuplicate(index)}
+            style={{ width: 24, height: 24 }}
+          >
+            ⧉
+          </IconButton>
+          <IconButton
+            aria-label="Delete step"
+            onClick={() => onDelete(index)}
+            style={{ width: 24, height: 24 }}
+          >
+            ✕
+          </IconButton>
         </span>
-      </button>
-      <span style={{ display: "flex", gap: 2 }}>
-        <IconButton
-          aria-label="Move up"
-          disabled={index === 0}
-          onClick={() => onMove(index, index - 1)}
-          style={{ width: 24, height: 24 }}
+      </div>
+      {showPreview ? (
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label="Edit step"
+          className="tc-step-line2"
+          style={{
+            width: "100%",
+            padding: "0 0 0 22px",
+            border: 0,
+            background: "transparent",
+            cursor: "pointer",
+            textAlign: "left",
+            font: "inherit",
+          }}
         >
-          ↑
-        </IconButton>
-        <IconButton
-          aria-label="Move down"
-          disabled={index === count - 1}
-          onClick={() => onMove(index, index + 1)}
-          style={{ width: 24, height: 24 }}
-        >
-          ↓
-        </IconButton>
-        <IconButton
-          aria-label="Duplicate"
-          onClick={() => onDuplicate(index)}
-          style={{ width: 24, height: 24 }}
-        >
-          ⧉
-        </IconButton>
-        <IconButton
-          aria-label="Delete step"
-          onClick={() => onDelete(index)}
-          style={{ width: 24, height: 24 }}
-        >
-          ✕
-        </IconButton>
-      </span>
+          {preview}
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -189,31 +230,8 @@ function InsertZone({
 }) {
   if (open) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 6,
-          padding: "8px 6px",
-          margin: "2px 0",
-          borderRadius: 8,
-          border: "1px dashed var(--tc-accent)",
-          background: "var(--tc-bg-subtle)",
-        }}
-      >
-        {STEP_TYPES.map((tp) => (
-          <Button
-            key={tp}
-            size="sm"
-            variant="ghost"
-            onClick={() => onAdd(tp, index)}
-          >
-            {tp}
-          </Button>
-        ))}
-        <Button size="sm" variant="ghost" onClick={onClose}>
-          cancel
-        </Button>
+      <div style={{ margin: "4px 0" }}>
+        <StepPicker onAdd={(tp) => onAdd(tp, index)} onClose={onClose} />
       </div>
     );
   }
@@ -235,6 +253,7 @@ export function TimelinePanel({
   onMove,
   onDuplicate,
   onUpdateStep,
+  onChangeType,
 }: {
   config: ConfigInput;
   selected: number | null;
@@ -245,6 +264,7 @@ export function TimelinePanel({
   onMove: (from: number, to: number) => void;
   onDuplicate: (index: number) => void;
   onUpdateStep: (index: number, patch: Record<string, unknown>) => void;
+  onChangeType: (index: number, type: StepType) => void;
 }) {
   const [adding, setAdding] = useState(false);
   const [insertAt, setInsertAt] = useState<number | null>(null);
@@ -291,7 +311,7 @@ export function TimelinePanel({
         flexDirection: "column",
         height: "100%",
         // Fill the column (the Cast tab uses flex:1) and allow shrinking so the
-        // panel never forces the column wider than its 320px basis.
+        // panel never forces the column wider than its basis.
         flex: 1,
         minWidth: 0,
       }}
@@ -356,6 +376,7 @@ export function TimelinePanel({
                         step={step}
                         participants={config.participants}
                         onChange={(patch) => onUpdateStep(i, patch)}
+                        onChangeType={(type) => onChangeType(i, type)}
                       />
                     </div>
                   ) : null}
@@ -387,29 +408,14 @@ export function TimelinePanel({
           }}
         >
           {adding ? (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {STEP_TYPES.map((t) => (
-                <Button
-                  key={t}
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    scrollToEnd.current = true;
-                    onAdd(t);
-                    setAdding(false);
-                  }}
-                >
-                  {t}
-                </Button>
-              ))}
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setAdding(false)}
-              >
-                cancel
-              </Button>
-            </div>
+            <StepPicker
+              onAdd={(t) => {
+                scrollToEnd.current = true;
+                onAdd(t);
+                setAdding(false);
+              }}
+              onClose={() => setAdding(false)}
+            />
           ) : (
             <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
               + Step

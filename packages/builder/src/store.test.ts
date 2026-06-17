@@ -7,6 +7,7 @@ import {
   deleteStep,
   duplicateStep,
   moveStep,
+  changeStepType,
   removeParticipant,
   setCanvas,
   setSelf,
@@ -66,6 +67,32 @@ describe("config store", () => {
     expect(next.participants.filter((p) => p.isSelf === true)).toHaveLength(1);
     expect(next.participants[1]!.isSelf).toBe(true);
     expect(next.participants[0]!.isSelf).toBeUndefined();
+  });
+
+  it("changeStepType preserves shared + compatible fields", () => {
+    const cfg: ConfigInput = {
+      ...base,
+      timeline: [
+        { type: "message", from: "b", text: "hi", id: "m1", delay: 500 },
+      ],
+    };
+    // message → composerType keeps from/text/id/delay
+    const ct = changeStepType(cfg, 0, "composerType", "a")
+      .timeline[0] as Record<string, unknown>;
+    expect(ct.type).toBe("composerType");
+    expect(ct.from).toBe("b");
+    expect(ct.text).toBe("hi");
+    expect(ct.id).toBe("m1");
+    expect(ct.delay).toBe(500);
+    // message → reaction drops text (not a reaction field) but keeps id/delay
+    const rx = changeStepType(cfg, 0, "reaction", "a").timeline[0] as Record<
+      string,
+      unknown
+    >;
+    expect(rx.type).toBe("reaction");
+    expect(rx.text).toBeUndefined();
+    expect(rx.emoji).toBe("👍");
+    expect(rx.id).toBe("m1");
   });
 
   it("sets canvas + pacing", () => {

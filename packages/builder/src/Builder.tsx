@@ -37,6 +37,7 @@ import { ImportPanel } from "./panels/ImportPanel.js";
 import {
   addStep,
   blankStep,
+  changeStepType,
   deleteStep,
   duplicateStep,
   moveStep,
@@ -224,14 +225,14 @@ export function Builder({
         <aside
           aria-label="Timeline and cast"
           style={{
-            flex: "0 0 320px",
+            flex: "0 0 360px",
             display: "flex",
             flexDirection: "column",
             borderRight: "1px solid var(--tc-border)",
             background: "var(--tc-panel)",
             minHeight: 0,
-            // Pin to 320px: without this, `min-width:auto` lets wide tab content
-            // (timeline rows) override the basis, so the column jumps per tab.
+            // Pin to the basis: without this, `min-width:auto` lets wide tab
+            // content (timeline rows) override it, so the column jumps per tab.
             minWidth: 0,
           }}
         >
@@ -287,6 +288,10 @@ export function Builder({
                 onUpdateStep={(i, patch) =>
                   commit(updateStep(config, i, patch as never), true)
                 }
+                onChangeType={(i, t) => {
+                  update(changeStepType(config, i, t, defaultFrom));
+                  setSelected(i);
+                }}
               />
             ) : (
               <div
@@ -348,7 +353,7 @@ export function Builder({
         <aside
           aria-label="App and options"
           style={{
-            flex: "0 0 320px",
+            flex: "0 0 360px",
             display: "flex",
             flexDirection: "column",
             borderLeft: "1px solid var(--tc-border)",
