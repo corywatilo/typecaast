@@ -1,6 +1,23 @@
+import type { ReactNode } from "react";
 import type { ConfigInput, StepType } from "@typecaast/schema";
 import { Field, Input, Select } from "@typecaast/ui";
 import { STEP_GROUPS } from "./steps.js";
+import { InfoTip } from "./Tooltip.js";
+
+/**
+ * Inline label + builder-side `InfoTip`. We use the JS-positioned tooltip from
+ * `./Tooltip` (rather than `Field`'s `hint` prop, which renders the SSR-safe
+ * `InfoTip` from `@typecaast/ui`) so the popover escapes the Options column's
+ * `overflow:auto` clip.
+ */
+function L({ children, tip }: { children: ReactNode; tip: string }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+      {children}
+      <InfoTip text={tip} />
+    </span>
+  );
+}
 
 type Step = ConfigInput["timeline"][number];
 type Participants = ConfigInput["participants"];
@@ -39,19 +56,19 @@ function Textarea({
 
 function NumberField({
   label,
-  hint,
+  tip,
   value,
   placeholder,
   onChange,
 }: {
   label: string;
-  hint?: string;
+  tip?: string;
   value: unknown;
   placeholder?: string;
   onChange: (v: number | undefined) => void;
 }) {
   return (
-    <Field label={label} hint={hint}>
+    <Field label={tip ? <L tip={tip}>{label}</L> : label}>
       <Input
         type="number"
         placeholder={placeholder}
@@ -88,7 +105,7 @@ export function StepEditor({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <Field label="Type" hint="What this step does on the timeline.">
+      <Field label={<L tip="What this step does on the timeline.">Type</L>}>
         <Select
           value={type}
           onChange={(e) => onChangeType(e.currentTarget.value as StepType)}
@@ -121,7 +138,9 @@ export function StepEditor({
       ) : null}
 
       {hasFrom ? (
-        <Field label="From" hint="Which participant performs this step.">
+        <Field
+          label={<L tip="Which participant performs this step.">From</L>}
+        >
           <Select
             value={(get(step, "from") as string) ?? ""}
             onChange={(e) => onChange({ from: e.currentTarget.value })}
@@ -137,7 +156,9 @@ export function StepEditor({
       ) : null}
 
       {hasText ? (
-        <Field label="Text" hint="The message content. Supports markdown.">
+        <Field
+          label={<L tip="The message content. Supports markdown.">Text</L>}
+        >
           <Textarea
             value={(get(step, "text") as string) ?? ""}
             placeholder={
@@ -156,18 +177,24 @@ export function StepEditor({
 
       {hasTarget ? (
         <Field
-          label="Target (message id or $prev)"
-          hint="The id of the message to react to / edit / delete. Use $prev for the immediately previous message."
+          label={
+            <L tip="Id of the message to react to / edit / delete. Leave blank to target the most-recent message.">
+              Target (message id)
+            </L>
+          }
         >
           <Input
             value={(get(step, "target") as string) ?? ""}
-            onChange={(e) => onChange({ target: e.currentTarget.value })}
+            placeholder="previous message"
+            onChange={(e) =>
+              onChange({ target: e.currentTarget.value || undefined })
+            }
           />
         </Field>
       ) : null}
 
       {type === "reaction" ? (
-        <Field label="Emoji" hint="Emoji shown as the reaction.">
+        <Field label={<L tip="Emoji shown as the reaction.">Emoji</L>}>
           <Input
             value={(get(step, "emoji") as string) ?? ""}
             onChange={(e) => onChange({ emoji: e.currentTarget.value })}
@@ -177,8 +204,11 @@ export function StepEditor({
 
       {type === "system" ? (
         <Field
-          label="Card"
-          hint="System card id provided by the skin (e.g. pr-opened, deploy-success)."
+          label={
+            <L tip="System card id provided by the skin (e.g. pr-opened, deploy-success).">
+              Card
+            </L>
+          }
         >
           <Input
             value={(get(step, "card") as string) ?? ""}
@@ -191,7 +221,7 @@ export function StepEditor({
       {type === "delay" ? (
         <NumberField
           label="Duration (ms)"
-          hint="How long this delay pauses the timeline."
+          tip="How long this delay pauses the timeline."
           value={get(step, "duration")}
           onChange={(v) => onChange({ duration: v ?? 0 })}
         />
@@ -200,7 +230,7 @@ export function StepEditor({
       {type === "typing" ? (
         <NumberField
           label="Show typing for (ms)"
-          hint="How long the typing indicator is visible. Auto = derived from the next message length."
+          tip="How long the typing indicator is visible. Auto = derived from the next message length."
           value={get(step, "showTypingFor")}
           placeholder="auto"
           onChange={(v) => onChange({ showTypingFor: v })}
@@ -210,9 +240,9 @@ export function StepEditor({
       {type === "reaction" ? (
         <NumberField
           label="Reaction delay (ms)"
-          hint="Gap between the target message appearing and this reaction landing. Auto = a humanised default."
+          tip="Gap between the target message appearing and this reaction landing. Leave blank for the default beat (~1000ms with humanise jitter)."
           value={get(step, "delay")}
-          placeholder="auto"
+          placeholder="1000"
           onChange={(v) => onChange({ delay: v })}
         />
       ) : null}
@@ -228,8 +258,11 @@ export function StepEditor({
         }}
       >
         <Field
-          label="Id (optional)"
-          hint="Stable id you can target from later steps (reactions, edits, deletes). Otherwise auto-generated."
+          label={
+            <L tip="Stable id you can target from later steps (reactions, edits, deletes). Otherwise auto-generated.">
+              Id (optional)
+            </L>
+          }
         >
           <Input
             value={(get(step, "id") as string) ?? ""}
@@ -241,8 +274,11 @@ export function StepEditor({
         </Field>
         {type === "message" || type === "system" ? (
           <Field
-            label="Instant"
-            hint="Skip the auto-paced delay and reveal animation. On the first step, the message appears at t=0."
+            label={
+              <L tip="Skips the auto-paced gap and reveal animation. On the first step, the message appears at t=0. Manual `delay` steps still take effect.">
+                Instant
+              </L>
+            }
           >
             <label
               style={{

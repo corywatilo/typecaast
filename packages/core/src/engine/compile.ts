@@ -19,6 +19,11 @@ const REVEAL_MS = 280;
 const SEND_REVEAL_MS = 180;
 const REACTION_POP_MS = 200;
 const DEFAULT_TYPING_MS = 1500;
+/**
+ * Default lag for a reaction whose `delay` is left blank — same beat the
+ * builder auto-prepends between added steps (see `addStepAutoPaced`).
+ */
+const DEFAULT_REACTION_LAG_MS = 1000;
 /** Padding after the last event so the final frame holds (ms). */
 const TAIL_PAD_MS = 800;
 
@@ -90,8 +95,15 @@ export function compile(config: Config): CompiledTimeline {
   let lastComposer: CompiledComposer | undefined;
   let autoId = 0;
   const nextId = (explicit?: string): string => explicit ?? `auto-${autoId++}`;
-  const resolveTarget = (target: string): CompiledMessage | undefined =>
-    target === "$prev" ? lastMessage : byId.get(target);
+  /**
+   * Resolve a step's `target` to a compiled message. Blank/`undefined`/`$prev`
+   * all mean "the most-recent message" so authors can leave the field empty in
+   * the common case.
+   */
+  const resolveTarget = (target?: string): CompiledMessage | undefined => {
+    if (!target || target === "$prev") return lastMessage;
+    return byId.get(target);
+  };
 
   for (const step of config.timeline) {
     stepBoundaries.push(cursor);
@@ -243,9 +255,11 @@ export function compile(config: Config): CompiledTimeline {
       case "reaction": {
         const target = resolveTarget(step.target);
         if (target) {
-          // No global default lag — reactions land when the target appears
-          // unless the step specifies its own `delay`.
-          const delay = step.delay ?? 0;
+          // Default lag mirrors the builder's auto-prepended delay between
+          // steps so reactions land with a natural beat unless overridden.
+          const delay =
+            step.delay ??
+            withJitter(rng, DEFAULT_REACTION_LAG_MS, pacing.humanize);
           const appearAt = target.appearMs + target.revealMs + delay;
           const by = step.from ? [step.from] : [];
           target.reactions.push({

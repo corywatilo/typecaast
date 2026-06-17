@@ -176,7 +176,8 @@ export function blankStep(type: Step["type"], from: string): Step {
     case "message":
       return { type: "message", from, text: "" };
     case "reaction":
-      return { type: "reaction", target: "$prev", emoji: "👍" };
+      // No target — defaults to the most-recent message at compile time.
+      return { type: "reaction", emoji: "👍" };
     case "typing":
       return { type: "typing", from };
     case "composerType":
@@ -187,9 +188,9 @@ export function blankStep(type: Step["type"], from: string): Step {
     case "system":
       return { type: "system", from, text: "" };
     case "edit":
-      return { type: "edit", target: "$prev", text: "" };
+      return { type: "edit", text: "" };
     case "delete":
-      return { type: "delete", target: "$prev" };
+      return { type: "delete" };
     case "readReceipt":
       return { type: "readReceipt", by: from };
     case "delay":

@@ -145,14 +145,15 @@ export function validateConfig(raw: unknown): Diagnostic[] {
       step.type === "delete"
     ) {
       const target = step.target;
-      if (target === "$prev") {
+      // Blank/`$prev` both mean "the most-recent message".
+      if (!target || target === "$prev") {
         if (priorMessages === 0) {
           diagnostics.push({
             code: "W_NO_PREV",
             severity: "warning",
-            message: '"$prev" target has no preceding message.',
+            message: "Default target has no preceding message.",
             location: `${loc}.target`,
-            hint: "Place this after a message, or target a message id.",
+            hint: "Place this after a message, or set a target message id.",
           });
         }
       } else if (!messageIds.has(target)) {

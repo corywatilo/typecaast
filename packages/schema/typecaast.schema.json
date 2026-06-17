@@ -461,7 +461,6 @@
             },
             "required": [
               "type",
-              "target",
               "emoji"
             ],
             "additionalProperties": false
@@ -755,8 +754,7 @@
               }
             },
             "required": [
-              "type",
-              "target"
+              "type"
             ],
             "additionalProperties": false
           },
@@ -778,8 +776,7 @@
               }
             },
             "required": [
-              "type",
-              "target"
+              "type"
             ],
             "additionalProperties": false
           },

@@ -46,7 +46,8 @@ export const messageStepSchema = z.object({
 /** A reaction landing on a target message (`$prev` or a message id). */
 export const reactionStepSchema = z.object({
   type: z.literal("reaction"),
-  target: z.string(),
+  /** Message id to react to. Defaults to `$prev` (the most-recent message). */
+  target: z.string().optional(),
   emoji: z.string(),
   /** Emoji shortcode without colons, e.g. `"eyes"` — shown in skin tooltips. */
   shortcode: z.string().optional(),
@@ -84,7 +85,8 @@ export const sendStepSchema = z.object({
 /** Edit a previously sent message's body. */
 export const editStepSchema = z.object({
   type: z.literal("edit"),
-  target: z.string(),
+  /** Message id to edit. Defaults to `$prev` (the most-recent message). */
+  target: z.string().optional(),
   ...bodyShape,
   ...stepBaseShape,
 });
@@ -92,7 +94,8 @@ export const editStepSchema = z.object({
 /** Delete a previously sent message. */
 export const deleteStepSchema = z.object({
   type: z.literal("delete"),
-  target: z.string(),
+  /** Message id to delete. Defaults to `$prev` (the most-recent message). */
+  target: z.string().optional(),
   ...stepBaseShape,
 });
 

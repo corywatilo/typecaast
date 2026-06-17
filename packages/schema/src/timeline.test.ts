@@ -71,10 +71,15 @@ describe("timelineStepSchema", () => {
     ).toThrow();
   });
 
-  it("requires target + emoji on a reaction", () => {
+  it("requires emoji on a reaction; target defaults to $prev when omitted", () => {
+    // Missing emoji → invalid.
     expect(() =>
       timelineStepSchema.parse({ type: "reaction", target: "$prev" }),
     ).toThrow();
+    // Missing target → valid (compile-time treats blank as `$prev`).
+    expect(() =>
+      timelineStepSchema.parse({ type: "reaction", emoji: "👀" }),
+    ).not.toThrow();
   });
 
   it("requires duration on a delay", () => {
