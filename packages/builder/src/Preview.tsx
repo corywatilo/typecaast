@@ -99,19 +99,22 @@ export function Preview({
     loop,
   });
 
-  // Preview-as-you-go: remember the scrub position and restore it whenever the
-  // engine recompiles (an edit), so editing never throws you back to t=0. The
-  // builder opens on the **final** frame (full thread) — `posRef` starts at the
-  // end and `inited` guards the per-render capture so it isn't reset to 0 before
-  // the first seek runs.
-  const posRef = useRef<number>(Number.MAX_SAFE_INTEGER);
-  const inited = useRef(false);
+  // Preview-as-you-go: the builder opens on the **final** frame (full thread),
+  // and editing restores the last scrub position instead of snapping to t=0.
+  // `posRef` is null until the user navigates (= "open at the end"); we update it
+  // only from explicit navigation (below), never from a per-render `currentMs`
+  // capture — that raced the initial seek under StrictMode and reset it to 0.
+  const posRef = useRef<number | null>(null);
+  const remember = (ms: number) => {
+    posRef.current = ms;
+  };
+  const seededFor = useRef<unknown>(null);
   useEffect(() => {
-    if (inited.current) posRef.current = tc.currentMs;
-  });
-  useEffect(() => {
-    tc.player.seek(Math.min(posRef.current, tc.player.durationMs));
-    inited.current = true;
+    // Seed once per player instance: an edit makes a fresh player, restoring the
+    // remembered position; first load (posRef null) opens on the final frame.
+    if (seededFor.current === tc.player) return;
+    seededFor.current = tc.player;
+    tc.player.seek(posRef.current ?? tc.player.durationMs);
   }, [tc.player]);
 
   const atEnd = tc.currentMs >= tc.duration - 1;
@@ -120,9 +123,24 @@ export function Preview({
       tc.pause();
       return;
     }
-    if (atEnd) tc.seek(0);
+    if (atEnd) {
+      tc.seek(0);
+      remember(0);
+    }
     tc.play();
     onPlay?.();
+  };
+  const scrubTo = (ms: number) => {
+    tc.scrubTo(ms);
+    remember(ms);
+  };
+  const stepPrev = () => {
+    tc.stepPrev();
+    remember(tc.currentMs);
+  };
+  const stepNext = () => {
+    tc.stepNext();
+    remember(tc.currentMs);
   };
 
   const { width: cw, height: ch } = config.meta.canvas;
@@ -313,7 +331,7 @@ export function Preview({
           background: "var(--tc-panel)",
         }}
       >
-        <IconButton aria-label="Previous step" onClick={tc.stepPrev}>
+        <IconButton aria-label="Previous step" onClick={stepPrev}>
           ⏮
         </IconButton>
         <IconButton
@@ -322,7 +340,7 @@ export function Preview({
         >
           {tc.playing ? "⏸" : atEnd ? "↺" : "▶"}
         </IconButton>
-        <IconButton aria-label="Next step" onClick={tc.stepNext}>
+        <IconButton aria-label="Next step" onClick={stepNext}>
           ⏭
         </IconButton>
         <IconButton
@@ -342,7 +360,7 @@ export function Preview({
           step={10}
           value={Math.round(tc.currentMs)}
           aria-label="Scrub timeline"
-          onChange={(e) => tc.scrubTo(Number(e.currentTarget.value))}
+          onChange={(e) => scrubTo(Number(e.currentTarget.value))}
           style={{ flex: 1 }}
         />
         <span

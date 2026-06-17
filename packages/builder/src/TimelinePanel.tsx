@@ -285,7 +285,17 @@ export function TimelinePanel({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        // Fill the column (the Cast tab uses flex:1) and allow shrinking so the
+        // panel never forces the column wider than its 320px basis.
+        flex: 1,
+        minWidth: 0,
+      }}
+    >
       <div
         ref={scrollRef}
         style={{

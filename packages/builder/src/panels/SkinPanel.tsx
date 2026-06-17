@@ -1,14 +1,7 @@
 import type { ComposerMode, ConfigInput } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
-import {
-  Badge,
-  Field,
-  InfoTip,
-  Input,
-  Panel,
-  Segmented,
-  Select,
-} from "@typecaast/ui";
+import { Badge, Field, Input, Panel, Segmented, Select } from "@typecaast/ui";
+import { InfoTip } from "../Tooltip.js";
 import { setSkin, updateMeta } from "../store.js";
 import { capabilityLint } from "../lint.js";
 

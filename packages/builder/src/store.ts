@@ -123,6 +123,17 @@ export function removeParticipant(
   };
 }
 
+/** Mark one participant as the viewer (`isSelf`), clearing it on all others. */
+export function setSelf(config: ConfigInput, index: number): ConfigInput {
+  return {
+    ...config,
+    participants: config.participants.map((p, i) => ({
+      ...p,
+      isSelf: i === index ? true : undefined,
+    })),
+  };
+}
+
 /** A blank step of a given type, for the "add step" menu. */
 export function blankStep(type: Step["type"], from: string): Step {
   switch (type) {

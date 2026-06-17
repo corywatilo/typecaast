@@ -230,6 +230,9 @@ export function Builder({
             borderRight: "1px solid var(--tc-border)",
             background: "var(--tc-panel)",
             minHeight: 0,
+            // Pin to 320px: without this, `min-width:auto` lets wide tab content
+            // (timeline rows) override the basis, so the column jumps per tab.
+            minWidth: 0,
           }}
         >
           <div style={columnHeader}>
@@ -351,6 +354,7 @@ export function Builder({
             borderLeft: "1px solid var(--tc-border)",
             background: "var(--tc-panel)",
             minHeight: 0,
+            minWidth: 0,
           }}
         >
           <div style={columnHeader}>

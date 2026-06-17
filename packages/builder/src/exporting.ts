@@ -16,11 +16,19 @@ export function toJSON(config: ConfigInput): string {
   return JSON.stringify(config, null, 2) + "\n";
 }
 
-/** The npm install line for the packages the embed snippet imports. */
-export function installSnippet(): string {
+export type PackageManager = "npm" | "yarn" | "pnpm";
+
+const INSTALL_CMD: Record<PackageManager, string> = {
+  npm: "npm install",
+  yarn: "yarn add",
+  pnpm: "pnpm add",
+};
+
+/** The install line for the packages the embed snippet imports. */
+export function installSnippet(pm: PackageManager = "npm"): string {
   // `@typecaast/skins` comes along as a dependency of `@typecaast/react` (the
   // skin is lazy-loaded by id), so the embed only needs the one package.
-  return `npm install @typecaast/react`;
+  return `${INSTALL_CMD[pm]} @typecaast/react`;
 }
 
 /**
@@ -35,7 +43,7 @@ export function embedSnippet(_config: ConfigInput): string {
     `import config from "./typecaast.json";`,
     ``,
     `export default function Demo() {`,
-    `  return <Typecaast config={config} autoplay loop />;`,
+    `  return <Typecaast config={config} autoplay />;`,
     `}`,
   ].join("\n");
 }

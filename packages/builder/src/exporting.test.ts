@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { ConfigInput } from "@typecaast/schema";
-import { embedSnippet, renderSnippet, skinVar, toJSON } from "./exporting.js";
+import {
+  embedSnippet,
+  installSnippet,
+  renderSnippet,
+  skinVar,
+  toJSON,
+} from "./exporting.js";
 
 const config: ConfigInput = {
   version: 1,
@@ -28,11 +34,19 @@ describe("export helpers", () => {
     const s = embedSnippet(config);
     expect(s).toContain('import { Typecaast } from "@typecaast/react"');
     expect(s).toContain('import config from "./typecaast.json"');
-    expect(s).toContain("<Typecaast config={config} autoplay loop />");
-    // Single source of truth: no skin import/prop, and no "use client" needed.
+    expect(s).toContain("<Typecaast config={config} autoplay />");
+    // Single source of truth: no skin import/prop, no loop, no "use client".
     expect(s).not.toContain("@typecaast/skins");
     expect(s).not.toContain("skin=");
+    expect(s).not.toContain("loop");
     expect(s).not.toContain("use client");
+  });
+
+  it("emits an install line per package manager", () => {
+    expect(installSnippet()).toBe("npm install @typecaast/react");
+    expect(installSnippet("npm")).toBe("npm install @typecaast/react");
+    expect(installSnippet("yarn")).toBe("yarn add @typecaast/react");
+    expect(installSnippet("pnpm")).toBe("pnpm add @typecaast/react");
   });
 
   it("emits a render command with size + theme", () => {

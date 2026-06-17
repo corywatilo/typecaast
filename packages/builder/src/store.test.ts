@@ -9,6 +9,7 @@ import {
   moveStep,
   removeParticipant,
   setCanvas,
+  setSelf,
   setSkin,
   updateMeta,
   updatePacing,
@@ -57,6 +58,14 @@ describe("config store", () => {
     expect(removeParticipant(base, 0).participants).toHaveLength(1);
     expect(setSkin(base, "imessage").meta.skin.id).toBe("imessage");
     expect(updateMeta(base, { seed: 99 }).meta.seed).toBe(99);
+  });
+
+  it("setSelf marks exactly one viewer", () => {
+    // `base` starts with participant a as self; move it to b.
+    const next = setSelf(base, 1);
+    expect(next.participants.filter((p) => p.isSelf === true)).toHaveLength(1);
+    expect(next.participants[1]!.isSelf).toBe(true);
+    expect(next.participants[0]!.isSelf).toBeUndefined();
   });
 
   it("sets canvas + pacing", () => {

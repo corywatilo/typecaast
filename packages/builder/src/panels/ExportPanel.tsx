@@ -7,6 +7,7 @@ import {
   installSnippet,
   renderSnippet,
   toJSON,
+  type PackageManager,
 } from "../exporting.js";
 import type { BuilderEvent } from "../Builder.js";
 
@@ -93,9 +94,12 @@ export function ExportPanel({
   onChange: (next: ConfigInput) => void;
   onEvent?: (event: BuilderEvent) => void;
 }) {
-  const install = installSnippet();
+  const [pm, setPm] = useState<PackageManager>("npm");
+  const [showJson, setShowJson] = useState(false);
+  const install = installSnippet(pm);
   const embed = embedSnippet(config);
   const render = renderSnippet(config);
+  const json = toJSON(config);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -115,18 +119,30 @@ export function ExportPanel({
         <Button
           variant="primary"
           onClick={() => {
-            download("typecaast.json", toJSON(config));
+            download("typecaast.json", json);
             onEvent?.("json_exported");
           }}
         >
           ⬇ Download JSON
         </Button>
         <CopyButton
-          text={toJSON(config)}
+          text={json}
           label="Copy JSON"
           onCopied={() => onEvent?.("json_exported")}
         />
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setShowJson((v) => !v)}
+        >
+          {showJson ? "Hide JSON" : "Preview JSON"}
+        </Button>
       </div>
+      {showJson ? (
+        <div style={{ maxHeight: 260, overflow: "auto" }}>
+          <CodeBlock code={json} />
+        </div>
+      ) : null}
 
       <div>
         <div
@@ -140,9 +156,21 @@ export function ExportPanel({
           <span className="tc-label">Install</span>
           <CopyButton text={install} />
         </div>
+        <div style={{ marginBottom: 6 }}>
+          <Segmented<PackageManager>
+            aria-label="Package manager"
+            value={pm}
+            onChange={setPm}
+            options={[
+              { value: "npm", label: "npm" },
+              { value: "yarn", label: "yarn" },
+              { value: "pnpm", label: "pnpm" },
+            ]}
+          />
+        </div>
         <CodeBlock code={install} />
         <p className="tc-muted" style={{ fontSize: 11.5, marginTop: 6 }}>
-          Install the packages the snippet below imports, then drop in your
+          Install the package the snippet below imports, then drop in your
           exported <code>typecaast.json</code>.
         </p>
       </div>

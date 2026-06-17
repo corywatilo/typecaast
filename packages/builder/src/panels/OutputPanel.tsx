@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { ConfigInput } from "@typecaast/schema";
-import { Button, Field, InfoTip, Input, Select, Slider } from "@typecaast/ui";
+import { Field, Input, Select, Slider } from "@typecaast/ui";
+import { InfoTip } from "../Tooltip.js";
 import { setCanvas, updateMeta, updatePacing } from "../store.js";
 
 export const ASPECT_PRESETS: Record<string, { width: number; height: number }> =
@@ -89,7 +90,7 @@ export function OutputPanel({
         </Field>
         <Field
           label={
-            <L tip="How the sim fits its container. Responsive (reflow) re-wraps to the available width; Scale renders at the exact canvas size, scaled to fit; Fixed is the exact size, clipped.">
+            <L tip="How the sim fits its container. Responsive re-wraps to the available width; Scale renders at the exact canvas size, scaled to fit; Fixed is the exact size, clipped.">
               Fit
             </L>
           }
@@ -104,7 +105,7 @@ export function OutputPanel({
               )
             }
           >
-            <option value="reflow">Responsive (reflow)</option>
+            <option value="reflow">Responsive</option>
             <option value="scale">Scale to fit</option>
             <option value="fixed">Fixed size</option>
           </Select>
@@ -275,14 +276,6 @@ export function OutputPanel({
           />
         </Field>
       </div>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onChange(setCanvas(config, height, width))}
-      >
-        ⤢ Swap orientation
-      </Button>
     </div>
   );
 }
