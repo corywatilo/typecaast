@@ -30,7 +30,7 @@ import { Preview } from "./Preview.js";
 import { TimelinePanel } from "./TimelinePanel.js";
 import { Modal } from "./Modal.js";
 import { IconRedo, IconUndo } from "./icons.js";
-import { CastPanel } from "./panels/CastPanel.js";
+import { ParticipantsPanel } from "./panels/ParticipantsPanel.js";
 import { SkinPanel } from "./panels/SkinPanel.js";
 import { OutputPanel } from "./panels/OutputPanel.js";
 import { ExportPanel } from "./panels/ExportPanel.js";
@@ -78,7 +78,7 @@ export interface BuilderProps {
   style?: CSSProperties;
 }
 
-type LeftTab = "timeline" | "cast";
+type LeftTab = "timeline" | "participants";
 type RightTab = "app" | "options";
 
 const layout: CSSProperties = {
@@ -198,7 +198,8 @@ export function Builder({
         <Badge tone="accent">Builder</Badge>
         <span style={{ flex: 1 }} />
         <span className="tc-muted" style={{ fontSize: 12 }}>
-          {config.timeline.length} steps · {config.participants.length} cast
+          {config.timeline.length} steps · {config.participants.length}{" "}
+          participants
         </span>
         <IconButton
           aria-label="Undo"
@@ -224,7 +225,7 @@ export function Builder({
 
       <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex" }}>
         <aside
-          aria-label="Timeline and cast"
+          aria-label="Timeline and participants"
           style={{
             flex: "0 0 360px",
             display: "flex",
@@ -245,7 +246,7 @@ export function Builder({
               onChange={setLeftTab}
               options={[
                 { value: "timeline", label: "Timeline" },
-                { value: "cast", label: "Cast" },
+                { value: "participants", label: "Participants" },
               ]}
             />
             <div
@@ -308,7 +309,7 @@ export function Builder({
                   padding: 16,
                 }}
               >
-                <CastPanel config={config} onChange={update} />
+                <ParticipantsPanel config={config} onChange={update} />
               </div>
             )}
           </div>

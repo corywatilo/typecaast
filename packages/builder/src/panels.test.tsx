@@ -38,14 +38,16 @@ describe("capabilityLint", () => {
 });
 
 describe("Builder inspector tabs", () => {
-  it("Cast tab manages participants", () => {
+  it("Participants tab manages participants", () => {
     render(
       <Builder
         initialConfig={config}
         skins={{ slack, "claude-code": claudeCode }}
       />,
     );
-    act(() => fireEvent.click(screen.getByRole("button", { name: "Cast" })));
+    act(() =>
+      fireEvent.click(screen.getByRole("button", { name: "Participants" })),
+    );
     expect(screen.getByDisplayValue("Ada")).toBeTruthy();
     act(() => fireEvent.click(screen.getByText("+ Add participant")));
     expect(screen.getByDisplayValue("New person")).toBeTruthy();

@@ -149,7 +149,7 @@ function AvatarControl({
   );
 }
 
-export function CastPanel({
+export function ParticipantsPanel({
   config,
   onChange,
 }: {
@@ -252,7 +252,7 @@ export function CastPanel({
           >
             <input
               type="radio"
-              name="tc-cast-viewer"
+              name="tc-participants-viewer"
               checked={p.isSelf === true}
               onChange={() => onChange(setSelf(config, i))}
             />

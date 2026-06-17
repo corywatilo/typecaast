@@ -306,7 +306,7 @@ export function TimelinePanel({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        // Fill the column (the Cast tab uses flex:1) and allow shrinking so the
+        // Fill the column (the Participants tab uses flex:1) and allow shrinking so the
         // panel never forces the column wider than its basis.
         flex: 1,
         minWidth: 0,
