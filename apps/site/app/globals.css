@@ -32,12 +32,11 @@ a {
  *
  * A single 2-col grid forced both shapes into the same width, which made
  * landscape skins feel half-empty and stretched portraits to 1000+px
- * towers. Instead we use a 4-col grid where landscape skins span 2 cols
- * (rendered ~half-width-and-shorter, like a real desktop window) and
- * portrait skins span 1 col (rendered narrow-and-taller, like a real
- * phone). `grid-auto-flow: dense` lets the browser pack cards into
- * whatever cells fit best, so the visual rhythm stays balanced even
- * when card heights differ row-to-row.
+ * towers. Instead we use a 3-col grid where landscape skins span 2 cols
+ * (~2/3 width, like a real desktop window) and portrait skins span 1 col
+ * (~1/3 width, like a real phone). `grid-auto-flow: dense` lets the
+ * browser pack cards into whatever cells fit best, so the visual rhythm
+ * stays balanced even when card heights differ row-to-row.
  *
  * Each card sets `[data-aspect="wide"]` (ratio ≥ 1) or
  * `[data-aspect="tall"]` (ratio < 1).
@@ -49,7 +48,7 @@ a {
 }
 @media (min-width: 720px) {
   .tc-gallery {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-auto-flow: dense;
   }
   .tc-gallery > [data-aspect="wide"] {

@@ -17,7 +17,7 @@ export const imessage = defineSkin({
   id: "imessage",
   meta: {
     name: "iMessage (iOS)",
-    defaultCanvas: { width: 390, height: 844 },
+    defaultCanvas: { width: 360, height: 760 },
     supportsThemes: ["light", "dark"],
     capabilities: imessageCapabilities,
     optionsSchema: imessageOptionsSchema,

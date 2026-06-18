@@ -16,7 +16,7 @@ export const slack = defineSkin({
   id: "slack",
   meta: {
     name: "Slack",
-    defaultCanvas: { width: 880, height: 720 },
+    defaultCanvas: { width: 620, height: 540 },
     supportsThemes: ["light", "dark"],
     capabilities: slackCapabilities,
     optionsSchema: slackOptionsSchema,

@@ -14,7 +14,7 @@ export const claudeCode = defineSkin({
   id: "claude-code",
   meta: {
     name: "Claude Code (TUI)",
-    defaultCanvas: { width: 720, height: 480 },
+    defaultCanvas: { width: 600, height: 420 },
     supportsThemes: ["dark"],
     capabilities: tuiCapabilities,
     optionsSchema: tuiOptionsSchema,

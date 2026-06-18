@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { builtinSkins } from "@typecaast/skins";
 import { Badge, Heading } from "@typecaast/ui";
 import { Nav } from "../../components/Nav";
@@ -25,6 +25,30 @@ export default function GalleryPage() {
     track("gallery_viewed");
   }, []);
 
+  // Order cards so wide (2-col) and narrow (1-col) skins alternate. Combined
+  // with the 3-col `grid-auto-flow: dense` layout this packs each wide+narrow
+  // pair into one clean row, instead of stranding trailing wide cards on
+  // half-empty rows when all the narrow skins were paired up earlier.
+  const cards = useMemo(() => {
+    const all = Object.entries(builtinSkins).map(([id, skin]) => {
+      const canvas = skin.meta.defaultCanvas;
+      // Landscape skins (desktop chat windows) span 2 grid cols; portrait
+      // skins (phone-shaped messengers) span 1, so each card's on-screen size
+      // matches the proportions of the platform it represents.
+      const aspect: "wide" | "tall" =
+        canvas.width / canvas.height >= 1 ? "wide" : "tall";
+      return { id, skin, canvas, aspect };
+    });
+    const wide = all.filter((c) => c.aspect === "wide");
+    const tall = all.filter((c) => c.aspect === "tall");
+    const out: typeof all = [];
+    for (let i = 0; i < Math.max(wide.length, tall.length); i++) {
+      if (wide[i]) out.push(wide[i]!);
+      if (tall[i]) out.push(tall[i]!);
+    }
+    return out;
+  }, []);
+
   return (
     <>
       <Nav />
@@ -38,16 +62,7 @@ export default function GalleryPage() {
           community skins are a directory, not an endorsement.
         </p>
         <div className="tc-gallery" style={{ marginTop: 32 }}>
-          {Object.entries(builtinSkins).map(([id, skin]) => {
-            const canvas = skin.meta.defaultCanvas;
-            const ratio = canvas.width / canvas.height;
-            // Landscape skins (desktop chat windows) span 2 grid cols;
-            // portrait skins (phone-shaped messengers) span 1. Combined
-            // with `grid-auto-flow: dense` this packs the cards into a
-            // magazine layout where each card's on-screen size matches
-            // the proportions of the platform it represents — no more
-            // half-empty Slack cards or sky-tall iMessage towers.
-            const aspect = ratio >= 1 ? "wide" : "tall";
+          {cards.map(({ id, skin, canvas, aspect }) => {
             return (
               <div
                 key={id}

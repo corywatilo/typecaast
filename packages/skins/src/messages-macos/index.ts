@@ -18,7 +18,7 @@ export const messagesMacos = defineSkin({
   id: "messages-macos",
   meta: {
     name: "Messages (macOS)",
-    defaultCanvas: { width: 900, height: 600 },
+    defaultCanvas: { width: 720, height: 500 },
     supportsThemes: ["light", "dark"],
     capabilities: imessageCapabilities,
     optionsSchema: macosOptionsSchema,
