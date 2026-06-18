@@ -148,13 +148,31 @@ export function agentConfig(
       {
         type: "message",
         from: "agent",
-        text: "Added a theme toggle — light, dark, and auto.",
+        text: "Added a theme toggle — it follows the system preference by default.",
         id: "a1",
       },
-      { type: "composerType", from: "you", text: "nice — ship it 🚀" },
+      {
+        type: "composerType",
+        from: "you",
+        text: "can you add a keyboard shortcut too?",
+      },
       { type: "send", id: "u2" },
+      { type: "typing", from: "agent", showTypingFor: 1300 },
+      {
+        type: "system",
+        from: "agent",
+        text: "Edited apps/site/app/layout.tsx",
+      },
+      {
+        type: "message",
+        from: "agent",
+        text: "Done — Cmd+Shift+L cycles light, dark, and auto.",
+        id: "a2",
+      },
+      { type: "composerType", from: "you", text: "perfect — ship it 🚀" },
+      { type: "send", id: "u3" },
       { type: "typing", from: "agent", showTypingFor: 1200 },
-      { type: "message", from: "agent", text: "Done. Pushed to main ✅" },
+      { type: "message", from: "agent", text: "Pushed to master ✅" },
     ],
   };
 }

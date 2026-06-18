@@ -31,6 +31,7 @@ export type TcEvent =
   | "embed_copied"
   | "render_snippet_copied"
   | "gallery_viewed"
+  | "gallery_json_viewed"
   | "docs_viewed";
 
 interface PostHogLike {
