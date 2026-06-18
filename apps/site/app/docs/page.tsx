@@ -41,7 +41,29 @@ export default function DocsPage() {
         <Heading level={2} style={{ marginTop: 36 }}>
           Install
         </Heading>
-        <Code>{`pnpm add @typecaast/react`}</Code>
+        <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
+          One package. <code>@typecaast/react</code> pulls in the engine,
+          schema, and every built-in skin as regular dependencies — you never
+          install those separately, and skins are loaded lazily per{" "}
+          <code>config.meta.skin.id</code>. The only thing you provide is{" "}
+          <code>react</code> (≥18), which your app already has.
+        </p>
+        <Code>{`# npm
+npm install @typecaast/react react
+
+# yarn
+yarn add @typecaast/react react
+
+# pnpm
+pnpm add @typecaast/react react`}</Code>
+        <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
+          In a monorepo, add it to the specific package that renders the
+          component rather than the workspace root (pnpm rejects a bare{" "}
+          <code>add</code> at the root):
+        </p>
+        <Code>{`pnpm add @typecaast/react react --filter <your-app>
+# yarn workspace <your-app> add @typecaast/react react
+# npm install @typecaast/react react -w <your-app>`}</Code>
 
         <Heading level={2} style={{ marginTop: 28 }}>
           Embed it

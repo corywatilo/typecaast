@@ -16,11 +16,15 @@ A visual **builder** assembles the timeline and emits the JSON config; a **hoste
 
 ## Quick start
 
-Embed a live, animated conversation in React:
+Embed a live, animated conversation in React. You only install **one package** — `@typecaast/react` brings the engine, schema, and every built-in skin along as regular dependencies (skins are loaded lazily per `meta.skin.id`). The only peer you supply is `react` (≥18):
 
 ```bash
-pnpm add @typecaast/react react
+npm install @typecaast/react react
+# yarn add @typecaast/react react
+# pnpm add @typecaast/react react
 ```
+
+In a monorepo, add it to the package that renders the component, not the workspace root — e.g. `pnpm add @typecaast/react react --filter <your-app>`.
 
 ```tsx
 import { Typecaast } from "@typecaast/react";
