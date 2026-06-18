@@ -10,7 +10,7 @@ import {
   type PackageManager,
 } from "../exporting.js";
 import type { BuilderEvent } from "../Builder.js";
-import { DisabledWrap, Tooltip } from "../Tooltip.js";
+import { DisabledWrap, InfoTip, Tooltip } from "../Tooltip.js";
 
 function copy(text: string): void {
   const nav = (
@@ -306,6 +306,41 @@ export function ExportPanel({
 
       {exportMode === "code" ? (
         <>
+          <Field
+            label={
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
+              >
+                Responsive widget
+                <InfoTip text="The embed fills its parent element — the canvas size in Options is just the preview/authoring size. Give the parent a width/height, or it falls back to the canvas aspect ratio. Turn this off to downscale the canvas to fit the parent instead, preserving aspect ratio." />
+              </span>
+            }
+          >
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                height: 32,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={(config.meta.fit ?? "reflow") !== "scale"}
+                onChange={(e) =>
+                  onChange(
+                    updateMeta(config, {
+                      fit: e.currentTarget.checked ? "reflow" : "scale",
+                    }),
+                  )
+                }
+              />
+              <span className="tc-muted" style={{ fontSize: 12 }}>
+                fills its parent element
+              </span>
+            </label>
+          </Field>
+
           <div>
             <StepHeader n={1} title="Install" />
             <div style={{ marginBottom: 6 }}>
