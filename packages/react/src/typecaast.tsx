@@ -1,6 +1,5 @@
 import {
   Suspense,
-  use,
   useEffect,
   useMemo,
   type CSSProperties,
@@ -23,7 +22,7 @@ import { useSkinFonts } from "./use-skin-fonts.js";
 import { useReducedMotion } from "./use-reduced-motion.js";
 import { buildTranscript } from "./transcript.js";
 import { FitBox } from "./fit-box.js";
-import { loadBuiltinSkin } from "./builtin-skins.js";
+import { readBuiltinSkin } from "./builtin-skins.js";
 
 /**
  * A loosely-typed config shape that a raw `import`ed `typecaast.json` satisfies —
@@ -132,7 +131,7 @@ export function Typecaast(props: TypecaastProps): ReactNode {
 function ResolvedPlayer(
   props: Omit<TypecaastProps, "config"> & { config: Config },
 ): ReactNode {
-  const skin = use(loadBuiltinSkin(props.config.meta.skin.id));
+  const skin = readBuiltinSkin(props.config.meta.skin.id);
   return <Player {...props} skin={skin} />;
 }
 

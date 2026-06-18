@@ -25,27 +25,73 @@ export const BUILTIN_SKIN_LOADERS: Record<string, () => Promise<SkinModule>> = {
 /** Ids of the built-in skins resolvable by `<Typecaast>` without a `skin` prop. */
 export const builtinSkinIds = Object.keys(BUILTIN_SKIN_LOADERS);
 
-// Stable promise per id so React's `use()` sees the same promise across renders.
-const cache = new Map<string, Promise<Skin>>();
+/**
+ * A status-tracked load, cached per id. Tracking the settled state lets us
+ * Suspense-read it on **React 18 and 19** alike (via the throw-the-promise
+ * primitive) instead of React 19's `use()`, which doesn't exist on 18.
+ */
+interface SkinResource {
+  promise: Promise<Skin>;
+  status: "pending" | "fulfilled" | "rejected";
+  value?: Skin;
+  error?: unknown;
+}
+
+// Stable resource per id so the same promise is seen across renders.
+const cache = new Map<string, SkinResource>();
 
 /**
- * Resolve a built-in skin id to a cached promise of its `Skin`. Throws
- * synchronously for an unknown id (a render error with a clear message), rather
- * than suspending forever.
+ * Get (or create) the cached resource for a skin id. Throws synchronously for an
+ * unknown id (a render error with a clear message), rather than suspending forever.
+ */
+function getResource(id: string): SkinResource {
+  let resource = cache.get(id);
+  if (resource) return resource;
+
+  const loader = BUILTIN_SKIN_LOADERS[id];
+  if (!loader) {
+    throw new Error(
+      `Typecaast: unknown skin "${id}". Built-in skins: ${builtinSkinIds.join(
+        ", ",
+      )}. For a custom skin, pass the \`skin\` prop.`,
+    );
+  }
+
+  resource = {
+    status: "pending",
+    promise: loader().then((m) => m.default),
+  };
+  // Record the settled state for the synchronous Suspense read. This handler
+  // also keeps `promise`'s rejection from going unhandled.
+  void resource.promise.then(
+    (skin) => {
+      resource!.status = "fulfilled";
+      resource!.value = skin;
+    },
+    (error: unknown) => {
+      resource!.status = "rejected";
+      resource!.error = error;
+    },
+  );
+  cache.set(id, resource);
+  return resource;
+}
+
+/**
+ * Resolve a built-in skin id to a cached promise of its `Skin`. Stable per id.
  */
 export function loadBuiltinSkin(id: string): Promise<Skin> {
-  let promise = cache.get(id);
-  if (!promise) {
-    const loader = BUILTIN_SKIN_LOADERS[id];
-    if (!loader) {
-      throw new Error(
-        `Typecaast: unknown skin "${id}". Built-in skins: ${builtinSkinIds.join(
-          ", ",
-        )}. For a custom skin, pass the \`skin\` prop.`,
-      );
-    }
-    promise = loader().then((m) => m.default);
-    cache.set(id, promise);
-  }
-  return promise;
+  return getResource(id).promise;
+}
+
+/**
+ * Suspense-read a built-in skin by id: returns the `Skin` once loaded, throws the
+ * pending promise to suspend, or re-throws a load error. This is the universal
+ * Suspense primitive — it works on React 18 and 19, unlike `use()` (19-only).
+ */
+export function readBuiltinSkin(id: string): Skin {
+  const resource = getResource(id);
+  if (resource.status === "fulfilled") return resource.value as Skin;
+  if (resource.status === "rejected") throw resource.error;
+  throw resource.promise;
 }

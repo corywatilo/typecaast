@@ -27,7 +27,7 @@ describe("built-in skin loader", () => {
     expect(telegram.id).toBe("telegram");
   });
 
-  it("returns a stable cached promise per id (for React `use`)", () => {
+  it("returns a stable cached promise per id (for the Suspense read)", () => {
     expect(loadBuiltinSkin("telegram")).toBe(loadBuiltinSkin("telegram"));
   });
 
@@ -49,11 +49,11 @@ describe("<Typecaast>", () => {
     timeline: [{ type: "message", from: "a", text: "shipping it" }],
   });
 
-  // Note: the zero-config (no `skin` prop) path resolves the skin via React
-  // `use()` + a lazy import. That suspends correctly in the real runtime
-  // (verified in a Next.js Server Component) but the concurrent scheduler doesn't
-  // resume in jsdom, so we exercise the synchronous explicit-skin path here and
-  // cover id resolution via the loader tests above.
+  // Note: the zero-config (no `skin` prop) path resolves the skin via a Suspense
+  // read of a lazy import (works on React 18 and 19). That suspends correctly in
+  // the real runtime (verified in a Next.js Server Component) but the concurrent
+  // scheduler doesn't resume in jsdom, so we exercise the synchronous
+  // explicit-skin path here and cover id resolution via the loader tests above.
   it("renders the skin passed explicitly (custom-skin path)", () => {
     render(<Typecaast config={config} skin={slack} />);
     expect(screen.getByText("Thread")).toBeTruthy();
