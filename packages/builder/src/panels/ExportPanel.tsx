@@ -42,6 +42,11 @@ function download(name: string, text: string): void {
  * Inline icon-only copy button rendered over the top-right corner of a code
  * block. The transient `✓` flash gives users clear feedback that the click
  * actually copied.
+ *
+ * The absolute positioning lives on the surrounding wrapper rather than on
+ * the IconButton itself — that way the `<Tooltip>` wrapper span has the
+ * icon's actual bounding rect (an absolutely-positioned trigger collapses
+ * its parent's box to zero, anchoring the popover to the wrong place).
  */
 function InlineCopyIcon({
   text,
@@ -52,30 +57,29 @@ function InlineCopyIcon({
 }) {
   const [done, setDone] = useState(false);
   return (
-    <Tooltip text={done ? "Copied" : "Copy to clipboard"}>
-      <IconButton
-        aria-label="Copy to clipboard"
-        onClick={(e) => {
-          e.stopPropagation();
-          copy(text);
-          onCopied?.();
-          setDone(true);
-          setTimeout(() => setDone(false), 1200);
-        }}
-        style={{
-          position: "absolute",
-          top: 6,
-          right: 6,
-          width: 26,
-          height: 26,
-          // Lift above the code so it stays legible whether or not the block
-          // is scrolled.
-          background: "var(--tc-panel)",
-        }}
-      >
-        {done ? "✓" : "⧉"}
-      </IconButton>
-    </Tooltip>
+    <div style={{ position: "absolute", top: 6, right: 6 }}>
+      <Tooltip text={done ? "Copied" : "Copy to clipboard"}>
+        <IconButton
+          aria-label="Copy to clipboard"
+          onClick={(e) => {
+            e.stopPropagation();
+            copy(text);
+            onCopied?.();
+            setDone(true);
+            setTimeout(() => setDone(false), 1200);
+          }}
+          style={{
+            width: 26,
+            height: 26,
+            // Lift above the code so it stays legible whether or not the
+            // block is scrolled.
+            background: "var(--tc-panel)",
+          }}
+        >
+          {done ? "✓" : "⧉"}
+        </IconButton>
+      </Tooltip>
+    </div>
   );
 }
 

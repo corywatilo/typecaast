@@ -246,6 +246,11 @@ export function DisabledWrap({
   children: ReactElement;
 }) {
   if (!disabled) return children;
+  // Two nested spans: the outer carries the dim + `not-allowed` cursor and
+  // (via the surrounding Tooltip) hover/focus tracking; the inner sets
+  // `pointer-events: none` on the actual control so the parent's cursor is
+  // the one the user sees (otherwise a `<button>` or `<select>` reasserts
+  // its own cursor: pointer/text on hover).
   return (
     <Tooltip text={reason}>
       <span
@@ -255,7 +260,9 @@ export function DisabledWrap({
           cursor: "not-allowed",
         }}
       >
-        {children}
+        <span style={{ display: "block", pointerEvents: "none" }}>
+          {children}
+        </span>
       </span>
     </Tooltip>
   );
