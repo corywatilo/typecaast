@@ -67,7 +67,7 @@ export default function PlaygroundPage() {
         theme={siteTheme}
         onChange={handleChange}
         onEvent={(event) => track(event)}
-        headerNav={<NavLinks style={{ marginLeft: 6 }} />}
+        headerNav={<NavLinks style={{ marginLeft: 22 }} />}
         headerActions={<ThemeToggle />}
       />
     </div>
