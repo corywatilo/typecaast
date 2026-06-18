@@ -1,5 +1,13 @@
 # @typecaast/react
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [9c84658]
+  - @typecaast/skin-kit@0.2.2
+  - @typecaast/skins@0.2.2
+
 ## 0.2.2
 
 ### Patch Changes
