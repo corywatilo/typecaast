@@ -11,8 +11,8 @@ export const ASPECT_PRESETS: Record<string, { width: number; height: number }> =
     "1:1": { width: 1080, height: 1080 },
     "9:16": { width: 1080, height: 1920 },
     "4:5": { width: 1080, height: 1350 },
-    Slack: { width: 880, height: 720 },
-    Phone: { width: 390, height: 844 },
+    Slack: { width: 600, height: 500 },
+    Phone: { width: 390, height: 760 },
   };
 
 const num = (v: unknown, fallback: number) =>
