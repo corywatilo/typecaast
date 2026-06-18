@@ -1,5 +1,22 @@
 # @typecaast/core
 
+## 0.3.0
+
+### Minor Changes
+
+- 49ad1e0: Add an optional `composer` (resolved `ComposerMode`) field to `FrameProps` so a
+  skin's chrome can mirror reply-box visibility. iMessage uses it to hide the
+  on-screen keyboard when the composer is hidden; other skins can ignore it.
+
+### Patch Changes
+
+- 33a0c23: Reveal composer text by code point instead of UTF-16 unit during a
+  `composerType` animation, so an astral emoji (🎬, 🚀, …) is never split into a
+  lone surrogate mid-type — which rendered as a "missing glyph" (□ / blue diamond)
+  until the rest of the pair appeared.
+- Updated dependencies [b6179ee]
+  - @typecaast/schema@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes

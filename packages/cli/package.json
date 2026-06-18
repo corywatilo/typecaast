@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/cli",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Typecaast command line: validate / render / scaffold-skin.",
   "license": "Apache-2.0",
   "repository": {

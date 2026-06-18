@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/schema",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Versioned, Zod-validated config schema for Typecaast (JSON Schema + TS types).",
   "license": "Apache-2.0",
   "repository": {

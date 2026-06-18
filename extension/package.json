@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/extension",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "description": "MV3 Chrome extension: pick a chat UI element and capture it into a Typecaast SkinDraft (local-only).",
   "license": "Apache-2.0",

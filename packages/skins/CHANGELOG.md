@@ -1,5 +1,38 @@
 # @typecaast/skins
 
+## 0.2.4
+
+### Patch Changes
+
+- f3c7490: Tighten the default canvas of every built-in skin so rendered content reads larger
+  (less empty chrome). Desktop skins (Slack, Claude Code, Discord, macOS Messages) get a
+  narrower window; phone skins (Telegram, iMessage, WhatsApp, Cursor) shrink proportionally.
+  Aspect ratios are preserved on the correct side of square, so landscape/portrait
+  classification is unchanged. No API change.
+- 49ad1e0: iMessage: tie the on-screen keyboard to reply-box visibility — when the composer
+  is hidden (`composer: "never"`), the keyboard hides with it.
+
+  Tune several default canvases: Claude Code and macOS Messages are taller; Telegram,
+  WhatsApp, and Cursor are a touch narrower (slightly larger content); Discord is a
+  touch wider (slightly smaller content).
+
+- 33a0c23: Typing indicators: never render the viewer's own "typing…" (you don't see
+  yourself type — that's the composer). Add a `typingPlacement` skin meta option
+  (`"thread"` default, or `"below-composer"`) and set Slack to show "X is typing…"
+  below the reply box, matching the real app.
+
+  WhatsApp: replace the emoji composer glyphs (🙂 / 🎤 / ➤) with real inline SVG
+  icons.
+
+- Updated dependencies [33a0c23]
+- Updated dependencies [b6179ee]
+- Updated dependencies [49ad1e0]
+- Updated dependencies [49ad1e0]
+- Updated dependencies [33a0c23]
+  - @typecaast/core@0.3.0
+  - @typecaast/schema@0.2.1
+  - @typecaast/skin-kit@0.3.0
+
 ## 0.2.3
 
 ### Patch Changes
