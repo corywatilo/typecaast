@@ -46,12 +46,12 @@
     "@typecaast/core": "workspace:*",
     "@typecaast/schema": "workspace:*",
     "@typecaast/skin-kit": "workspace:*",
-    "dompurify": "^3.2.4"
+    "dompurify": "^3.2.4",
+    "zod": "^4.0.0"
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18",
-    "zod": "^4"
+    "react-dom": ">=18"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",

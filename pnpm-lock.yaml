@@ -170,6 +170,9 @@ importers:
       dompurify:
         specifier: ^3.2.4
         version: 3.4.10
+      zod:
+        specifier: ^4.0.0
+        version: 4.4.3
     devDependencies:
       '@playwright/test':
         specifier: ^1.49.1
@@ -198,9 +201,6 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
 
   packages/cli:
     dependencies:
@@ -319,6 +319,9 @@ importers:
       '@typecaast/schema':
         specifier: workspace:*
         version: link:../schema
+      zod:
+        specifier: ^4.0.0
+        version: 4.4.3
     devDependencies:
       '@types/react':
         specifier: ^19.0.0
@@ -332,9 +335,6 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
 
   packages/skins:
     dependencies:
@@ -347,6 +347,9 @@ importers:
       '@typecaast/skin-kit':
         specifier: workspace:*
         version: link:../skin-kit
+      zod:
+        specifier: ^4.0.0
+        version: 4.4.3
     devDependencies:
       '@playwright/test':
         specifier: ^1.49.1
@@ -378,9 +381,6 @@ importers:
       vite:
         specifier: ^6.0.0
         version: 6.4.3(@types/node@22.19.21)(terser@5.48.0)
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
 
   packages/ui:
     devDependencies:
