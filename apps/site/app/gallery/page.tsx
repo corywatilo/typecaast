@@ -48,8 +48,12 @@ export default function GalleryPage() {
           {Object.entries(builtinSkins).map(([id, skin]) => {
             const canvas = skin.meta.defaultCanvas;
             const ratio = canvas.width / canvas.height;
-            const w = 280;
-            const h = Math.min(420, Math.round(w / ratio));
+            // Each card has a fixed-height preview slot; `<Typecaast>` now
+            // fills it (width: 100% / height: 100%) and `fit="scale"`
+            // renders the skin at its authored canvas, scaled to fit —
+            // exactly like the hero. `min(420, …)` keeps the tall
+            // portrait skins from blowing the grid out vertically.
+            const h = Math.min(420, Math.round(280 / ratio));
             return (
               <div
                 key={id}
@@ -72,6 +76,7 @@ export default function GalleryPage() {
                     config={genericConfig(id, canvas, SAMPLE_OPTIONS[id])}
                     skin={skin}
                     theme="auto"
+                    fit="scale"
                   />
                 </div>
                 <div
