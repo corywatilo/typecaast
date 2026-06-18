@@ -430,6 +430,7 @@ export function Builder({
                 skin={skin}
                 previewTheme={previewTheme}
                 onPreviewThemeChange={setPreviewTheme}
+                chromeTheme={theme}
                 onPlay={() => onEvent?.("preview_played")}
               />
             ) : (

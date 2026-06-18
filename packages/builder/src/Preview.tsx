@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Config, ThemeMode } from "@typecaast/schema";
+import type { ResolvedTheme } from "@typecaast/core";
 import type { Skin } from "@typecaast/skin-kit";
 import { TypecaastStage, useTypecaast } from "@typecaast/react";
 import { IconButton, Segmented, Slider } from "@typecaast/ui";
@@ -89,18 +90,24 @@ export function Preview({
   skin,
   previewTheme,
   onPreviewThemeChange,
+  chromeTheme,
   onPlay,
 }: {
   config: Config;
   skin: Skin;
   previewTheme: ThemeMode;
   onPreviewThemeChange: (t: ThemeMode) => void;
+  /** The page/builder's resolved theme. When the preview is "auto" it follows
+   *  this instead of `prefers-color-scheme`, so it matches the surrounding
+   *  page (which has already resolved its own "auto" → light/dark, falling back
+   *  to the browser preference). Explicit Light/Dark still override. */
+  chromeTheme: ResolvedTheme;
   onPlay?: () => void;
 }) {
   // `loop` lives on `config.meta.loop` (set in the Options panel) and is
   // honored by `useTypecaast` automatically when no prop overrides it.
   const tc = useTypecaast(config, {
-    theme: previewTheme,
+    theme: previewTheme === "auto" ? chromeTheme : previewTheme,
     capabilities: skin.meta.capabilities,
   });
 
