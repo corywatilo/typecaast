@@ -13,6 +13,7 @@
 export {
   Typecaast,
   type TypecaastProps,
+  type TypecaastHandle,
   type TypecaastConfig,
   type RawConfig,
 } from "./typecaast.js";

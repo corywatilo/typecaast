@@ -67,6 +67,30 @@ a React Server Component (Next.js App Router); no `"use client"` needed. (Using 
   give the parent a size (add `overflow-hidden` for rounded corners).
 - **`autoplay`**, **`loop`**, **`rate`**, **`fit`** (`"reflow"`/`"scale"`),
   **`composer`** (`"auto"`/`"always"`/`"never"`), **`label`**.
+- **`paused`** — controlled pause/resume. `paused={true}` freezes in place;
+  `paused={false}` resumes **from the current position** (never restarts). Omit
+  it to keep the default `autoplay` behavior. Ideal for tab/visibility UIs
+  without unmounting: `<Typecaast config={config} autoplay paused={activeTab !== "demo"} />`.
+- **`onPlay`** / **`onPause`** / **`onEnded`** — playback lifecycle callbacks.
+
+### Imperative control (ref)
+
+For actions the props don't cover — **jump to a time**, change rate, step — pass a
+`ref`. The handle (`TypecaastHandle`) exposes `play()`, `pause()`, `seek(ms)`,
+`scrubTo(ms)`, `setRate(n)`, `stepNext()`, `stepPrev()`, and live `currentMs` /
+`duration` / `playing`:
+
+```tsx
+import { useRef } from "react";
+import { Typecaast, type TypecaastHandle } from "@typecaast/react";
+
+const ref = useRef<TypecaastHandle>(null);
+<Typecaast ref={ref} config={config} autoplay />;
+// …later, e.g. from a scrubber:
+ref.current?.seek(5000);
+```
+
+`ref.current` is `null` until the skin loads and the player mounts.
 
 No build step or design work required — the skin renders the platform's exact look in light and dark. Don't want to write JSON by hand? Build it visually in the [playground](https://typecaast.com/playground) and copy the config or embed snippet — see [`docs/playground.md`](./docs/playground.md) for a tour of the builder.
 

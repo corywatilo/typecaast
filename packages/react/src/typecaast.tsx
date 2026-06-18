@@ -1,8 +1,11 @@
 import {
+  forwardRef,
   Suspense,
   useEffect,
+  useImperativeHandle,
   useMemo,
   type CSSProperties,
+  type ForwardedRef,
   type ReactElement,
 } from "react";
 import {
@@ -78,6 +81,52 @@ export interface TypecaastProps {
   label?: string;
   className?: string;
   style?: CSSProperties;
+  /**
+   * Controlled pause. When provided it takes over playback: `true` pauses in
+   * place, `false` plays/resumes **from the current position** (never restarts).
+   * Omit it to keep the default `autoplay` behavior (uncontrolled). Toggling it
+   * (e.g. `paused={activeTab !== "slack"}`) pauses/resumes without unmounting.
+   * No-op under `prefers-reduced-motion` (which holds the completed thread).
+   */
+  paused?: boolean;
+  /** Called when playback starts or resumes. */
+  onPlay?: () => void;
+  /** Called when playback pauses. */
+  onPause?: () => void;
+  /** Called once when playback reaches the end (non-looping). */
+  onEnded?: () => void;
+}
+
+/**
+ * Imperative playback controls, exposed via a `ref` on `<Typecaast>` for cases
+ * the declarative props don't cover (jump to a time, change rate, step):
+ *
+ * ```tsx
+ * const ref = useRef<TypecaastHandle>(null);
+ * <Typecaast ref={ref} config={config} autoplay />;
+ * // …later: ref.current?.seek(5000);
+ * ```
+ *
+ * `ref.current` is `null` until the skin has loaded and the player mounts.
+ */
+export interface TypecaastHandle {
+  play(): void;
+  pause(): void;
+  /** Jump to an absolute time in ms (clamped to `[0, duration]`). */
+  seek(timeMs: number): void;
+  /** Like `seek`, used for scrubbing. */
+  scrubTo(timeMs: number): void;
+  /** Playback rate multiplier (1 = realtime). */
+  setRate(rate: number): void;
+  /** Jump to the next / previous step boundary. */
+  stepNext(): void;
+  stepPrev(): void;
+  /** Live playback time in ms. */
+  readonly currentMs: number;
+  /** Total duration in ms. */
+  readonly duration: number;
+  /** Whether the clock is currently running. */
+  readonly playing: boolean;
 }
 
 const SR_ONLY: CSSProperties = {
@@ -123,41 +172,44 @@ function rootStyle(canvas: { width: number; height: number }): CSSProperties {
  * since the default path takes only the serializable `config`, the embed drops
  * straight into a React Server Component.
  */
-export function Typecaast(props: TypecaastProps): ReactElement {
-  // Normalize once: validate and apply schema defaults (pacing, fit, theme, …)
-  // so a raw exported `typecaast.json` works without the caller pre-parsing it.
-  const config = useMemo<Config>(
-    () => configSchema.parse(props.config),
-    [props.config],
-  );
+export const Typecaast = forwardRef<TypecaastHandle, TypecaastProps>(
+  function Typecaast(props, ref): ReactElement {
+    // Normalize once: validate and apply schema defaults (pacing, fit, theme, …)
+    // so a raw exported `typecaast.json` works without the caller pre-parsing it.
+    const config = useMemo<Config>(
+      () => configSchema.parse(props.config),
+      [props.config],
+    );
 
-  // Explicit skin object → render synchronously, no lazy load.
-  if (props.skin)
-    return <Player {...props} config={config} skin={props.skin} />;
-  // Otherwise resolve (and lazy-load) the built-in named in the config.
-  return (
-    <Suspense
-      fallback={
-        <SkinFallback
-          config={config}
-          fit={props.fit}
-          label={props.label}
-          className={props.className}
-          style={props.style}
-        />
-      }
-    >
-      <ResolvedPlayer {...props} config={config} />
-    </Suspense>
-  );
-}
+    // Explicit skin object → render synchronously, no lazy load.
+    if (props.skin)
+      return <Player {...props} config={config} skin={props.skin} ref={ref} />;
+    // Otherwise resolve (and lazy-load) the built-in named in the config.
+    return (
+      <Suspense
+        fallback={
+          <SkinFallback
+            config={config}
+            fit={props.fit}
+            label={props.label}
+            className={props.className}
+            style={props.style}
+          />
+        }
+      >
+        <ResolvedPlayer {...props} config={config} ref={ref} />
+      </Suspense>
+    );
+  },
+);
 
-function ResolvedPlayer(
-  props: Omit<TypecaastProps, "config"> & { config: Config },
-): ReactElement {
+const ResolvedPlayer = forwardRef<
+  TypecaastHandle,
+  Omit<TypecaastProps, "config"> & { config: Config }
+>(function ResolvedPlayer(props, ref): ReactElement {
   const skin = readBuiltinSkin(props.config.meta.skin.id);
-  return <Player {...props} skin={skin} />;
-}
+  return <Player {...props} skin={skin} ref={ref} />;
+});
 
 /**
  * The actual player. The animated visuals are `aria-hidden`; an accessible
@@ -165,36 +217,90 @@ function ResolvedPlayer(
  * `prefers-reduced-motion` snaps to the final state instead of animating
  * (PLAN §20).
  */
-function Player({
-  config,
-  skin,
-  theme,
-  autoplay,
-  loop,
-  rate,
-  fit,
-  composer,
-  label,
-  className,
-  style,
-}: Omit<TypecaastProps, "config"> & {
-  config: Config;
-  skin: Skin;
-}): ReactElement {
+const Player = forwardRef<
+  TypecaastHandle,
+  Omit<TypecaastProps, "config"> & { config: Config; skin: Skin }
+>(function Player(
+  {
+    config,
+    skin,
+    theme,
+    autoplay,
+    loop,
+    rate,
+    fit,
+    composer,
+    label,
+    className,
+    style,
+    paused,
+    onPlay,
+    onPause,
+    onEnded,
+  },
+  ref: ForwardedRef<TypecaastHandle>,
+): ReactElement {
   const reduced = useReducedMotion();
   const tc = useTypecaast(config, {
     theme,
-    autoplay: autoplay && !reduced,
+    // Gate mount-autoplay with `!paused` so a `paused`-at-mount instance never
+    // flashes a frame of playback. `!paused` is `true` when uncontrolled.
+    autoplay: autoplay && !reduced && !paused,
     loop: loop && !reduced,
     rate,
     capabilities: skin.meta.capabilities,
   });
+  const player = tc.player;
   const fonts = useSkinFonts(skin);
 
   // Reduced motion: hold the completed conversation, no animation.
   useEffect(() => {
     if (reduced) tc.seek(tc.duration);
   }, [reduced, tc]);
+
+  // Controlled `paused`: reconcile only when the consumer drives it (so an
+  // uncontrolled instance keeps its autoplay behavior). Runs after the hook's
+  // mount-autoplay effect, and re-applies on player recreation (theme change)
+  // via the `tc` dep. No-op under reduced motion.
+  useEffect(() => {
+    if (paused === undefined || reduced) return;
+    if (paused) tc.pause();
+    else tc.play();
+  }, [paused, reduced, tc]);
+
+  // Lifecycle callbacks → player events.
+  useEffect(() => {
+    const offs: Array<() => void> = [];
+    if (onPlay) offs.push(player.on("play", onPlay));
+    if (onPause) offs.push(player.on("pause", onPause));
+    if (onEnded) offs.push(player.on("end", onEnded));
+    return () => offs.forEach((off) => off());
+  }, [player, onPlay, onPause, onEnded]);
+
+  // Imperative controls (jump to a time, change rate, step). Getters read the
+  // live player so values are exact; the handle is stable per player.
+  useImperativeHandle(
+    ref,
+    () => ({
+      play: () => player.play(),
+      pause: () => player.pause(),
+      seek: (t: number) => player.seek(t),
+      scrubTo: (t: number) => player.scrubTo(t),
+      setRate: (r: number) => player.setRate(r),
+      stepNext: () => player.stepNext(),
+      stepPrev: () => player.stepPrev(),
+      get currentMs() {
+        return player.currentMs;
+      },
+      get duration() {
+        return player.durationMs;
+      },
+      get playing() {
+        return player.playing;
+      },
+    }),
+    [player],
+  );
 
   const transcript = useMemo(() => buildTranscript(config), [config]);
 
@@ -227,7 +333,7 @@ function Player({
       </div>
     </div>
   );
-}
+});
 
 /**
  * A same-size placeholder shown while a built-in skin's chunk loads, so there's

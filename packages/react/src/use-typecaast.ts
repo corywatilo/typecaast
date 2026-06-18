@@ -89,12 +89,21 @@ export function useTypecaast(
       player.on("play", () => setPlaying(true)),
       player.on("pause", () => setPlaying(false)),
     ];
-    if (autoplay) player.play();
     return () => {
       offs.forEach((off) => off());
       player.destroy();
     };
-  }, [player, autoplay]);
+  }, [player]);
+
+  // Apply `autoplay` once per player (at creation), not reactively. If this read
+  // were a dependency of the subscribe/destroy effect above, a consumer toggling
+  // a controlled `paused` — which flips the gated `autoplay` value upstream —
+  // would tear down and recreate the live player. Post-mount play/pause is the
+  // consumer's job (e.g. `<Typecaast>`'s `paused` reconcile).
+  // (deps intentionally exclude `autoplay` — see the comment above.)
+  useEffect(() => {
+    if (autoplay) player.play();
+  }, [player]);
 
   return {
     state,
