@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { ComposerMode, ConfigInput } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import { Field, Input, Segmented, Select } from "@typecaast/ui";
@@ -167,12 +166,17 @@ export function SkinPanel({
   config,
   skins,
   onChange,
+  customView,
+  onCustomView,
 }: {
   config: ConfigInput;
   skins: Record<string, Skin>;
   onChange: (next: ConfigInput) => void;
+  /** "Custom" app picked — the editor is paused (lifted to Builder so it can
+   *  fade the canvas + options until a built-in app is chosen). */
+  customView: boolean;
+  onCustomView: (v: boolean) => void;
 }) {
-  const [customView, setCustomView] = useState(false);
   const skin = skins[config.meta.skin.id];
   const options = (config.meta.skin.options ?? {}) as Record<string, unknown>;
 
@@ -194,10 +198,10 @@ export function SkinPanel({
           onChange={(e) => {
             const v = e.currentTarget.value;
             if (v === CUSTOM) {
-              setCustomView(true);
+              onCustomView(true);
               return;
             }
-            setCustomView(false);
+            onCustomView(false);
             onChange(setSkin(config, v, options));
           }}
         >

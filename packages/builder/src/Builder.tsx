@@ -166,6 +166,9 @@ export function Builder({
   // applies to one path (FPS only matters for video; Loop only for live code
   // embeds, etc).
   const [exportMode, setExportMode] = useState<"code" | "video">("code");
+  // "Custom" app picked in the App tab: there's no built-in skin to preview, so
+  // we pause the editor (fade the canvas + options) until a real app is chosen.
+  const [customApp, setCustomApp] = useState(false);
 
   // Commit a config change to history. `coalesce` collapses rapid text edits.
   const commit = useCallback(
@@ -342,7 +345,13 @@ export function Builder({
                   padding: 16,
                 }}
               >
-                <SkinPanel config={config} skins={skins} onChange={update} />
+                <SkinPanel
+                  config={config}
+                  skins={skins}
+                  onChange={update}
+                  customView={customApp}
+                  onCustomView={setCustomApp}
+                />
               </div>
             ) : leftTab === "timeline" ? (
               <TimelinePanel
@@ -398,44 +407,87 @@ export function Builder({
           </div>
         </aside>
 
-        <main style={{ flex: "1 1 auto", minWidth: 0, minHeight: 0 }}>
-          {parsed.success && skin ? (
-            <Preview
-              config={parsed.data as Config}
-              skin={skin}
-              previewTheme={previewTheme}
-              onPreviewThemeChange={setPreviewTheme}
-              onPlay={() => onEvent?.("preview_played")}
-            />
-          ) : (
+        <main
+          style={{
+            flex: "1 1 auto",
+            minWidth: 0,
+            minHeight: 0,
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              opacity: customApp ? 0.25 : 1,
+              filter: customApp ? "grayscale(1)" : undefined,
+              pointerEvents: customApp ? "none" : undefined,
+              transition: "opacity 150ms ease, filter 150ms ease",
+            }}
+          >
+            {parsed.success && skin ? (
+              <Preview
+                config={parsed.data as Config}
+                skin={skin}
+                previewTheme={previewTheme}
+                onPreviewThemeChange={setPreviewTheme}
+                onPlay={() => onEvent?.("preview_played")}
+              />
+            ) : (
+              <div
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 24,
+                }}
+              >
+                <Panel raised style={{ maxWidth: 420, padding: 20 }}>
+                  <Heading level={2}>Can't preview yet</Heading>
+                  {!skin ? (
+                    <p className="tc-muted" style={{ fontSize: 13 }}>
+                      Unknown skin <code>{config.meta.skin.id}</code>.
+                    </p>
+                  ) : (
+                    <ul style={{ fontSize: 13, paddingLeft: 18 }}>
+                      {errors.slice(0, 6).map((d, i) => (
+                        <li key={i} className="tc-muted">
+                          <span className="tc-mono">{d.location ?? ""}</span>{" "}
+                          {d.message}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Panel>
+              </div>
+            )}
+          </div>
+          {customApp ? (
             <div
               style={{
-                height: "100%",
+                position: "absolute",
+                inset: 0,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 padding: 24,
               }}
             >
-              <Panel raised style={{ maxWidth: 420, padding: 20 }}>
-                <Heading level={2}>Can't preview yet</Heading>
-                {!skin ? (
-                  <p className="tc-muted" style={{ fontSize: 13 }}>
-                    Unknown skin <code>{config.meta.skin.id}</code>.
-                  </p>
-                ) : (
-                  <ul style={{ fontSize: 13, paddingLeft: 18 }}>
-                    {errors.slice(0, 6).map((d, i) => (
-                      <li key={i} className="tc-muted">
-                        <span className="tc-mono">{d.location ?? ""}</span>{" "}
-                        {d.message}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+              <Panel
+                raised
+                style={{ maxWidth: 360, padding: 20, textAlign: "center" }}
+              >
+                <Heading level={2}>Editor paused</Heading>
+                <p
+                  className="tc-muted"
+                  style={{ fontSize: 13, margin: "6px 0 0" }}
+                >
+                  “Custom” isn’t a previewable app. Pick a built-in app from the{" "}
+                  <strong>App</strong> tab to keep editing.
+                </p>
               </Panel>
             </div>
-          )}
+          ) : null}
         </main>
 
         <aside
@@ -457,6 +509,10 @@ export function Builder({
               // ~14px gap on the right even when nothing was scrolling, so
               // the section backgrounds didn't reach the edge of the panel.
               overflowY: "auto",
+              // Paused while "Custom" is selected (no previewable app).
+              opacity: customApp ? 0.4 : 1,
+              pointerEvents: customApp ? "none" : undefined,
+              transition: "opacity 150ms ease",
             }}
           >
             <SectionHeader>Options</SectionHeader>
