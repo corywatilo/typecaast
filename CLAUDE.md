@@ -63,6 +63,26 @@ Filter a package: `pnpm --filter @typecaast/<pkg> run <script>`.
 - `apps/site` and the builder render via the **built `dist`** of the workspace packages, so rebuild
   (`pnpm build` or the package's `dev` watch) after changing a package before checking the site.
 
+## Changing the config schema / step types
+
+The config schema (`packages/schema/src/timeline.ts`, `meta.ts`, …) is the contract between the
+**deployed playground** (auto-deploys from source, emits configs in the _latest_ schema) and the
+**published npm packages** (what consumers install). Keep them in lockstep:
+
+- **A schema change MUST ship with a changeset _and_ a release.** Change the schema without releasing
+  `@typecaast/schema` (+ `@typecaast/core`) and the playground starts emitting configs the installed
+  package rejects. This bit us: renaming the `beat` step → `delay` reached the playground but not npm,
+  so exported configs failed `configSchema.parse` against the older package. Bump `@typecaast/schema`
+  (and `@typecaast/core` if the engine changed); dependents (`react`/`skins`/…) cascade.
+- **Adding or changing a timeline step type** touches all of: `packages/schema/src/timeline.ts` (the
+  step's Zod schema, the union, and `STEP_TYPES`), `packages/core/src/engine/compile.ts` (the
+  `case "<type>"`), every `packages/skins/src/*/capabilities.ts` (the `events.<type>` entry), and in the
+  builder — `steps.tsx` (icon, description, group), `format.ts` (`stepLabel`), `store.ts` (`blankStep`
+  and the fields `changeStepType` carries), and `StepEditor.tsx` (type-specific fields). Also
+  `examples/*.json`, tests, and the `PLAN.md` step list. TypeScript catches the `Record<StepType, …>`
+  and exhaustive-switch sites; JSON examples, docs, and the release are on you — run
+  `pnpm validate:examples` and the full gate.
+
 ## Releases
 
 Changesets + **npm OIDC trusted publishing** (no tokens). Add a changeset (`pnpm changeset`) for any

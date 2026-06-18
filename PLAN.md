@@ -158,7 +158,7 @@ pacing: {
 Per-step overrides: `delay` (absolute or relative), `typingDuration`, `instant: true`, `showTypingFor`, `holdAfter`.
 
 ### Event/step types (v1)
-`message` (incoming, optional preceding typing indicator) · `reaction` (attached to a message id) · `typing` (standalone indicator) · `composerType` (self types char-by-char in the input) · `send` (composer commits to thread) · `edit` · `delete` · `readReceipt` · `system` (e.g. "Pull request opened" app card) · `beat`/`wait` (explicit pause).
+`message` (incoming, optional preceding typing indicator) · `reaction` (attached to a message id) · `typing` (standalone indicator) · `composerType` (self types char-by-char in the input) · `send` (composer commits to thread) · `edit` · `delete` · `readReceipt` · `system` (e.g. "Pull request opened" app card) · `delay` (explicit pause).
 
 ### Player API (consumed by renderers)
 `play() · pause() · seek(t) · setRate(x) · on('tick'|'end') · state` — plus `loop`. The player is a thin clock wrapper around `getStateAt`; renderers can also drive sampling directly (Remotion does).
