@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ComposerMode, ConfigInput } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
 import { Field, Input, Segmented, Select } from "@typecaast/ui";
@@ -108,6 +109,60 @@ function supportedFeatures(skin: Skin): Feature[] {
   return out;
 }
 
+/**
+ * How the App dropdown groups the built-in skins, plus per-id display
+ * overrides where the skin's `meta.name` carries a qualifier we don't want in
+ * the picker (e.g. the Cursor skin is "Cursor panel").
+ */
+const APP_GROUPS: { label: string; ids: string[] }[] = [
+  { label: "Chat", ids: ["slack", "discord"] },
+  { label: "Code", ids: ["claude-code", "cursor"] },
+  {
+    label: "Messaging",
+    ids: ["imessage", "messages-macos", "telegram", "whatsapp"],
+  },
+];
+const APP_LABELS: Record<string, string> = { cursor: "Cursor" };
+/** Sentinel value for the "Custom" dropdown entry (not a real skin). */
+const CUSTOM = "__custom__";
+
+/** Shown when "Custom" is picked — the playground can't render a bring-your-own
+ *  skin, so point at the two ways to make one. */
+function CustomBlurb() {
+  return (
+    <div
+      style={{
+        padding: "12px 14px",
+        borderRadius: 8,
+        border: "1px solid var(--tc-border)",
+        background: "var(--tc-bg-subtle)",
+        fontSize: 12.5,
+        lineHeight: 1.55,
+      }}
+    >
+      <p
+        style={{ margin: "0 0 6px", fontWeight: 600, color: "var(--tc-text)" }}
+      >
+        Bring your own UI
+      </p>
+      <p className="tc-muted" style={{ margin: 0 }}>
+        The playground previews the built-in skins above. To use a different
+        app, author a skin (from a screenshot or platform) or capture a live UI
+        with the Typecaast Chrome extension, then pass it to{" "}
+        <code>&lt;Typecaast skin=&#123;…&#125; /&gt;</code> in your app.{" "}
+        <a
+          href="https://typecaast.com/docs"
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{ color: "var(--tc-accent)" }}
+        >
+          Read the docs →
+        </a>
+      </p>
+    </div>
+  );
+}
+
 export function SkinPanel({
   config,
   skins,
@@ -117,6 +172,7 @@ export function SkinPanel({
   skins: Record<string, Skin>;
   onChange: (next: ConfigInput) => void;
 }) {
+  const [customView, setCustomView] = useState(false);
   const skin = skins[config.meta.skin.id];
   const options = (config.meta.skin.options ?? {}) as Record<string, unknown>;
 
@@ -132,189 +188,230 @@ export function SkinPanel({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <Field label="Skin">
+      <Field label="App">
         <Select
-          value={config.meta.skin.id}
-          onChange={(e) =>
-            onChange(setSkin(config, e.currentTarget.value, options))
-          }
+          value={customView ? CUSTOM : config.meta.skin.id}
+          onChange={(e) => {
+            const v = e.currentTarget.value;
+            if (v === CUSTOM) {
+              setCustomView(true);
+              return;
+            }
+            setCustomView(false);
+            onChange(setSkin(config, v, options));
+          }}
         >
-          {Object.entries(skins).map(([id, s]) => (
-            <option key={id} value={id}>
-              {s.meta.name}
-            </option>
-          ))}
-          {skins[config.meta.skin.id] ? null : (
+          {APP_GROUPS.map((g) => {
+            const ids = g.ids.filter((id) => skins[id]);
+            return ids.length ? (
+              <optgroup key={g.label} label={g.label}>
+                {ids.map((id) => (
+                  <option key={id} value={id}>
+                    {APP_LABELS[id] ?? skins[id]!.meta.name}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null;
+          })}
+          {(() => {
+            // Defensive: any built-in not covered by a group still appears.
+            const grouped = new Set(APP_GROUPS.flatMap((g) => g.ids));
+            const rest = Object.keys(skins).filter((id) => !grouped.has(id));
+            return rest.length ? (
+              <optgroup label="Other">
+                {rest.map((id) => (
+                  <option key={id} value={id}>
+                    {APP_LABELS[id] ?? skins[id]!.meta.name}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null;
+          })()}
+          <optgroup label="Custom">
+            <option value={CUSTOM}>Custom skin…</option>
+          </optgroup>
+          {!customView && !skins[config.meta.skin.id] ? (
             <option value={config.meta.skin.id}>
               {config.meta.skin.id} (unknown)
             </option>
-          )}
+          ) : null}
         </Select>
       </Field>
 
-      {(() => {
-        const optionKeys = getStringOptionKeys(skin);
-        if (optionKeys.length === 0) return null;
-        return (
-          <div>
-            <p className="tc-label" style={{ marginBottom: 8 }}>
-              Options
-            </p>
+      {customView ? (
+        <CustomBlurb />
+      ) : (
+        <>
+          {(() => {
+            const optionKeys = getStringOptionKeys(skin);
+            if (optionKeys.length === 0) return null;
+            return (
+              <div>
+                <p className="tc-label" style={{ marginBottom: 8 }}>
+                  Options
+                </p>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 8,
+                  }}
+                >
+                  {optionKeys.map((key) => {
+                    const known = KNOWN_OPTIONS[key];
+                    const label = known?.label ?? titleCase(key);
+                    const placeholder = known?.placeholder ?? "";
+                    return (
+                      <Field key={key} label={label}>
+                        <Input
+                          value={(options[key] as string) ?? ""}
+                          placeholder={placeholder}
+                          onChange={(e) =>
+                            setOption(key, e.currentTarget.value)
+                          }
+                        />
+                      </Field>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          <Field
+            label={
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
+              >
+                Message input
+                <InfoTip text="Whether the reply box shows. Always keeps it visible; Hidden never shows it." />
+              </span>
+            }
+          >
+            <Segmented<Exclude<ComposerMode, "auto">>
+              aria-label="Message input visibility"
+              // Treat the legacy "auto" value as "always" for display so the
+              // segmented control is never in a no-selection state — clicking
+              // either option commits the new explicit value.
+              value={config.meta.composer === "never" ? "never" : "always"}
+              onChange={(v) => onChange(updateMeta(config, { composer: v }))}
+              options={[
+                { value: "always", label: "Always" },
+                { value: "never", label: "Hidden" },
+              ]}
+            />
+          </Field>
+
+          {features.length > 0 ? (
+            <div>
+              <p className="tc-label" style={{ marginBottom: 8 }}>
+                Supported features
+              </p>
+              <ul
+                style={{
+                  margin: 0,
+                  padding: 0,
+                  listStyle: "none",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  rowGap: 4,
+                  columnGap: 8,
+                }}
+              >
+                {features.map((f) => (
+                  <li
+                    key={f.label}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontSize: 12.5,
+                      color: "var(--tc-text)",
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 14,
+                        height: 14,
+                        flex: "0 0 auto",
+                        color: "var(--tc-success, #16a34a)",
+                        fontWeight: 800,
+                        fontSize: 11,
+                      }}
+                      title={
+                        f.native ? "Native" : "Rendered with a generic fallback"
+                      }
+                    >
+                      ✓
+                    </span>
+                    <span>
+                      {f.label}
+                      {f.native ? null : (
+                        <span className="tc-muted" style={{ fontSize: 11.5 }}>
+                          {" "}
+                          (fallback)
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {warnings.length > 0 ? (
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1px solid var(--tc-warn-border, #e9c46a)",
+                background: "var(--tc-warn-bg, rgba(250, 176, 5, 0.10))",
               }}
             >
-              {optionKeys.map((key) => {
-                const known = KNOWN_OPTIONS[key];
-                const label = known?.label ?? titleCase(key);
-                const placeholder = known?.placeholder ?? "";
-                return (
-                  <Field key={key} label={label}>
-                    <Input
-                      value={(options[key] as string) ?? ""}
-                      placeholder={placeholder}
-                      onChange={(e) => setOption(key, e.currentTarget.value)}
-                    />
-                  </Field>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
-
-      <Field
-        label={
-          <span
-            style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
-          >
-            Message input
-            <InfoTip text="Whether the reply box shows. Always keeps it visible; Hidden never shows it." />
-          </span>
-        }
-      >
-        <Segmented<Exclude<ComposerMode, "auto">>
-          aria-label="Message input visibility"
-          // Treat the legacy "auto" value as "always" for display so the
-          // segmented control is never in a no-selection state — clicking
-          // either option commits the new explicit value.
-          value={config.meta.composer === "never" ? "never" : "always"}
-          onChange={(v) => onChange(updateMeta(config, { composer: v }))}
-          options={[
-            { value: "always", label: "Always" },
-            { value: "never", label: "Hidden" },
-          ]}
-        />
-      </Field>
-
-      {features.length > 0 ? (
-        <div>
-          <p className="tc-label" style={{ marginBottom: 8 }}>
-            Supported features
-          </p>
-          <ul
-            style={{
-              margin: 0,
-              padding: 0,
-              listStyle: "none",
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              rowGap: 4,
-              columnGap: 8,
-            }}
-          >
-            {features.map((f) => (
-              <li
-                key={f.label}
+              <p
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
-                  fontSize: 12.5,
-                  color: "var(--tc-text)",
+                  margin: "0 0 8px",
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                  color: "var(--tc-warn, #b45309)",
                 }}
               >
-                <span
-                  aria-hidden
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 14,
-                    height: 14,
-                    flex: "0 0 auto",
-                    color: "var(--tc-success, #16a34a)",
-                    fontWeight: 800,
-                    fontSize: 11,
-                  }}
-                  title={
-                    f.native ? "Native" : "Rendered with a generic fallback"
-                  }
-                >
-                  ✓
-                </span>
-                <span>
-                  {f.label}
-                  {f.native ? null : (
-                    <span className="tc-muted" style={{ fontSize: 11.5 }}>
-                      {" "}
-                      (fallback)
-                    </span>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      {warnings.length > 0 ? (
-        <div
-          style={{
-            padding: "10px 12px",
-            borderRadius: 8,
-            border: "1px solid var(--tc-warn-border, #e9c46a)",
-            background: "var(--tc-warn-bg, rgba(250, 176, 5, 0.10))",
-          }}
-        >
-          <p
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              margin: "0 0 8px",
-              fontSize: 11.5,
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              color: "var(--tc-warn, #b45309)",
-            }}
-          >
-            <span aria-hidden>⚠</span> Won't render in this skin
-          </p>
-          <ul
-            style={{
-              margin: 0,
-              paddingLeft: 16,
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-            }}
-          >
-            {warnings.map((w, i) => (
-              <li key={i} style={{ fontSize: 12.5, color: "var(--tc-text)" }}>
-                {w.stepIndex !== undefined ? (
-                  <strong>Step {w.stepIndex + 1}: </strong>
-                ) : null}
-                <span className="tc-muted">{w.message}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+                <span aria-hidden>⚠</span> Won't render in this skin
+              </p>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: 16,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                }}
+              >
+                {warnings.map((w, i) => (
+                  <li
+                    key={i}
+                    style={{ fontSize: 12.5, color: "var(--tc-text)" }}
+                  >
+                    {w.stepIndex !== undefined ? (
+                      <strong>Step {w.stepIndex + 1}: </strong>
+                    ) : null}
+                    <span className="tc-muted">{w.message}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </>
+      )}
     </div>
   );
 }
