@@ -34,9 +34,30 @@ Three columns:
 The top-left "Typecaast Builder" wordmark is always a link back to
 [`/`](https://typecaast.com), regardless of which tab is active.
 
+## Working in the builder (for contributors)
+
+Every panel is a thin view over a **pure config transform** in
+[`packages/builder/src/store.ts`](../packages/builder/src/store.ts): a panel
+calls e.g. `setSkin(config, …)` / `addStep(config, …)` and passes the result up
+via `onChange`/`update`. The store never mutates, so undo/redo and the
+`localStorage` + URL-hash persistence come for free. The UI is
+**capability-aware** — panels read the active skin's `meta.capabilities` (via
+[`lint.ts`](../packages/builder/src/lint.ts)) to dim, warn on, or refuse steps a
+skin can't render. The site renders the builder from the **built `dist`**, so
+rebuild `@typecaast/builder` (or run its `dev` watch) to see source changes.
+
+Each section below names its **Code** entry points (panel · store action ·
+schema field). Adding a brand-new timeline **step type** is its own multi-file
+procedure — use the `/add-step-type` skill (and the checklist in the root
+[`CLAUDE.md`](../CLAUDE.md)).
+
 ## Left column tabs
 
 ### App
+
+**Code:** [`panels/SkinPanel.tsx`](../packages/builder/src/panels/SkinPanel.tsx)
+· store `setSkin` / `updateMeta` · schema `config.meta.skin` (`.id`, `.options`)
+and `config.meta.composer`.
 
 The home for everything specific to the chosen skin:
 
@@ -61,6 +82,15 @@ The home for everything specific to the chosen skin:
 
 ### Timeline
 
+**Code:**
+[`TimelinePanel.tsx`](../packages/builder/src/TimelinePanel.tsx) +
+[`StepEditor.tsx`](../packages/builder/src/StepEditor.tsx) +
+[`steps.tsx`](../packages/builder/src/steps.tsx) (icons, descriptions, groups,
+the `StepPicker`) · store `addStep` / `addStepAutoPaced` / `updateStep` /
+`moveStep` / `deleteStep` / `duplicateStep` / `changeStepType` / `blankStep` ·
+schema `config.timeline[]`. Step **labels** come from
+[`format.ts`](../packages/builder/src/format.ts) (`stepLabel`).
+
 Drag-reorderable rows of steps, each showing the step type, an icon, and a
 short content preview on a second line. Hovering between rows reveals an
 inline `+` insert zone; the `+ Step` bar at the bottom of the column is
@@ -82,12 +112,21 @@ Capability awareness is woven through the timeline:
 
 ### Participants
 
+**Code:**
+[`panels/ParticipantsPanel.tsx`](../packages/builder/src/panels/ParticipantsPanel.tsx)
+· store `addParticipant` / `updateParticipant` / `removeParticipant` / `setSelf`
+· schema `config.participants[]`.
+
 Manage the cast of the conversation: name, id, color, kind (person / app),
 avatar (file → inlined data URL, or pasted URL → kept as a link), and a
 single-select **viewer** radio that marks the participant whose perspective
 the simulation is rendered from.
 
 ## Preview pane
+
+**Code:** [`Preview.tsx`](../packages/builder/src/Preview.tsx) — read-only; it
+renders the config through `useTypecaast` + `<TypecaastStage>` and owns the
+transport/zoom/theme controls (no store actions; it doesn't edit the config).
 
 A live `<TypecaastStage>` rendering the current config with the active skin.
 Controls:
@@ -104,6 +143,10 @@ The preview also auto-jumps to the final frame once a config first compiles
 without errors, so a fresh import or page load shows the end state.
 
 ## Options section
+
+**Code:** [`panels/OutputPanel.tsx`](../packages/builder/src/panels/OutputPanel.tsx)
+· store `setCanvas` / `updateMeta` / `updatePacing` · schema
+`config.meta.{canvas, fit, fps, seed, background, loop}` and `config.pacing`.
 
 Right column, top half. Lays out:
 
@@ -123,6 +166,12 @@ Right column, top half. Lays out:
   seeded random variation to delays so the timing feels less robotic.
 
 ## Export section
+
+**Code:** [`panels/ExportPanel.tsx`](../packages/builder/src/panels/ExportPanel.tsx)
+(serializes via `toJSON`, handles download) · schema `config.meta.assets`
+(`inline` / `url`). The `Import` button in the left tab bar is
+[`panels/ImportPanel.tsx`](../packages/builder/src/panels/ImportPanel.tsx) — it
+replaces the whole config (one undo away).
 
 Right column, bottom half. Two top-level paths via a `Code | Video`
 segmented control. The **Assets** dropdown right below the toggle (`Inline
