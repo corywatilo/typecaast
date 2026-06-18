@@ -1,5 +1,12 @@
 # @typecaast/skins
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [36e0f43]
+  - @typecaast/skin-kit@0.2.3
+
 ## 0.2.2
 
 ### Patch Changes
