@@ -1,5 +1,12 @@
 # @typecaast/builder
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [1ad9881]
+  - @typecaast/react@0.2.4
+
 ## 0.2.2
 
 ### Patch Changes
