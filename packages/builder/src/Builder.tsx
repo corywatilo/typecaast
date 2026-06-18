@@ -461,11 +461,7 @@ export function Builder({
           >
             <SectionHeader>Options</SectionHeader>
             <div style={{ padding: "12px 16px 18px" }}>
-              <OutputPanel
-                config={config}
-                onChange={update}
-                exportMode={exportMode}
-              />
+              <OutputPanel config={config} onChange={update} />
             </div>
             <SectionHeader topBorder>Export</SectionHeader>
             <div style={{ padding: "12px 16px 18px" }}>

@@ -1,7 +1,15 @@
 import { useState } from "react";
 import type { ConfigInput } from "@typecaast/schema";
-import { Button, Field, IconButton, Segmented, Select } from "@typecaast/ui";
+import {
+  Button,
+  Field,
+  IconButton,
+  Input,
+  Segmented,
+  Select,
+} from "@typecaast/ui";
 import { updateMeta } from "../store.js";
+import { BackgroundPicker } from "../BackgroundPicker.js";
 import {
   embedSnippet,
   installSnippet,
@@ -306,40 +314,59 @@ export function ExportPanel({
 
       {exportMode === "code" ? (
         <>
-          <Field
-            label={
-              <span
-                style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
-              >
-                Responsive widget
-                <InfoTip text="The embed fills its parent element — the canvas size in Options is just the preview/authoring size. Give the parent a width/height, or it falls back to the canvas aspect ratio. Turn this off to downscale the canvas to fit the parent instead, preserving aspect ratio." />
-              </span>
-            }
-          >
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                height: 32,
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={(config.meta.fit ?? "reflow") !== "scale"}
-                onChange={(e) =>
-                  onChange(
-                    updateMeta(config, {
-                      fit: e.currentTarget.checked ? "reflow" : "scale",
-                    }),
-                  )
-                }
-              />
-              <span className="tc-muted" style={{ fontSize: 12 }}>
-                fills its parent element
-              </span>
-            </label>
-          </Field>
+          <div>
+            <p className="tc-label" style={{ marginBottom: 8 }}>
+              Options
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <input
+                  type="checkbox"
+                  checked={(config.meta.fit ?? "reflow") !== "scale"}
+                  onChange={(e) =>
+                    onChange(
+                      updateMeta(config, {
+                        fit: e.currentTarget.checked ? "reflow" : "scale",
+                      }),
+                    )
+                  }
+                />
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    fontSize: 13,
+                  }}
+                >
+                  Responsive
+                  <InfoTip text="The embed fills its parent element — the canvas size in Options is just the preview/authoring size. Give the parent a width/height (or it falls back to the canvas aspect ratio). Turn this off to downscale the canvas to fit the parent instead, preserving aspect ratio." />
+                </span>
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <input
+                  type="checkbox"
+                  checked={config.meta.loop === true}
+                  onChange={(e) =>
+                    onChange(
+                      updateMeta(config, { loop: e.currentTarget.checked }),
+                    )
+                  }
+                />
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    fontSize: 13,
+                  }}
+                >
+                  Loop
+                  <InfoTip text="Auto-replay when the timeline reaches the end. Honored by the preview and zero-prop embeds." />
+                </span>
+              </label>
+            </div>
+          </div>
 
           <div>
             <StepHeader n={1} title="Install" />
@@ -366,7 +393,11 @@ export function ExportPanel({
             />
             <p className="tc-muted" style={{ fontSize: 11.5, marginTop: 6 }}>
               Drop this into a React component. The skin is lazy-loaded from
-              <code> config.meta.skin</code>.
+              <code> config.meta.skin</code>. Also accepts{" "}
+              <code>className</code>, <code>style</code>, and <code>theme</code>{" "}
+              (<code>light</code>/<code>dark</code>/<code>auto</code> — pass
+              your site&apos;s value to keep it in sync); add{" "}
+              <code>overflow-hidden</code> for rounded corners.
             </p>
           </div>
 
@@ -393,18 +424,55 @@ export function ExportPanel({
           </div>
         </>
       ) : (
-        <div>
-          <p className="tc-label" style={{ marginBottom: 8 }}>
-            Render with the CLI
-          </p>
-          <CodeBlock
-            code={render}
-            onCopied={() => onEvent?.("render_snippet_copied")}
-          />
-          <p className="tc-muted" style={{ fontSize: 11.5, marginTop: 8 }}>
-            No hosted video in v1 — run the OSS CLI to produce an MP4. (A
-            “Render for me” service is planned.)
-          </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <Field
+            label={
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
+              >
+                FPS
+                <InfoTip text="Frames per second for the rendered video." />
+              </span>
+            }
+          >
+            <Input
+              type="number"
+              value={config.meta.fps ?? 30}
+              onChange={(e) =>
+                onChange(
+                  updateMeta(config, { fps: Number(e.currentTarget.value) }),
+                )
+              }
+            />
+          </Field>
+          <Field
+            label={
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
+              >
+                Background
+                <InfoTip text="Background behind the skin in the rendered video (e.g. transparent for WebM, or a CSS colour)." />
+              </span>
+            }
+          >
+            <BackgroundPicker
+              value={config.meta.background ?? "transparent"}
+              onChange={(v) => onChange(updateMeta(config, { background: v }))}
+            />
+          </Field>
+          <div>
+            <p className="tc-label" style={{ marginBottom: 8 }}>
+              Render with the CLI
+            </p>
+            <CodeBlock
+              code={render}
+              onCopied={() => onEvent?.("render_snippet_copied")}
+            />
+            <p className="tc-muted" style={{ fontSize: 11.5, marginTop: 8 }}>
+              No hosted video in v1 — run the OSS CLI to produce an MP4. (A
+              “Render for me” service is planned.)
+            </p>
+          </div>
         </div>
       )}
     </div>

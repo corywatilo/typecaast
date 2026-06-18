@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
 import type { ConfigInput } from "@typecaast/schema";
 import { Field, Input, Select, Slider } from "@typecaast/ui";
-import { DisabledWrap, InfoTip } from "../Tooltip.js";
+import { InfoTip } from "../Tooltip.js";
 import { setCanvas, updateMeta, updatePacing } from "../store.js";
-import type { ExportMode } from "./ExportPanel.js";
 
 export const ASPECT_PRESETS: Record<string, { width: number; height: number }> =
   {
@@ -28,96 +27,15 @@ function L({ children, tip }: { children: ReactNode; tip: string }) {
   );
 }
 
-/**
- * Background picker. A native colour swatch + hex input pair, plus a
- * "Transparent" toggle that drops the value to the literal string
- * `"transparent"`. Clearer than a freeform text input — the user can either
- * pick a colour explicitly or opt out of one entirely.
- */
-function BackgroundPicker({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (next: string) => void;
-}) {
-  const isTransparent =
-    value === "transparent" || value === "" || value === "none";
-  // Normalise to a `#rrggbb` for the swatch — the native colour input only
-  // accepts that form. Free-form CSS colours (e.g. `rgb(...)`) round-trip
-  // through the text input but reset the swatch to black.
-  const hex = isTransparent
-    ? "#000000"
-    : /^#[0-9a-fA-F]{6}$/.test(value)
-      ? value
-      : "#000000";
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <input
-          type="color"
-          aria-label="Pick background colour"
-          disabled={isTransparent}
-          value={hex}
-          onChange={(e) => onChange(e.currentTarget.value)}
-          style={{
-            width: 32,
-            height: 32,
-            padding: 0,
-            border: "1px solid var(--tc-border)",
-            borderRadius: 6,
-            background: "transparent",
-            cursor: isTransparent ? "not-allowed" : "pointer",
-            opacity: isTransparent ? 0.45 : 1,
-            flex: "0 0 auto",
-          }}
-        />
-        <Input
-          aria-label="Background colour"
-          disabled={isTransparent}
-          value={isTransparent ? "transparent" : value}
-          placeholder="#000000"
-          onChange={(e) => onChange(e.currentTarget.value)}
-          style={{ flex: "1 1 auto", minWidth: 0 }}
-        />
-      </div>
-      <label
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          fontSize: 12,
-          color: "var(--tc-muted)",
-        }}
-      >
-        <input
-          type="checkbox"
-          checked={isTransparent}
-          onChange={(e) =>
-            onChange(e.currentTarget.checked ? "transparent" : "#000000")
-          }
-        />
-        Transparent
-      </label>
-    </div>
-  );
-}
-
 export function OutputPanel({
   config,
   onChange,
-  exportMode,
 }: {
   config: ConfigInput;
   onChange: (next: ConfigInput) => void;
-  /** Active export pipeline. Drives which fields are disabled — FPS only
-   *  applies to video, Loop only applies to live code embeds, etc. */
-  exportMode: ExportMode;
 }) {
   const { width, height } = config.meta.canvas;
   const pacing = config.pacing ?? {};
-  const fpsDisabled = exportMode === "code";
-  const loopDisabled = exportMode === "video";
   // Reflect the active preset in the label until the dimensions deviate.
   const currentPreset =
     Object.entries(ASPECT_PRESETS).find(
@@ -176,95 +94,25 @@ export function OutputPanel({
         </Field>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <DisabledWrap
-          disabled={fpsDisabled}
-          reason="FPS only applies when rendering video — the live code embed plays at the browser's frame rate."
-        >
-          <Field
-            label={
-              <L tip="Frames per second for video export only — it has no effect on the live web preview.">
-                FPS
-              </L>
-            }
-          >
-            <Input
-              type="number"
-              disabled={fpsDisabled}
-              value={config.meta.fps ?? 30}
-              onChange={(e) =>
-                onChange(
-                  updateMeta(config, { fps: Number(e.currentTarget.value) }),
-                )
-              }
-            />
-          </Field>
-        </DisabledWrap>
-        <Field
-          label={
-            <L tip="Random seed for jitter/humanize. The same seed always replays identically — change it to reshuffle the timing.">
-              Seed
-            </L>
+      {/* FPS + Background moved to Export → Video; Loop moved to Export → Code
+          (they each only apply to one export path). Seed applies to both. */}
+      <Field
+        label={
+          <L tip="Random seed for jitter/humanize. The same seed always replays identically — change it to reshuffle the timing.">
+            Seed
+          </L>
+        }
+      >
+        <Input
+          type="number"
+          value={config.meta.seed ?? 42}
+          onChange={(e) =>
+            onChange(
+              updateMeta(config, { seed: Number(e.currentTarget.value) }),
+            )
           }
-        >
-          <Input
-            type="number"
-            value={config.meta.seed ?? 42}
-            onChange={(e) =>
-              onChange(
-                updateMeta(config, { seed: Number(e.currentTarget.value) }),
-              )
-            }
-          />
-        </Field>
-        <Field
-          label={
-            <L tip="Background behind the skin for video export (e.g. transparent for WebM, or a CSS color).">
-              Background
-            </L>
-          }
-        >
-          <BackgroundPicker
-            value={config.meta.background ?? "transparent"}
-            onChange={(v) => onChange(updateMeta(config, { background: v }))}
-          />
-        </Field>
-        <DisabledWrap
-          disabled={loopDisabled}
-          reason="Loop is a live-playback setting — it doesn't apply to a one-shot video render."
-        >
-          <Field
-            label={
-              <L tip="Auto-replay when the timeline reaches the end. Honored by the preview and zero-prop embeds.">
-                Loop
-              </L>
-            }
-          >
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                height: 32,
-              }}
-            >
-              <input
-                type="checkbox"
-                disabled={loopDisabled}
-                checked={config.meta.loop === true}
-                onChange={(e) =>
-                  onChange(
-                    updateMeta(config, { loop: e.currentTarget.checked }),
-                  )
-                }
-              />
-              <span className="tc-muted" style={{ fontSize: 12 }}>
-                auto-replay
-              </span>
-            </label>
-          </Field>
-        </DisabledWrap>
-      </div>
+        />
+      </Field>
 
       <div style={{ paddingTop: 8, borderTop: "1px solid var(--tc-border)" }}>
         <p
