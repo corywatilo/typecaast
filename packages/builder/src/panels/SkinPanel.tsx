@@ -5,12 +5,50 @@ import { InfoTip } from "../Tooltip.js";
 import { setSkin, updateMeta } from "../store.js";
 import { capabilityLint } from "../lint.js";
 
-const OPTION_FIELDS = [
-  { key: "channel", label: "Channel", placeholder: "#alerts" },
-  { key: "title", label: "Title", placeholder: "Chat" },
-  { key: "contact", label: "Contact", placeholder: "Sam Carter" },
-  { key: "status", label: "Status", placeholder: "online" },
-] as const;
+/**
+ * Friendly metadata for skin option keys we know about. Unknown keys fall
+ * back to title-cased labels with no placeholder.
+ */
+const KNOWN_OPTIONS: Record<
+  string,
+  { label: string; placeholder: string } | undefined
+> = {
+  channel: { label: "Channel", placeholder: "#alerts" },
+  title: { label: "Title", placeholder: "Chat" },
+  contact: { label: "Contact", placeholder: "Sam Carter" },
+  status: { label: "Status", placeholder: "online" },
+};
+
+/**
+ * Discover the active skin's string-typed option keys by introspecting its
+ * Zod options schema. We only render fields the active skin actually
+ * consumes — previously we hard-coded `channel/title/contact/status` for
+ * every skin, which meant most fields silently did nothing on most skins.
+ */
+function getStringOptionKeys(skin: Skin | undefined): string[] {
+  const schema = skin?.meta.optionsSchema as
+    | { shape?: Record<string, unknown> }
+    | undefined;
+  const shape = schema?.shape;
+  if (!shape) return [];
+  const out: string[] = [];
+  for (const [key, fieldSchema] of Object.entries(shape)) {
+    // Each shape entry is itself a ZodType. `.safeParse("…")` succeeds for
+    // strings (incl. `ZodString`, `ZodOptional<ZodString>`, etc.) and fails
+    // for booleans/numbers, so we render only the keys that accept text.
+    const field = fieldSchema as
+      | { safeParse?: (v: unknown) => { success: boolean } }
+      | undefined;
+    if (field?.safeParse?.("test")?.success) out.push(key);
+  }
+  return out;
+}
+
+function titleCase(s: string): string {
+  return s
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/^./, (c) => c.toUpperCase());
+}
 
 interface Feature {
   label: string;
@@ -114,24 +152,39 @@ export function SkinPanel({
         </Select>
       </Field>
 
-      <div>
-        <p className="tc-label" style={{ marginBottom: 8 }}>
-          Options
-        </p>
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
-        >
-          {OPTION_FIELDS.map((f) => (
-            <Field key={f.key} label={f.label}>
-              <Input
-                value={(options[f.key] as string) ?? ""}
-                placeholder={f.placeholder}
-                onChange={(e) => setOption(f.key, e.currentTarget.value)}
-              />
-            </Field>
-          ))}
-        </div>
-      </div>
+      {(() => {
+        const optionKeys = getStringOptionKeys(skin);
+        if (optionKeys.length === 0) return null;
+        return (
+          <div>
+            <p className="tc-label" style={{ marginBottom: 8 }}>
+              Options
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}
+            >
+              {optionKeys.map((key) => {
+                const known = KNOWN_OPTIONS[key];
+                const label = known?.label ?? titleCase(key);
+                const placeholder = known?.placeholder ?? "";
+                return (
+                  <Field key={key} label={label}>
+                    <Input
+                      value={(options[key] as string) ?? ""}
+                      placeholder={placeholder}
+                      onChange={(e) => setOption(key, e.currentTarget.value)}
+                    />
+                  </Field>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       <Field
         label={
@@ -139,16 +192,18 @@ export function SkinPanel({
             style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
           >
             Message input
-            <InfoTip text="Whether the reply box shows. Auto reveals it only while someone is typing/sending; Always keeps it visible; Hidden never shows it." />
+            <InfoTip text="Whether the reply box shows. Always keeps it visible; Hidden never shows it." />
           </span>
         }
       >
-        <Segmented<ComposerMode>
+        <Segmented<Exclude<ComposerMode, "auto">>
           aria-label="Message input visibility"
-          value={config.meta.composer ?? "auto"}
+          // Treat the legacy "auto" value as "always" for display so the
+          // segmented control is never in a no-selection state — clicking
+          // either option commits the new explicit value.
+          value={config.meta.composer === "never" ? "never" : "always"}
           onChange={(v) => onChange(updateMeta(config, { composer: v }))}
           options={[
-            { value: "auto", label: "Auto" },
             { value: "always", label: "Always" },
             { value: "never", label: "Hidden" },
           ]}
