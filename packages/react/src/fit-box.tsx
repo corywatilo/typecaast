@@ -19,9 +19,15 @@ export interface FitBoxProps {
 /**
  * Applies the `fit` strategy between the authoring canvas and the host
  * container (PLAN §7):
- * - `reflow`: fills width; content re-wraps (container query / ResizeObserver).
- * - `scale`: renders at exact canvas size, CSS-scaled to fit (layout preserved).
- * - `fixed`: exact canvas size, clipped.
+ * - `reflow`: **fills both axes** (width + height); content re-wraps to the
+ *   container width and the bottom-anchored thread clips older messages
+ *   when they overflow vertically. The widget is container-driven — it
+ *   never grows past its host as more steps play.
+ * - `scale`: renders at exact canvas size, CSS-scaled to fit (layout
+ *   preserved). Use when you want the skin to look like its native canvas
+ *   regardless of container size.
+ * - `fixed`: exact canvas size, clipped — the only mode where the widget
+ *   is *not* container-driven.
  */
 export function FitBox({
   fit,
@@ -52,7 +58,12 @@ export function FitBox({
         ref={ref}
         className={className}
         data-fit="reflow"
-        style={{ width: "100%", ...style }}
+        // `height: 100%` closes the height chain: combined with the parent
+        // `<Typecaast>` outer's `aspect-ratio` fallback, the widget fills
+        // its host container instead of growing taller as more messages
+        // play (the skin's bottom-anchored thread + `overflow: hidden`
+        // clip older steps off the top).
+        style={{ width: "100%", height: "100%", ...style }}
       >
         {children}
       </div>

@@ -7,7 +7,7 @@ afterEach(cleanup);
 const canvas = { width: 880, height: 720 };
 
 describe("FitBox", () => {
-  it("reflow fills width and tags the mode", () => {
+  it("reflow fills both axes and tags the mode", () => {
     render(
       <FitBox fit="reflow" canvas={canvas}>
         <span>x</span>
@@ -15,7 +15,10 @@ describe("FitBox", () => {
     );
     const el = document.querySelector('[data-fit="reflow"]') as HTMLElement;
     expect(el).toBeTruthy();
+    // Reflow is container-driven on both axes — the bottom-anchored skin
+    // thread relies on a definite parent height to clip overflow.
     expect(el.style.width).toBe("100%");
+    expect(el.style.height).toBe("100%");
   });
 
   it("fixed pins the canvas size and clips", () => {

@@ -93,6 +93,30 @@ const SR_ONLY: CSSProperties = {
 };
 
 /**
+ * Default sizing for the outer `<Typecaast>` wrapper. The widget is
+ * **container-driven**: it fills its parent in both axes. When the host
+ * gives the wrapper a definite height (responsive grid + fixed-height
+ * card, hero box with `aspectRatio`, …) `height: 100%` resolves to that
+ * height and the skin reflows / scales to fit. When the host gives only a
+ * width, `height: 100%` resolves to `auto` and the canvas's own
+ * `aspect-ratio` takes over, deriving a sensible height from the
+ * authored canvas dimensions instead of letting message content drive
+ * the widget taller as more steps play.
+ *
+ * The user's `style` prop is spread *after* these defaults so any
+ * explicit width/height/aspectRatio overrides win — same opt-out story
+ * as the `style.position` pass-through.
+ */
+function rootStyle(canvas: { width: number; height: number }): CSSProperties {
+  return {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    aspectRatio: `${canvas.width} / ${canvas.height}`,
+  };
+}
+
+/**
  * Renders a `<Typecaast>` from a config. The skin defaults to the built-in named
  * by `config.meta.skin.id` (lazy-loaded by id — see `builtin-skins.ts`); pass an
  * explicit `skin` to use a custom one. `<Typecaast>` is a client component, but
@@ -177,7 +201,7 @@ function Player({
   return (
     <div
       className={className}
-      style={{ position: "relative", ...style }}
+      style={{ ...rootStyle(config.meta.canvas), ...style }}
       data-typecaast=""
       data-fonts={fonts}
       role="figure"
@@ -190,7 +214,7 @@ function Player({
           </li>
         ))}
       </ol>
-      <div aria-hidden="true" style={{ height: "100%" }}>
+      <div aria-hidden="true" style={{ width: "100%", height: "100%" }}>
         <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
           <TypecaastStage
             state={tc.state}
@@ -222,14 +246,14 @@ function SkinFallback({
   return (
     <div
       className={className}
-      style={{ position: "relative", ...style }}
+      style={{ ...rootStyle(config.meta.canvas), ...style }}
       data-typecaast=""
       data-typecaast-loading=""
       role="figure"
       aria-label={label ?? "Chat simulation"}
       aria-busy="true"
     >
-      <div aria-hidden="true" style={{ height: "100%" }}>
+      <div aria-hidden="true" style={{ width: "100%", height: "100%" }}>
         <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
           <div
             style={{

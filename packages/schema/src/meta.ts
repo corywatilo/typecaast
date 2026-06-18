@@ -8,10 +8,17 @@ export const sizeSchema = z.object({
 export type Size = z.infer<typeof sizeSchema>;
 
 /**
- * How the rendered conversation fills its container.
- * - `reflow`: container queries + ResizeObserver; bubbles re-wrap on small screens.
- * - `scale`: CSS transform scale-to-fit, preserves exact layout.
- * - `fixed`: clip to canvas.
+ * How the rendered conversation fills its container. The widget is
+ * **container-driven** in the first two modes — its size never grows
+ * with content; messages clip when they overflow the bottom-anchored
+ * thread.
+ * - `reflow`: fills the container in both axes; bubbles re-wrap to the
+ *   container width.
+ * - `scale`: renders at the exact authored canvas size and CSS-scales
+ *   to fit (preserves the canonical layout — letterboxes if the
+ *   container's aspect doesn't match the canvas).
+ * - `fixed`: pins the widget to the authored canvas px; clips. The only
+ *   non-container-driven mode.
  */
 export const fitModeSchema = z.enum(["reflow", "scale", "fixed"]);
 export type FitMode = z.infer<typeof fitModeSchema>;
