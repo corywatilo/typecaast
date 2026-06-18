@@ -149,12 +149,21 @@ function clippingAncestor(el: HTMLElement | null): HTMLElement | null {
  * inside the sim viewport (like Slack clamps to the window) — the tail tracks
  * the reaction so it still points correctly after a shift.
  */
-const ReactionTooltip: FC<{ reaction: ReactionProps["reaction"] }> = ({
-  reaction,
-}) => {
+const ReactionTooltip: FC<{
+  reaction: ReactionProps["reaction"];
+  theme: ReactionProps["theme"];
+}> = ({ reaction, theme }) => {
   const ref = useRef<HTMLSpanElement>(null);
   const [dx, setDx] = useState(0);
   const code = reaction.shortcode;
+  const c = SLACK_COLORS[theme];
+
+  // A solid, elevated popover. In dark mode the surface is lifted above the
+  // message column (which is `c.bg` = #1a1d21) so it doesn't read as
+  // transparent; a hairline border + shadow separate it in both themes.
+  const surface = theme === "dark" ? "#272a2e" : c.bg;
+  const border = theme === "dark" ? "rgba(255,255,255,0.12)" : c.border;
+  const fg = theme === "dark" ? "#e8e8e8" : c.text;
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -181,23 +190,24 @@ const ReactionTooltip: FC<{ reaction: ReactionProps["reaction"] }> = ({
         zIndex: 20,
         width: 220,
         boxSizing: "border-box",
-        background: "#1a1d21",
-        color: "#e8e8e8",
+        background: surface,
+        color: fg,
+        border: `1px solid ${border}`,
         borderRadius: 12,
-        padding: "16px 16px 14px",
+        padding: "13px 14px 12px",
         textAlign: "center",
-        fontSize: 15,
+        fontSize: 13,
         lineHeight: 1.4,
-        boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.45)",
         pointerEvents: "none",
       }}
     >
-      <span style={{ display: "block", fontSize: 36, marginBottom: 8 }}>
+      <span style={{ display: "block", fontSize: 30, marginBottom: 6 }}>
         {reaction.emoji}
       </span>
       <span style={{ fontWeight: 700 }}>{joinNames(reaction.byNames)}</span>
-      <span style={{ color: "#ababad" }}> reacted with </span>
-      <span style={{ color: "#ababad" }}>
+      <span style={{ color: c.subtle }}> reacted with </span>
+      <span style={{ color: c.subtle }}>
         {code ? `:${code}:` : reaction.emoji}
       </span>
       {/* downward tail — offset opposite the clamp shift so it stays on the chip */}
@@ -211,7 +221,7 @@ const ReactionTooltip: FC<{ reaction: ReactionProps["reaction"] }> = ({
           height: 0,
           borderLeft: "7px solid transparent",
           borderRight: "7px solid transparent",
-          borderTop: "7px solid #1a1d21",
+          borderTop: `7px solid ${surface}`,
         }}
       />
     </span>
@@ -252,7 +262,9 @@ const Reaction: FC<ReactionProps> = ({ theme, reaction }) => {
           {reaction.count}
         </span>
       </span>
-      {hover && hasReactors ? <ReactionTooltip reaction={reaction} /> : null}
+      {hover && hasReactors ? (
+        <ReactionTooltip reaction={reaction} theme={theme} />
+      ) : null}
     </span>
   );
 };
@@ -338,6 +350,8 @@ function buttonStyle(
     textDecoration: "none",
     display: "inline-flex",
     alignItems: "center",
+    // Keep each button's label on one line; the row wraps buttons instead.
+    whiteSpace: "nowrap",
   };
   return primary
     ? { ...base, background: c.primary, color: c.primaryText, border: "none" }
@@ -388,7 +402,14 @@ const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
             <MessageContent nodes={message.content} styles={markStyles(c)} />
           </div>
           {actions.length > 0 ? (
-            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                marginTop: 8,
+              }}
+            >
               {actions.map((a, i) => {
                 // First action defaults to primary unless explicitly overridden.
                 const primary =

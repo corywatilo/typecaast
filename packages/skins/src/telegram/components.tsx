@@ -114,12 +114,13 @@ const ReactionTooltip: FC<{ names: string[] }> = ({ names }) => (
       transform: "translateX(-50%)",
       zIndex: 20,
       whiteSpace: "nowrap",
-      background: "rgba(0,0,0,0.82)",
+      // Solid (was rgba 0.82, which let message content bleed through).
+      background: "#1f2329",
       color: "#fff",
       borderRadius: 8,
       padding: "5px 9px",
       fontSize: 12,
-      boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
+      boxShadow: "0 6px 18px rgba(0,0,0,0.45)",
       pointerEvents: "none",
     }}
   >
