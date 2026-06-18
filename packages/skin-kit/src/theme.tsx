@@ -1,4 +1,9 @@
-import { createContext, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import type { ResolvedTheme } from "@typecaast/core";
 import type { SkinTokens } from "./types.js";
 
@@ -21,7 +26,7 @@ export function ThemeProvider({
   theme,
   tokens,
   children,
-}: ThemeProviderProps): ReactNode {
+}: ThemeProviderProps): ReactElement {
   return (
     <ThemeContext.Provider value={{ theme, tokens }}>
       {children}

@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactElement, ReactNode } from "react";
 import type {
   ContentNode,
   ImageNode,
@@ -118,7 +118,7 @@ export function MessageContent({
   classNames = {},
   styles = {},
   imageStyle,
-}: MessageContentProps): ReactNode {
+}: MessageContentProps): ReactElement {
   return (
     <>
       {nodes.map((node, i) => {

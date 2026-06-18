@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactElement, ReactNode } from "react";
 
 /**
  * Animation primitives are **pure functions of progress** (0..1), not CSS
@@ -85,7 +85,7 @@ export function TypingDots({
   color = "currentColor",
   size = 6,
   gap = 4,
-}: TypingDotsProps): ReactNode {
+}: TypingDotsProps): ReactElement {
   const phase = clamp01(progress) * cycles * Math.PI * 2;
   const dots: ReactNode[] = [];
   for (let i = 0; i < count; i++) {

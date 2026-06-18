@@ -3,6 +3,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactElement,
   type ReactNode,
 } from "react";
 import type { FitMode, Size } from "@typecaast/schema";
@@ -28,7 +29,7 @@ export function FitBox({
   children,
   className,
   style,
-}: FitBoxProps): ReactNode {
+}: FitBoxProps): ReactElement {
   const ref = useRef<HTMLDivElement>(null);
   const [container, setContainer] = useState<{ w: number; h: number } | null>(
     null,

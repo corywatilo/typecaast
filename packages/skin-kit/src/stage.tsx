@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo, type ReactElement } from "react";
 import type { ComposerMode, Participant } from "@typecaast/schema";
 import type { SimState } from "@typecaast/core";
 import { ThemeProvider } from "./theme.js";
@@ -34,7 +34,7 @@ export function TypecaastStage({
   participants,
   options,
   composer = "auto",
-}: TypecaastStageProps): ReactNode {
+}: TypecaastStageProps): ReactElement {
   const theme = state.theme;
   const byId = useMemo(() => {
     const map = new Map<string, Participant>();

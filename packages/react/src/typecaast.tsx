@@ -3,7 +3,7 @@ import {
   useEffect,
   useMemo,
   type CSSProperties,
-  type ReactNode,
+  type ReactElement,
 } from "react";
 import {
   configSchema,
@@ -99,7 +99,7 @@ const SR_ONLY: CSSProperties = {
  * since the default path takes only the serializable `config`, the embed drops
  * straight into a React Server Component.
  */
-export function Typecaast(props: TypecaastProps): ReactNode {
+export function Typecaast(props: TypecaastProps): ReactElement {
   // Normalize once: validate and apply schema defaults (pacing, fit, theme, …)
   // so a raw exported `typecaast.json` works without the caller pre-parsing it.
   const config = useMemo<Config>(
@@ -130,7 +130,7 @@ export function Typecaast(props: TypecaastProps): ReactNode {
 
 function ResolvedPlayer(
   props: Omit<TypecaastProps, "config"> & { config: Config },
-): ReactNode {
+): ReactElement {
   const skin = readBuiltinSkin(props.config.meta.skin.id);
   return <Player {...props} skin={skin} />;
 }
@@ -156,7 +156,7 @@ function Player({
 }: Omit<TypecaastProps, "config"> & {
   config: Config;
   skin: Skin;
-}): ReactNode {
+}): ReactElement {
   const reduced = useReducedMotion();
   const tc = useTypecaast(config, {
     theme,
