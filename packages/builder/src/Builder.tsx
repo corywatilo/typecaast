@@ -73,6 +73,8 @@ export interface BuilderProps {
   onEvent?: (event: BuilderEvent) => void;
   /** Extra controls rendered in the header's top-right (e.g. a theme toggle). */
   headerActions?: ReactNode;
+  /** Content rendered immediately right of the wordmark (e.g. site nav links). */
+  headerNav?: ReactNode;
   /** Persist to localStorage + the URL hash (shareable links). Default true. */
   persist?: boolean;
   className?: string;
@@ -140,6 +142,7 @@ export function Builder({
   onChange,
   onEvent,
   headerActions,
+  headerNav,
   persist = true,
   className,
   style,
@@ -247,6 +250,7 @@ export function Builder({
           </Heading>
           <Badge tone="accent">Builder</Badge>
         </a>
+        {headerNav}
         <span style={{ flex: 1 }} />
         <span className="tc-muted" style={{ fontSize: 12 }}>
           {config.timeline.length} steps · {config.participants.length}{" "}

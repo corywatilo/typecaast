@@ -257,8 +257,9 @@ const Reaction: FC<ReactionProps> = ({ theme, reaction }) => {
   );
 };
 
-// Slack shows a plain italicized "<name> is typing…" line — no bouncing dots
-// (those are an iMessage/WhatsApp idiom, not Slack's).
+// Slack shows a plain "<name> is typing…" line under the reply box — no bouncing
+// dots (those are an iMessage/WhatsApp idiom, not Slack's). Left edge lines up
+// with the composer; small, muted, upright text.
 const TypingIndicator: FC<TypingProps> = ({ theme, author }) => {
   const c = SLACK_COLORS[theme];
   return (
@@ -266,10 +267,9 @@ const TypingIndicator: FC<TypingProps> = ({ theme, author }) => {
       style={{
         display: "flex",
         alignItems: "center",
-        padding: "2px 16px 4px 60px",
+        padding: "0 16px 5px",
         color: c.subtle,
-        fontSize: 12,
-        fontStyle: "italic",
+        fontSize: 11.5,
       }}
     >
       <span>{author.name} is typing…</span>

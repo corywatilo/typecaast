@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@typecaast/ui";
+import { NavLinks } from "./NavLinks";
 
 export function Nav() {
   return (
@@ -31,27 +32,7 @@ export function Nav() {
           </strong>
           <Badge tone="accent">beta</Badge>
         </Link>
-        <nav
-          style={{
-            marginLeft: "auto",
-            display: "flex",
-            alignItems: "center",
-            gap: 22,
-            fontSize: 14,
-          }}
-          className="tc-muted"
-        >
-          <Link href="/playground">Playground</Link>
-          <Link href="/gallery">Gallery</Link>
-          <Link href="/docs">Docs</Link>
-          <a
-            href="https://github.com/corywatilo/typecaast"
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
-          </a>
-        </nav>
+        <NavLinks style={{ marginLeft: "auto" }} />
       </div>
     </header>
   );
