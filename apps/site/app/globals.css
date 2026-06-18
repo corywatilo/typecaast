@@ -23,3 +23,30 @@ a {
   margin: 0 auto;
   padding: 0 24px;
 }
+
+/*
+ * Masonry-style column layout for the skin gallery. Cards have widely
+ * varying heights (Slack is wide-and-short; iMessage is tall) and a
+ * regular CSS grid forces every cell to the row's tallest height, so
+ * shorter skins end up with huge empty space below them. CSS columns
+ * lay out top-to-bottom in column 1 then column 2, packing the cards.
+ *
+ * `break-inside: avoid` keeps a card from splitting across columns;
+ * `display: inline-block` is required so each card behaves as a single
+ * column item (default `block` items get fragmented).
+ */
+.tc-masonry {
+  column-count: 1;
+  column-gap: 20px;
+}
+@media (min-width: 720px) {
+  .tc-masonry {
+    column-count: 2;
+  }
+}
+.tc-masonry > * {
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 20px;
+  break-inside: avoid;
+}

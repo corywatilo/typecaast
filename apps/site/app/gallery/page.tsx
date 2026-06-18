@@ -37,23 +37,14 @@ export default function GalleryPage() {
           Every preset, playing the same script. Official skins are first-party;
           community skins are a directory, not an endorsement.
         </p>
-        <div
-          style={{
-            marginTop: 32,
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: 20,
-          }}
-        >
+        <div className="tc-masonry" style={{ marginTop: 32 }}>
           {Object.entries(builtinSkins).map(([id, skin]) => {
             const canvas = skin.meta.defaultCanvas;
-            const ratio = canvas.width / canvas.height;
-            // Each card has a fixed-height preview slot; `<Typecaast>` now
-            // fills it (width: 100% / height: 100%) and `fit="scale"`
-            // renders the skin at its authored canvas, scaled to fit —
-            // exactly like the hero. `min(420, …)` keeps the tall
-            // portrait skins from blowing the grid out vertically.
-            const h = Math.min(420, Math.round(280 / ratio));
+            // Each card's preview slot uses the skin's authored canvas
+            // aspect-ratio — so a wide Slack thread renders short, an
+            // iMessage device renders tall, and `fit="scale"` fills each
+            // edge-to-edge with no letterbox. The masonry column layout
+            // packs the differently-sized cards.
             return (
               <div
                 key={id}
@@ -66,7 +57,8 @@ export default function GalleryPage() {
               >
                 <div
                   style={{
-                    height: h,
+                    width: "100%",
+                    aspectRatio: `${canvas.width} / ${canvas.height}`,
                     display: "flex",
                     overflow: "hidden",
                     background: "var(--tc-bg-subtle)",
