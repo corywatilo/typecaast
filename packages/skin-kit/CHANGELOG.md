@@ -1,5 +1,28 @@
 # @typecaast/skin-kit
 
+## 0.3.0
+
+### Minor Changes
+
+- 33a0c23: Typing indicators: never render the viewer's own "typing…" (you don't see
+  yourself type — that's the composer). Add a `typingPlacement` skin meta option
+  (`"thread"` default, or `"below-composer"`) and set Slack to show "X is typing…"
+  below the reply box, matching the real app.
+
+  WhatsApp: replace the emoji composer glyphs (🙂 / 🎤 / ➤) with real inline SVG
+  icons.
+
+### Patch Changes
+
+- 49ad1e0: `TypecaastStage` now forwards the resolved composer mode to the skin's `Frame`
+  (via the new `FrameProps.composer`), so chrome elements can react to reply-box
+  visibility.
+- Updated dependencies [33a0c23]
+- Updated dependencies [b6179ee]
+- Updated dependencies [49ad1e0]
+  - @typecaast/core@0.3.0
+  - @typecaast/schema@0.2.1
+
 ## 0.2.3
 
 ### Patch Changes

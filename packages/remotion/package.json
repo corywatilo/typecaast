@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/remotion",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Remotion composition + renderer for deterministic Typecaast video export.",
   "license": "Apache-2.0",
   "repository": {
