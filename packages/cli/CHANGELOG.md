@@ -1,5 +1,12 @@
 # @typecaast/cli
 
+## 0.1.8
+
+### Patch Changes
+
+- @typecaast/remotion@0.1.8
+- @typecaast/capture@0.0.7
+
 ## 0.1.7
 
 ### Patch Changes

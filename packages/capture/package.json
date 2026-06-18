@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/capture",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Capture tooling: distill a chat UI subtree into a sanitized, slotted SkinDraft + TemplateSkinAdapter (Apache-2.0).",
   "license": "Apache-2.0",
   "repository": {

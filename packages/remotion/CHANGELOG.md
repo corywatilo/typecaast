@@ -1,5 +1,16 @@
 # @typecaast/remotion
 
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [b12dff8]
+- Updated dependencies [bd032dc]
+- Updated dependencies [be501a8]
+  - @typecaast/skins@0.3.0
+  - @typecaast/skin-kit@0.3.1
+  - @typecaast/react@0.3.1
+
 ## 0.1.7
 
 ### Patch Changes

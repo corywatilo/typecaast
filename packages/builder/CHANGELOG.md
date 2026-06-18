@@ -1,5 +1,23 @@
 # @typecaast/builder
 
+## 0.3.0
+
+### Minor Changes
+
+- bd032dc: Add a `headerNav` prop to `<Builder>` — content rendered immediately right of the
+  wordmark in the header (e.g. site nav links), so an embedding app can surface its
+  own navigation in the builder chrome without stacking a second header above it.
+
+### Patch Changes
+
+- 2c65190: Builder Options: **Fit** now comes first (it decides whether an explicit canvas
+  size matters), and the Size preset + Width/Height controls are hidden in
+  **Responsive** mode — where the embed fills its container, so an explicit size
+  is moot. Scale/Fixed still show them.
+- Updated dependencies [be501a8]
+  - @typecaast/skin-kit@0.3.1
+  - @typecaast/react@0.3.1
+
 ## 0.2.5
 
 ### Patch Changes
