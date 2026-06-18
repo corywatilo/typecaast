@@ -54,6 +54,20 @@ a React Server Component (Next.js App Router); no `"use client"` needed. (Using 
 **custom** skin? Pass it explicitly — `<Typecaast config={config} skin={mySkin} />`
 — inside a `"use client"` module.)
 
+### Props
+
+`<Typecaast>` also takes (all optional):
+
+- **`theme`** — `"light"` / `"dark"` / `"auto"`. Overrides `config.meta.theme` and
+  resolves at render time, so pass your site's value to keep it in sync:
+  `<Typecaast config={config} theme={isDark ? "dark" : "light"} />`. `"auto"`
+  follows the OS `prefers-color-scheme`.
+- **`className`** / **`style`** — applied to the widget's outer container; `style`
+  overrides the default width/height/aspect-ratio. The widget fills its parent, so
+  give the parent a size (add `overflow-hidden` for rounded corners).
+- **`autoplay`**, **`loop`**, **`rate`**, **`fit`** (`"reflow"`/`"scale"`),
+  **`composer`** (`"auto"`/`"always"`/`"never"`), **`label`**.
+
 No build step or design work required — the skin renders the platform's exact look in light and dark. Don't want to write JSON by hand? Build it visually in the [playground](https://typecaast.com/playground) and copy the config or embed snippet — see [`docs/playground.md`](./docs/playground.md) for a tour of the builder.
 
 ## Export to video
