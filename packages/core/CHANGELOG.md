@@ -1,5 +1,15 @@
 # @typecaast/core
 
+## 0.4.0
+
+### Minor Changes
+
+- 3d0f6f7: Skin components' `Composer` now receives the skin's `options` (mirroring
+  `FrameProps.options`), so a skin can label reply-box chrome from config. The
+  **Cursor** skin uses it for a new **`model`** option — the reply box's model chip
+  (defaults to "Mythos", editable in the builder). Cursor code snippets also get a
+  hairline border to match Cursor's outlined code style.
+
 ## 0.3.0
 
 ### Minor Changes

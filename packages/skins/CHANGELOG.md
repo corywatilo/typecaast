@@ -1,5 +1,25 @@
 # @typecaast/skins
 
+## 0.3.1
+
+### Patch Changes
+
+- 3d0f6f7: Skin components' `Composer` now receives the skin's `options` (mirroring
+  `FrameProps.options`), so a skin can label reply-box chrome from config. The
+  **Cursor** skin uses it for a new **`model`** option — the reply box's model chip
+  (defaults to "Mythos", editable in the builder). Cursor code snippets also get a
+  hairline border to match Cursor's outlined code style.
+- 6537d63: Skin polish: the Slack reaction tooltip ("X reacted with :emoji:") is now
+  **theme-aware and opaque** — it was hardcoded to the dark message colour, so on a
+  dark thread it read as transparent and on a light thread it clashed; it also had
+  an oversized font. The Slack system-card action buttons now **wrap** (the row
+  uses `flex-wrap`, each label stays on one line) instead of breaking the text onto
+  two lines at narrow widths. Telegram's reactor tooltip is now solid (was
+  semi-transparent).
+- Updated dependencies [3d0f6f7]
+  - @typecaast/core@0.4.0
+  - @typecaast/skin-kit@0.3.2
+
 ## 0.3.0
 
 ### Minor Changes
