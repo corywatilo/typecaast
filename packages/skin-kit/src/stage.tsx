@@ -80,53 +80,66 @@ export function TypecaastStage({
   return (
     <ThemeProvider theme={theme} tokens={tokens}>
       <Frame theme={theme} options={options} composer={composer}>
-        {/* Thread viewport: bottom-anchored + clipped, so as the thread grows
-            older items shift up out of view ("content shifts up", PLAN §7).
-            The engine's scroll.targetOffset is honored here once real layout
-            measurement lands; for now the flex anchor gives the same feel. */}
+        {/* Thread viewport. `column-reverse` pins the conversation to the
+            bottom (newest message + composer sit at the bottom, older items
+            "shift up", PLAN §7) and, once the thread outgrows the height, makes
+            it scroll from the bottom with the top reachable — entirely in CSS,
+            so it renders identically in a live embed, an SSR page, and a video
+            frame (no scroll-to-bottom effect, which wouldn't run before a
+            Remotion screenshot). Because `column-reverse` lays the first child
+            out at the bottom, children render newest-first: the typing
+            indicator (most recent activity) first, then messages reversed. The
+            engine's scroll.targetOffset is honored here once real layout
+            measurement lands. */}
         <div
           data-typecaast-thread=""
           style={{
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
+            flexDirection: "column-reverse",
             flex: "1 1 auto",
             minHeight: 0,
-            overflow: "hidden",
+            overflowY: "auto",
+            // Subtle scrollbar (Firefox); WebKit/Blink use the OS overlay
+            // scrollbar, which already auto-hides on macOS/iOS.
+            scrollbarWidth: "thin",
             // Breathing room beneath the last message — keeps it off the
             // composer (when shown) and the Frame's bottom edge (when hidden).
             paddingBottom: 16,
           }}
         >
-          {state.messages.map((message, i) => {
-            const author = byId.get(message.from);
-            if (!author) return null;
-            // Index-disambiguated so a config with duplicate message ids can't
-            // collide React keys (the builder can produce them transiently).
-            const key = `${message.id}-${i}`;
-            if (message.variant === "system") {
+          {typingPlacement === "thread" ? typingNodes : null}
+          {state.messages
+            .map((message, i) => {
+              const author = byId.get(message.from);
+              if (!author) return null;
+              // Index-disambiguated so a config with duplicate message ids can't
+              // collide React keys (the builder can produce them transiently).
+              const key = `${message.id}-${i}`;
+              if (message.variant === "system") {
+                return (
+                  <SystemMessage
+                    key={key}
+                    theme={theme}
+                    message={message}
+                    author={author}
+                  />
+                );
+              }
+              // Grouping looks at the chronological predecessor — computed
+              // before the reverse below, so author-collapsing is unaffected.
+              const prev = state.messages[i - 1];
+              const previousAuthor = prev ? byId.get(prev.from) : undefined;
               return (
-                <SystemMessage
+                <Message
                   key={key}
                   theme={theme}
                   message={message}
                   author={author}
+                  previousAuthor={previousAuthor}
                 />
               );
-            }
-            const prev = state.messages[i - 1];
-            const previousAuthor = prev ? byId.get(prev.from) : undefined;
-            return (
-              <Message
-                key={key}
-                theme={theme}
-                message={message}
-                author={author}
-                previousAuthor={previousAuthor}
-              />
-            );
-          })}
-          {typingPlacement === "thread" ? typingNodes : null}
+            })
+            .reverse()}
         </div>
         {showComposer ? (
           <Composer
