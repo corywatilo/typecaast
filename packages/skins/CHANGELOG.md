@@ -1,5 +1,21 @@
 # @typecaast/skins
 
+## 0.3.0
+
+### Minor Changes
+
+- b12dff8: Claude Code (TUI) and Discord now support a **light** theme in addition to dark.
+  Each skin's palette is keyed by theme (`COLORS[theme]`) with a new light variant,
+  and `supportsThemes` is `["dark", "light"]` — so the builder's App-tab "Supported
+  features" lists Light and the preview/theme toggle renders it.
+
+### Patch Changes
+
+- bd032dc: Slack: refine the "X is typing…" line below the reply box — upright (no italic),
+  slightly smaller, tighter vertical padding, and left-aligned with the composer.
+- Updated dependencies [be501a8]
+  - @typecaast/skin-kit@0.3.1
+
 ## 0.2.4
 
 ### Patch Changes
