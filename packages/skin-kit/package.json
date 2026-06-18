@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/skin-kit",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Skin authoring kit: defineSkin, Skin/Capabilities/SkinTokens types, theme context, font loader.",
   "license": "Apache-2.0",
   "repository": {

@@ -1,5 +1,13 @@
 # @typecaast/cli
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [9c84658]
+  - @typecaast/capture@0.0.4
+  - @typecaast/remotion@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes
