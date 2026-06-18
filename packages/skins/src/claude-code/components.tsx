@@ -9,7 +9,7 @@ import type {
   SystemProps,
   TypingProps,
 } from "@typecaast/core";
-import { TUI_COLORS as c, MONO_STACK } from "./tokens.js";
+import { TUI_COLORS, MONO_STACK } from "./tokens.js";
 
 /** Flatten content to a plain string (terminals render text, not rich marks). */
 function flatten(content: ContentNode[]): string {
@@ -52,13 +52,14 @@ const lineStyle: CSSProperties = {
 
 const Avatar: FC<AvatarProps> = () => null;
 
-const Reaction: FC<ReactionProps> = ({ reaction }) => (
-  <span style={{ color: c.dim }}> {reaction.emoji}</span>
+const Reaction: FC<ReactionProps> = ({ theme, reaction }) => (
+  <span style={{ color: TUI_COLORS[theme].dim }}> {reaction.emoji}</span>
 );
 
 const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
-const TypingIndicator: FC<TypingProps> = ({ typing }) => {
+const TypingIndicator: FC<TypingProps> = ({ theme, typing }) => {
+  const c = TUI_COLORS[theme];
   const frame =
     Math.floor(typing.progress * SPINNER.length * 6) % SPINNER.length;
   return (
@@ -68,7 +69,8 @@ const TypingIndicator: FC<TypingProps> = ({ typing }) => {
   );
 };
 
-const Message: FC<MessageProps> = ({ message }) => {
+const Message: FC<MessageProps> = ({ theme, message }) => {
+  const c = TUI_COLORS[theme];
   const text = streamed(flatten(message.content), message.revealProgress);
   if (message.isSelf) {
     return (
@@ -86,7 +88,8 @@ const Message: FC<MessageProps> = ({ message }) => {
   );
 };
 
-const SystemMessage: FC<SystemProps> = ({ message }) => {
+const SystemMessage: FC<SystemProps> = ({ theme, message }) => {
+  const c = TUI_COLORS[theme];
   const text = streamed(flatten(message.content), message.revealProgress);
   return (
     <div style={{ ...lineStyle, display: "flex", gap: 8, color: c.dim }}>
@@ -96,23 +99,26 @@ const SystemMessage: FC<SystemProps> = ({ message }) => {
   );
 };
 
-const Composer: FC<ComposerProps> = ({ composer }) => (
-  <div
-    style={{
-      display: "flex",
-      gap: 8,
-      padding: "6px 0 2px",
-      marginTop: 6,
-      borderTop: `1px solid ${c.border}`,
-    }}
-  >
-    <span style={{ color: c.prompt }}>❯</span>
-    <span style={{ whiteSpace: "pre-wrap", color: c.text }}>
-      {composer.text}
-      <span style={{ color: c.cursor }}>█</span>
-    </span>
-  </div>
-);
+const Composer: FC<ComposerProps> = ({ theme, composer }) => {
+  const c = TUI_COLORS[theme];
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 8,
+        padding: "6px 0 2px",
+        marginTop: 6,
+        borderTop: `1px solid ${c.border}`,
+      }}
+    >
+      <span style={{ color: c.prompt }}>❯</span>
+      <span style={{ whiteSpace: "pre-wrap", color: c.text }}>
+        {composer.text}
+        <span style={{ color: c.cursor }}>█</span>
+      </span>
+    </div>
+  );
+};
 
 const Dot: FC<{ color: string }> = ({ color }) => (
   <span
@@ -127,9 +133,11 @@ const Dot: FC<{ color: string }> = ({ color }) => (
 );
 
 const Frame: FC<FrameProps & { children?: ReactNode }> = ({
+  theme,
   options,
   children,
 }) => {
+  const c = TUI_COLORS[theme];
   const title =
     typeof options?.title === "string" ? options.title : "claude — typecaast";
   return (

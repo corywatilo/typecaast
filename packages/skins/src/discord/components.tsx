@@ -15,7 +15,11 @@ import {
   TypingDots,
   type ContentStyles,
 } from "@typecaast/skin-kit";
-import { DISCORD as c, DISCORD_FONT_STACK } from "./tokens.js";
+import {
+  DISCORD_COLORS,
+  DISCORD_FONT_STACK,
+  type DiscordColors,
+} from "./tokens.js";
 
 const GUTTER = 56; // avatar column width + padding
 
@@ -38,24 +42,26 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-const markStyles: ContentStyles = {
-  link: { color: c.link, textDecoration: "none" },
-  mention: {
-    color: c.mentionText,
-    background: c.mentionBg,
-    borderRadius: 3,
-    padding: "0 2px",
-    fontWeight: 500,
-  },
-  code: {
-    fontFamily: "Menlo, Consolas, monospace",
-    fontSize: "0.85em",
-    background: c.codeBg,
-    color: c.codeText,
-    borderRadius: 3,
-    padding: "1px 4px",
-  },
-};
+function markStyles(c: DiscordColors): ContentStyles {
+  return {
+    link: { color: c.link, textDecoration: "none" },
+    mention: {
+      color: c.mentionText,
+      background: c.mentionBg,
+      borderRadius: 3,
+      padding: "0 2px",
+      fontWeight: 500,
+    },
+    code: {
+      fontFamily: "Menlo, Consolas, monospace",
+      fontSize: "0.85em",
+      background: c.codeBg,
+      color: c.codeText,
+      borderRadius: 3,
+      padding: "1px 4px",
+    },
+  };
+}
 
 const Avatar: FC<AvatarProps> = ({ participant, size = 40 }) => {
   if (participant.avatar) {
@@ -94,33 +100,37 @@ const Avatar: FC<AvatarProps> = ({ participant, size = 40 }) => {
   );
 };
 
-const Reaction: FC<ReactionProps> = ({ reaction }) => (
-  <span
-    style={{
-      ...popIn(reaction.progress),
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 5,
-      background: c.reactionBg,
-      border: `1px solid ${c.reactionBorder}`,
-      borderRadius: 8,
-      padding: "2px 7px",
-      fontSize: 13,
-      color: c.reactionText,
-    }}
-  >
-    <span>{reaction.emoji}</span>
-    <span style={{ fontWeight: 600, fontSize: 12 }}>{reaction.count}</span>
-  </span>
-);
+const Reaction: FC<ReactionProps> = ({ theme, reaction }) => {
+  const c = DISCORD_COLORS[theme];
+  return (
+    <span
+      style={{
+        ...popIn(reaction.progress),
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        background: c.reactionBg,
+        border: `1px solid ${c.reactionBorder}`,
+        borderRadius: 8,
+        padding: "2px 7px",
+        fontSize: 13,
+        color: c.reactionText,
+      }}
+    >
+      <span>{reaction.emoji}</span>
+      <span style={{ fontWeight: 600, fontSize: 12 }}>{reaction.count}</span>
+    </span>
+  );
+};
 
-const Message: FC<MessageProps> = ({ message, author }) => {
+const Message: FC<MessageProps> = ({ theme, message, author }) => {
+  const c = DISCORD_COLORS[theme];
   const roleColor = author.color ?? c.username;
   const body = (
     <div style={{ color: c.text, fontSize: 15, lineHeight: 1.375 }}>
       <MessageContent
         nodes={message.content}
-        styles={markStyles}
+        styles={markStyles(c)}
         imageStyle={{ borderRadius: 8, marginTop: 4, maxWidth: 320 }}
       />
       {message.reactions.length > 0 ? (
@@ -128,7 +138,7 @@ const Message: FC<MessageProps> = ({ message, author }) => {
           style={{ display: "flex", gap: 4, marginTop: 5, flexWrap: "wrap" }}
         >
           {message.reactions.map((r, i) => (
-            <Reaction key={i} theme="dark" reaction={r} />
+            <Reaction key={i} theme={theme} reaction={r} />
           ))}
         </div>
       ) : null}
@@ -157,7 +167,7 @@ const Message: FC<MessageProps> = ({ message, author }) => {
         ...fadeSlideIn(message.revealProgress, { distance: 4 }),
       }}
     >
-      <Avatar theme="dark" participant={author} size={40} />
+      <Avatar theme={theme} participant={author} size={40} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
           <span style={{ color: roleColor, fontWeight: 500, fontSize: 15 }}>
@@ -173,7 +183,8 @@ const Message: FC<MessageProps> = ({ message, author }) => {
   );
 };
 
-const SystemMessage: FC<SystemProps> = ({ message }) => {
+const SystemMessage: FC<SystemProps> = ({ theme, message }) => {
+  const c = DISCORD_COLORS[theme];
   const text = message.content
     .map((n) =>
       n.type === "text"
@@ -201,25 +212,29 @@ const SystemMessage: FC<SystemProps> = ({ message }) => {
   );
 };
 
-const TypingIndicator: FC<TypingProps> = ({ typing, author }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      padding: "2px 16px 4px",
-      color: c.text,
-      fontSize: 13,
-    }}
-  >
-    <TypingDots progress={typing.progress} color={c.muted} size={5} />
-    <span>
-      <strong>{author.name}</strong> is typing…
-    </span>
-  </div>
-);
+const TypingIndicator: FC<TypingProps> = ({ theme, typing, author }) => {
+  const c = DISCORD_COLORS[theme];
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "2px 16px 4px",
+        color: c.text,
+        fontSize: 13,
+      }}
+    >
+      <TypingDots progress={typing.progress} color={c.muted} size={5} />
+      <span>
+        <strong>{author.name}</strong> is typing…
+      </span>
+    </div>
+  );
+};
 
-const Composer: FC<ComposerProps> = ({ composer }) => {
+const Composer: FC<ComposerProps> = ({ theme, composer }) => {
+  const c = DISCORD_COLORS[theme];
   const hasText = composer.text.length > 0;
   return (
     <div style={{ flex: "0 0 auto", padding: "0 16px 18px" }}>
@@ -250,9 +265,11 @@ const Composer: FC<ComposerProps> = ({ composer }) => {
 };
 
 const Frame: FC<FrameProps & { children?: ReactNode }> = ({
+  theme,
   options,
   children,
 }) => {
+  const c = DISCORD_COLORS[theme];
   const channel =
     typeof options?.channel === "string" ? options.channel : "general";
   return (
@@ -282,7 +299,7 @@ const Frame: FC<FrameProps & { children?: ReactNode }> = ({
         <span style={{ color: c.hashtag, fontSize: 22, fontWeight: 600 }}>
           #
         </span>
-        <span style={{ fontWeight: 600, fontSize: 16, color: "#f2f3f5" }}>
+        <span style={{ fontWeight: 600, fontSize: 16, color: c.username }}>
           {channel}
         </span>
       </div>

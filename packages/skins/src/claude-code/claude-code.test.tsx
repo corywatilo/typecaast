@@ -79,12 +79,23 @@ function renderTui(state: SimState): string {
 }
 
 describe("claude-code (TUI) skin", () => {
-  it("is dark-only and declares a mono font + no reactions", () => {
+  it("supports both themes and declares a mono font + no reactions", () => {
     expect(claudeCode.id).toBe("claude-code");
-    expect(claudeCode.meta.supportsThemes).toEqual(["dark"]);
+    expect(claudeCode.meta.supportsThemes).toEqual(["dark", "light"]);
     expect(claudeCode.meta.capabilities.reactions).toBe(false);
     expect(claudeCode.meta.capabilities.content.image).toBe(false);
     expect(claudeCode.meta.fonts?.[0]?.family).toBe("JetBrains Mono");
+  });
+
+  it("renders a light palette when theme=light", () => {
+    const { Frame } = claudeCode.components;
+    const html = renderToStaticMarkup(
+      <ThemeProvider theme="light">
+        <Frame theme="light" options={{ title: "claude" }} />
+      </ThemeProvider>,
+    );
+    expect(html).toContain("#ffffff"); // light background
+    expect(html).toContain("#2b2b2b"); // dark text
   });
 
   it("renders the terminal chrome and streamed output", () => {

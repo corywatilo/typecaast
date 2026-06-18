@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ThemeMode } from "@typecaast/schema";
 import { builtinSkins } from "@typecaast/skins";
-import { Badge, Button, Heading, Segmented } from "@typecaast/ui";
+import { Button, Heading, Segmented } from "@typecaast/ui";
 import { Nav } from "../../components/Nav";
 import { Footer } from "../../components/Footer";
 import { LiveSim } from "../../components/LiveSim";
@@ -38,12 +38,27 @@ export default function GalleryPage() {
     null,
   );
 
-  // Order cards so wide (2-col) and narrow (1-col) skins alternate. Combined
-  // with the 3-col `grid-auto-flow: dense` layout this packs each wide+narrow
-  // pair into one clean row, instead of stranding trailing wide cards on
-  // half-empty rows when all the narrow skins were paired up earlier.
+  // Explicit card order — each wide (2-col) skin paired with the narrow (1-col)
+  // skin beside it, so the 3-col `grid-auto-flow: dense` layout lays them out
+  // as: slack+telegram, claude-code+cursor, messages+imessage, discord+whatsapp.
+  // Any skin not listed is appended so a new built-in never silently vanishes.
   const cards = useMemo(() => {
-    const all = Object.entries(builtinSkins).map(([id, skin]) => {
+    const ORDER = [
+      "slack",
+      "telegram",
+      "claude-code",
+      "cursor",
+      "messages-macos",
+      "imessage",
+      "discord",
+      "whatsapp",
+    ];
+    const ids = [
+      ...ORDER.filter((id) => id in builtinSkins),
+      ...Object.keys(builtinSkins).filter((id) => !ORDER.includes(id)),
+    ];
+    return ids.map((id) => {
+      const skin = builtinSkins[id as keyof typeof builtinSkins];
       const canvas = skin.meta.defaultCanvas;
       // Landscape skins (desktop chat windows) span 2 grid cols; portrait
       // skins (phone-shaped messengers) span 1, so each card's on-screen size
@@ -58,14 +73,6 @@ export default function GalleryPage() {
           : genericConfig(id, canvas, SAMPLE_OPTIONS[id]);
       return { id, skin, canvas, aspect, config };
     });
-    const wide = all.filter((c) => c.aspect === "wide");
-    const tall = all.filter((c) => c.aspect === "tall");
-    const out: typeof all = [];
-    for (let i = 0; i < Math.max(wide.length, tall.length); i++) {
-      if (wide[i]) out.push(wide[i]!);
-      if (tall[i]) out.push(tall[i]!);
-    }
-    return out;
   }, []);
 
   return (
@@ -163,9 +170,6 @@ export default function GalleryPage() {
                   >
                     View JSON
                   </Button>
-                  {skin.meta.supportsThemes.map((t) => (
-                    <Badge key={t}>{t}</Badge>
-                  ))}
                 </div>
               </div>
             );

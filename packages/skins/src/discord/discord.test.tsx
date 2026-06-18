@@ -4,7 +4,7 @@ import { configSchema, type Config, type Participant } from "@typecaast/schema";
 import { createEngine, type SimState } from "@typecaast/core";
 import { ThemeProvider } from "@typecaast/skin-kit";
 import { discord } from "./index.js";
-import { DISCORD } from "./tokens.js";
+import { DISCORD_COLORS } from "./tokens.js";
 
 const config: Config = configSchema.parse({
   version: 1,
@@ -52,10 +52,21 @@ function render(state: SimState): string {
 }
 
 describe("discord skin", () => {
-  it("is dark, with reactions + threads", () => {
-    expect(discord.meta.supportsThemes).toEqual(["dark"]);
+  it("supports both themes, with reactions + threads", () => {
+    expect(discord.meta.supportsThemes).toEqual(["dark", "light"]);
     expect(discord.meta.capabilities.reactions).toBe(true);
     expect(discord.meta.capabilities.threads).toBe(true);
+  });
+
+  it("renders a light palette when theme=light", () => {
+    const { Frame } = discord.components;
+    const html = renderToStaticMarkup(
+      <ThemeProvider theme="light">
+        <Frame theme="light" options={{ channel: "dev" }} />
+      </ThemeProvider>,
+    );
+    expect(html).toContain("#ffffff"); // light background
+    expect(html).toContain("#313338"); // dark text
   });
 
   it("renders the channel header, role-colored names, grouping, reactions", () => {
@@ -65,7 +76,7 @@ describe("discord skin", () => {
     expect(html).toContain("pushed the fix"); // a message
     expect(html).toContain("#f47fff"); // ana's role color on her name
     expect(html).toContain("🚀"); // reaction
-    expect(html).toContain(DISCORD.bg); // dark channel bg
+    expect(html).toContain(DISCORD_COLORS.dark.bg); // dark channel bg
     // The grouped "running CI now" has no second username header — only two
     // role-colored name spans appear (ana once, you once).
     const names = html.match(/color:#f47fff/g) ?? [];
