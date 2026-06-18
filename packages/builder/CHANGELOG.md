@@ -1,5 +1,15 @@
 # @typecaast/builder
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [c165c9a]
+  - @typecaast/schema@0.2.0
+  - @typecaast/core@0.2.0
+  - @typecaast/react@0.2.2
+  - @typecaast/skin-kit@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes

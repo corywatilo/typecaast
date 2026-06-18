@@ -1,5 +1,11 @@
 # @typecaast/extension
 
+## 0.0.3
+
+### Patch Changes
+
+- @typecaast/capture@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
