@@ -37,18 +37,22 @@ export default function GalleryPage() {
           Every preset, playing the same script. Official skins are first-party;
           community skins are a directory, not an endorsement.
         </p>
-        <div className="tc-masonry" style={{ marginTop: 32 }}>
+        <div className="tc-gallery" style={{ marginTop: 32 }}>
           {Object.entries(builtinSkins).map(([id, skin]) => {
             const canvas = skin.meta.defaultCanvas;
-            // Each card's preview slot uses the skin's authored canvas
-            // aspect-ratio — so a wide Slack thread renders short, an
-            // iMessage device renders tall, and `fit="scale"` fills each
-            // edge-to-edge with no letterbox. The masonry column layout
-            // packs the differently-sized cards.
+            const ratio = canvas.width / canvas.height;
+            // Landscape skins (desktop chat windows) span 2 grid cols;
+            // portrait skins (phone-shaped messengers) span 1. Combined
+            // with `grid-auto-flow: dense` this packs the cards into a
+            // magazine layout where each card's on-screen size matches
+            // the proportions of the platform it represents — no more
+            // half-empty Slack cards or sky-tall iMessage towers.
+            const aspect = ratio >= 1 ? "wide" : "tall";
             return (
               <div
                 key={id}
                 className="tc-panel"
+                data-aspect={aspect}
                 style={{
                   overflow: "hidden",
                   display: "flex",

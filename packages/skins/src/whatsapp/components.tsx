@@ -105,7 +105,6 @@ const Message: FC<MessageProps> = ({ theme, message }) => {
   const self = message.isSelf;
   const bubble: CSSProperties = {
     position: "relative",
-    maxWidth: "78%",
     padding: "6px 8px 5px 9px",
     borderRadius: RADIUS,
     background: self ? c.selfBubble : c.otherBubble,
@@ -125,7 +124,13 @@ const Message: FC<MessageProps> = ({ theme, message }) => {
         ...fadeSlideIn(message.revealProgress, { distance: 5 }),
       }}
     >
-      <div style={{ position: "relative" }}>
+      {/*
+       * `maxWidth` lives on the wrapper (a flex child of the row) so the
+       * percentage resolves against the row's definite width. Putting it on
+       * the inner bubble made it resolve against the wrapper's auto width,
+       * which collapsed to min-content and wrapped short messages.
+       */}
+      <div style={{ position: "relative", maxWidth: "78%" }}>
         <div style={bubble}>
           <MessageContent
             nodes={message.content}
