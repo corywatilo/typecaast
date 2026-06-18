@@ -6,6 +6,20 @@ import type { Skin } from "./types.js";
 
 export type { ComposerMode };
 
+// A subtle, native-feeling scrollbar for the scrollable thread, scoped to the
+// thread viewport and injected inline so the embed needs no external stylesheet.
+// A neutral translucent grey reads on both light and dark skins and deepens on
+// hover; WebKit/Blink get the thin overlay-style thumb, Firefox uses the
+// standard `scrollbar-*` props. The selector is global on purpose — identical
+// rules across multiple embeds on a page are harmless and keep them consistent.
+const THREAD_SCROLLBAR_CSS = `
+[data-typecaast-thread]{scrollbar-width:thin;scrollbar-color:rgba(128,128,128,.4) transparent}
+[data-typecaast-thread]::-webkit-scrollbar{width:8px;height:8px}
+[data-typecaast-thread]::-webkit-scrollbar-track{background:transparent}
+[data-typecaast-thread]::-webkit-scrollbar-thumb{background-color:rgba(128,128,128,.4);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+[data-typecaast-thread]:hover::-webkit-scrollbar-thumb{background-color:rgba(128,128,128,.6)}
+`;
+
 export interface TypecaastStageProps {
   state: SimState;
   skin: Skin;
@@ -79,6 +93,7 @@ export function TypecaastStage({
 
   return (
     <ThemeProvider theme={theme} tokens={tokens}>
+      <style>{THREAD_SCROLLBAR_CSS}</style>
       <Frame theme={theme} options={options} composer={composer}>
         {/* Thread viewport. `column-reverse` pins the conversation to the
             bottom (newest message + composer sit at the bottom, older items
@@ -99,9 +114,8 @@ export function TypecaastStage({
             flex: "1 1 auto",
             minHeight: 0,
             overflowY: "auto",
-            // Subtle scrollbar (Firefox); WebKit/Blink use the OS overlay
-            // scrollbar, which already auto-hides on macOS/iOS.
-            scrollbarWidth: "thin",
+            // Scrollbar styling lives in THREAD_SCROLLBAR_CSS (the `<style>`
+            // above) so it can reach the WebKit pseudo-elements.
             // Breathing room beneath the last message — keeps it off the
             // composer (when shown) and the Frame's bottom edge (when hidden).
             paddingBottom: 16,
