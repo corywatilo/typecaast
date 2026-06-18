@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/core",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Framework-agnostic Typecaast engine + the SimState/Player/skin-prop contracts.",
   "license": "Apache-2.0",
   "repository": {
