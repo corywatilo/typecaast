@@ -21,6 +21,8 @@ export const slack = defineSkin({
     capabilities: slackCapabilities,
     optionsSchema: slackOptionsSchema,
     fonts: slackFonts,
+    // Slack shows "X is typing…" in a thin bar below the reply box.
+    typingPlacement: "below-composer",
   },
   components: slackComponents,
   tokens: slackTokens,

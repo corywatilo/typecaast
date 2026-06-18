@@ -238,6 +238,58 @@ const SystemMessage: FC<SystemProps> = ({ theme, message }) => {
   );
 };
 
+// Inline icons (currentColor) — never emoji glyphs, which render inconsistently
+// across platforms and aren't real UI chrome.
+const EmojiIcon: FC<{ size?: number }> = ({ size = 20 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <path d="M8.5 14.5a4.5 4.5 0 0 0 7 0" />
+    <circle cx="9" cy="9.8" r="1" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="9.8" r="1" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const MicIcon: FC<{ size?: number }> = ({ size = 20 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="9" y="3" width="6" height="11" rx="3" />
+    <path d="M6 11a6 6 0 0 0 12 0" />
+    <line x1="12" y1="17" x2="12" y2="20.5" />
+    <line x1="8.5" y1="20.5" x2="15.5" y2="20.5" />
+  </svg>
+);
+
+const SendIcon: FC<{ size?: number }> = ({ size = 18 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M3.4 20.4 21 12 3.4 3.6 3.39 10.1 15 12l-11.61 1.9z" />
+  </svg>
+);
+
 const Composer: FC<ComposerProps> = ({ theme, composer }) => {
   const c = WHATSAPP_COLORS[theme];
   const hasText = composer.text.length > 0;
@@ -266,7 +318,9 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
           fontSize: 15,
         }}
       >
-        <span style={{ color: c.subtle, fontSize: 18 }}>🙂</span>
+        <span style={{ color: c.subtle, display: "inline-flex" }}>
+          <EmojiIcon size={20} />
+        </span>
         {hasText ? (
           <span>
             {composer.text}
@@ -286,10 +340,9 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 18,
         }}
       >
-        {hasText ? "➤" : "🎤"}
+        {hasText ? <SendIcon size={18} /> : <MicIcon size={20} />}
       </span>
     </div>
   );

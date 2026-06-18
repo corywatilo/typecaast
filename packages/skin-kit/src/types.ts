@@ -59,6 +59,12 @@ export interface SkinMeta {
   optionsSchema?: ZodType;
   /** Fonts the skin declares and loads (live + export). */
   fonts?: FontDeclaration[];
+  /**
+   * Where "X is typing…" renders. `"thread"` (default) shows it inline in the
+   * message flow (a bubble, like iMessage); `"below-composer"` shows it under
+   * the reply box (like Slack). Self-authored typing never renders either way.
+   */
+  typingPlacement?: "thread" | "below-composer";
 }
 
 /** The presentational React components a skin provides. */

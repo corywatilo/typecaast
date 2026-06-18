@@ -91,16 +91,22 @@ export function sampleState(
   for (const c of compiled.composers) {
     const end = c.sendMs ?? Number.POSITIVE_INFINITY;
     if (t < c.startMs || t >= end) continue;
+    // Reveal by code point (not UTF-16 unit) so an astral emoji (🎬, 🚀) is
+    // never split into a lone surrogate mid-type — that renders as a "missing
+    // glyph" (□ / blue diamond) until the rest of the pair appears.
+    const chars = [...c.text];
     const text =
       t >= c.endMs
         ? c.text
-        : c.text.slice(
-            0,
-            Math.round(
-              clamp01((t - c.startMs) / Math.max(1, c.endMs - c.startMs)) *
-                c.text.length,
-            ),
-          );
+        : chars
+            .slice(
+              0,
+              Math.round(
+                clamp01((t - c.startMs) / Math.max(1, c.endMs - c.startMs)) *
+                  chars.length,
+              ),
+            )
+            .join("");
     composer = {
       from: c.from,
       text,

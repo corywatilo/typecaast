@@ -58,6 +58,25 @@ export function TypecaastStage({
       : undefined;
   const showComposer = composer !== "never" && composerAuthor !== undefined;
 
+  // "X is typing…" indicators, minus the viewer's own (you never see yourself
+  // typing — that's what the composer shows). Placement is skin-driven: inline
+  // in the thread by default, or below the composer (Slack).
+  const typingPlacement = skin.meta.typingPlacement ?? "thread";
+  const typingNodes = state.typingIndicators
+    .map((typing, i) => {
+      const author = byId.get(typing.from);
+      if (!author || author.isSelf) return null;
+      return (
+        <TypingIndicator
+          key={`typing-${typing.from}-${i}`}
+          theme={theme}
+          typing={typing}
+          author={author}
+        />
+      );
+    })
+    .filter(Boolean);
+
   return (
     <ThemeProvider theme={theme} tokens={tokens}>
       <Frame theme={theme} options={options} composer={composer}>
@@ -107,18 +126,7 @@ export function TypecaastStage({
               />
             );
           })}
-          {state.typingIndicators.map((typing, i) => {
-            const author = byId.get(typing.from);
-            if (!author) return null;
-            return (
-              <TypingIndicator
-                key={`typing-${typing.from}-${i}`}
-                theme={theme}
-                typing={typing}
-                author={author}
-              />
-            );
-          })}
+          {typingPlacement === "thread" ? typingNodes : null}
         </div>
         {showComposer ? (
           <Composer
@@ -127,6 +135,7 @@ export function TypecaastStage({
             author={composerAuthor}
           />
         ) : null}
+        {typingPlacement === "below-composer" ? typingNodes : null}
       </Frame>
     </ThemeProvider>
   );
