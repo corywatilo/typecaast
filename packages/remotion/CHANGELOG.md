@@ -1,5 +1,12 @@
 # @typecaast/remotion
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [1ad9881]
+  - @typecaast/react@0.2.4
+
 ## 0.1.4
 
 ### Patch Changes
