@@ -31,7 +31,7 @@ export const cursor = defineSkin({
   id: "cursor",
   meta: {
     name: "Cursor panel",
-    defaultCanvas: { width: 380, height: 560 },
+    defaultCanvas: { width: 350, height: 520 },
     supportsThemes: ["dark", "light"],
     capabilities: cursorCapabilities,
     optionsSchema: cursorOptionsSchema,

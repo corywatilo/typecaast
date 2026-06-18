@@ -1,4 +1,4 @@
-import type { Participant } from "@typecaast/schema";
+import type { ComposerMode, Participant } from "@typecaast/schema";
 import type {
   ComposerState,
   RenderedMessage,
@@ -20,6 +20,12 @@ export interface FrameProps {
   theme: ResolvedTheme;
   /** Skin-specific options (validated by the skin's `optionsSchema`). */
   options?: Record<string, unknown>;
+  /**
+   * Resolved composer visibility, so chrome can mirror the reply box. iMessage
+   * uses it to hide the on-screen keyboard when the composer is hidden
+   * (`"never"`); skins that don't render input chrome can ignore it.
+   */
+  composer?: ComposerMode;
 }
 
 export interface MessageProps {

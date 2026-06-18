@@ -31,7 +31,7 @@ export const discord = defineSkin({
   id: "discord",
   meta: {
     name: "Discord",
-    defaultCanvas: { width: 540, height: 430 },
+    defaultCanvas: { width: 600, height: 470 },
     supportsThemes: ["dark"],
     capabilities: discordCapabilities,
     optionsSchema: discordOptionsSchema,

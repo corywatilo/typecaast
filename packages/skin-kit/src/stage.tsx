@@ -60,7 +60,7 @@ export function TypecaastStage({
 
   return (
     <ThemeProvider theme={theme} tokens={tokens}>
-      <Frame theme={theme} options={options}>
+      <Frame theme={theme} options={options} composer={composer}>
         {/* Thread viewport: bottom-anchored + clipped, so as the thread grows
             older items shift up out of view ("content shifts up", PLAN §7).
             The engine's scroll.targetOffset is honored here once real layout

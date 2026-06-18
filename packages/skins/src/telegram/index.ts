@@ -19,7 +19,7 @@ export const telegram = defineSkin({
   id: "telegram",
   meta: {
     name: "Telegram",
-    defaultCanvas: { width: 400, height: 700 },
+    defaultCanvas: { width: 370, height: 650 },
     supportsThemes: ["light", "dark"],
     capabilities: telegramCapabilities,
     optionsSchema: telegramOptionsSchema,

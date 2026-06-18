@@ -6,7 +6,7 @@ import { Badge, Heading } from "@typecaast/ui";
 import { Nav } from "../../components/Nav";
 import { Footer } from "../../components/Footer";
 import { LiveSim } from "../../components/LiveSim";
-import { genericConfig } from "../../lib/configs";
+import { agentConfig, genericConfig } from "../../lib/configs";
 import { track } from "../../lib/analytics";
 
 const SAMPLE_OPTIONS: Record<string, Record<string, unknown>> = {
@@ -84,10 +84,18 @@ export default function GalleryPage() {
                   }}
                 >
                   <LiveSim
-                    config={genericConfig(id, canvas, SAMPLE_OPTIONS[id])}
+                    config={
+                      // Claude Code & Cursor are single-human-↔-AI tools, not
+                      // multiplayer chats — they play the assistant script.
+                      id === "claude-code" || id === "cursor"
+                        ? agentConfig(id, canvas, SAMPLE_OPTIONS[id])
+                        : genericConfig(id, canvas, SAMPLE_OPTIONS[id])
+                    }
                     skin={skin}
                     theme="auto"
                     fit="scale"
+                    composer="always"
+                    loop
                   />
                 </div>
                 <div

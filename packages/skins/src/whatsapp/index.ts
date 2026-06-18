@@ -16,7 +16,7 @@ export const whatsapp = defineSkin({
   id: "whatsapp",
   meta: {
     name: "WhatsApp",
-    defaultCanvas: { width: 360, height: 680 },
+    defaultCanvas: { width: 335, height: 640 },
     supportsThemes: ["light", "dark"],
     capabilities: whatsappCapabilities,
     optionsSchema: whatsappOptionsSchema,

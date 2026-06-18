@@ -441,12 +441,15 @@ const Keyboard: FC<{ theme: ResolvedTheme }> = ({ theme }) => {
 const Frame: FC<FrameProps & { children?: ReactNode }> = ({
   theme,
   options,
+  composer,
   children,
 }) => {
   const c = IMESSAGE_COLORS[theme];
   const contact =
     typeof options?.contact === "string" ? options.contact : "Messages";
-  const showKeyboard = options?.keyboard !== false;
+  // The keyboard is tied to the reply bar — hide it when the composer is hidden
+  // (`"never"`), so a keyboard never floats above an empty input area.
+  const showKeyboard = options?.keyboard !== false && composer !== "never";
   return (
     <div
       style={{
