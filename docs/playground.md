@@ -10,7 +10,7 @@ keep step with the UI.
 ```
 ┌────────────────────┬─────────────────────┬────────────────────┐
 │ App │ Timeline │ … │      Preview        │ OPTIONS            │
-│              Import│ ◀◀ ↻ ▶ ▶▶  ━━●━━━━ │ canvas / fps / …   │
+│              Import│ ◀◀ ↻ ▶ ▶▶  ━━●━━━━ │ canvas / seed / …  │
 │                    │                     │                    │
 │   (left tab body)  │  (live skin render) │ EXPORT             │
 │                    │                     │  Code | Video      │
@@ -61,12 +61,16 @@ and `config.meta.composer`.
 
 The home for everything specific to the chosen skin:
 
-- **Skin** — picks one of the built-in skins (Slack, iMessage, Cursor, Claude
-  Code, Telegram, WhatsApp, Discord, Messages-macOS). The id round-trips
-  through `config.meta.skin.id`; unknown ids stay selected as
-  `"<id> (unknown)"` so a config from a future skin doesn't get clobbered.
-- **Options** — a small grid of skin-specific fields (channel, title,
-  contact, status). They feed `config.meta.skin.options`.
+- **App** — picks a built-in skin, grouped by type: **Chat** (Slack, Discord),
+  **Code** (Claude Code, Cursor), **Messaging** (iMessage, Messages, Telegram,
+  WhatsApp). The id round-trips through `config.meta.skin.id`; unknown ids stay
+  selected as `"<id> (unknown)"` so a config from a future skin isn't clobbered.
+  A **Custom** entry explains how to bring your own UI (author a skin or capture
+  one with the Chrome extension) — selecting it **pauses the editor** (the canvas
+  and the Options/Export panels fade out, since there's no built-in skin to
+  preview) until a real app is picked.
+- **Options** — a small grid of skin-specific fields (channel, title, contact,
+  status, and the Cursor `model` chip). They feed `config.meta.skin.options`.
 - **Message input** — Auto / Always / Hidden composer visibility (driven by
   `config.meta.composer`).
 - **Supported features** — an affirmative checklist. Every capability the
@@ -134,7 +138,9 @@ Controls:
 - **Restart** (↻ rewound to start, then plays) · **Prev** (one step back) ·
   **Play / Pause** · **Next** (one step forward).
 - **Scrub bar** with the current time readout in seconds.
-- **Theme toggle** (light / dark / auto).
+- **Theme toggle** (light / dark / auto). In **Auto** the preview follows the
+  page's own light/dark setting (and the browser preference when the page is also
+  auto), not just `prefers-color-scheme`.
 - **Zoom**: `Fit` scales the canvas down to the pane (capped at 100% so a
   small canvas in a big pane never gets blown up), `Responsive` reflows the
   skin to the pane width, plus explicit percentages from −/+ buttons.
@@ -146,30 +152,30 @@ without errors, so a fresh import or page load shows the end state.
 
 **Code:** [`panels/OutputPanel.tsx`](../packages/builder/src/panels/OutputPanel.tsx)
 · store `setCanvas` / `updateMeta` / `updatePacing` · schema
-`config.meta.{canvas, fit, fps, seed, background, loop}` and `config.pacing`.
+`config.meta.{canvas, seed}` and `config.pacing`.
 
-Right column, top half. Lays out:
+Right column, top half — the settings that apply to **both** export paths:
 
-- **Size preset** + Width/Height. Presets stay sticky in the dropdown until
-  you edit a dimension manually.
-- **Fit** — `Responsive` (skin reflows to the pane width), `Scale to fit`,
-  or `Fixed size`.
-- **FPS** — frames per second. **Disabled when Export = Code** (the live
-  embed runs at the browser's frame rate); the field hovers a tooltip
-  explaining why.
-- **Seed** — drives jitter/humanise. The same seed always replays
-  identically.
-- **Background** — page background behind the skin.
-- **Loop** — auto-replay when the timeline ends. **Disabled when Export =
-  Video** (one-shot renders don't loop).
-- **Pacing** — Reading WPM, Typing CPS, and a humanise slider that adds
-  seeded random variation to delays so the timing feels less robotic.
+- **Size preset** + Width/Height. The authoring/preview canvas size — also the
+  video frame size and, for a responsive embed, the fallback aspect ratio.
+  Presets stay sticky in the dropdown until you edit a dimension manually.
+- **Seed** — drives jitter/humanise. The same seed always replays identically.
+- **Pacing** — Reading WPM, Typing CPS, and a humanise slider that adds seeded
+  random variation to delays so the timing feels less robotic.
+
+Settings that only apply to one export path now live **with that path** in the
+Export section below — **Responsive** + **Loop** under Code, **FPS** +
+**Background** under Video. There's no separate "Fit" control: whether the embed
+fills its parent is the **Responsive** toggle (Export → Code).
 
 ## Export section
 
 **Code:** [`panels/ExportPanel.tsx`](../packages/builder/src/panels/ExportPanel.tsx)
-(serializes via `toJSON`, handles download) · schema `config.meta.assets`
-(`inline` / `url`). The `Import` button in the left tab bar is
+(serializes via `toJSON`, handles download) · store `updateMeta` · schema
+`config.meta.{assets, fit, loop, fps, background}` (Code writes `fit`/`loop`,
+Video writes `fps`/`background` via the shared
+[`BackgroundPicker.tsx`](../packages/builder/src/BackgroundPicker.tsx)). The
+`Import` button in the left tab bar is
 [`panels/ImportPanel.tsx`](../packages/builder/src/panels/ImportPanel.tsx) — it
 replaces the whole config (one undo away).
 
@@ -181,7 +187,14 @@ in regardless.
 
 ### Code
 
-Three numbered steps:
+An **Options** group sits at the top (writes `config.meta.fit` / `loop`):
+
+- **Responsive** — on (default) fills the parent (`fit: "reflow"`); off
+  downscales the canvas to fit the parent, preserving aspect ratio
+  (`fit: "scale"`).
+- **Loop** — auto-replay when the timeline ends (`config.meta.loop`).
+
+Then three numbered steps:
 
 1. **Install** — `npm` / `yarn` / `pnpm` segmented control + the install
    line for `@typecaast/react`. Click `⧉` in the top-right corner of the
@@ -198,7 +211,10 @@ Three numbered steps:
    ```
 
    The skin is lazy-loaded from `config.meta.skin.id` — no skin import, no
-   `"use client"`. Drop straight into a React Server Component.
+   `"use client"`. Drop straight into a React Server Component. `<Typecaast>`
+   also accepts `className`/`style`, a controlled `theme` and `paused`, a `ref`
+   for imperative control (`seek`, …), and `onPlay`/`onPause`/`onEnded` — see the
+   [README props](../README.md#props).
 
 3. **Content** — a truncated, fading preview of the JSON config. Click the
    preview to expand to the full document; the corner `⧉` button copies the
@@ -207,10 +223,14 @@ Three numbered steps:
 
 ### Video
 
-The CLI snippet for `typecaast render`. There's no hosted video render in
-v1; the [`@typecaast/cli`](../packages/cli) takes the same JSON and produces
-an MP4 locally via `@remotion/cli`. A "Render for me" entry point is
-reserved for the future paid service.
+- **FPS** — frames per second for the rendered video (`config.meta.fps`).
+- **Background** — the colour (or transparent) behind the skin in the render
+  (`config.meta.background`); a swatch + hex input with a Transparent toggle.
+
+Then the CLI snippet for `typecaast render`. There's no hosted video render in
+v1; the [`@typecaast/cli`](../packages/cli) takes the same JSON and produces an
+MP4 locally via `@remotion/cli`. A "Render for me" entry point is reserved for
+the future paid service.
 
 ## Persistence
 
