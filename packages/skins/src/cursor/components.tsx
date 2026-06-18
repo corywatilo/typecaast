@@ -25,6 +25,8 @@ function markStyles(c: (typeof CURSOR_COLORS)[ResolvedTheme]): ContentStyles {
       fontSize: "0.86em",
       background: c.codeBg,
       color: c.codeText,
+      // Cursor outlines its code snippets — match that with a hairline border.
+      border: `1px solid ${c.border}`,
       borderRadius: 4,
       padding: "1px 4px",
     },
@@ -122,9 +124,13 @@ const TypingIndicator: FC<TypingProps> = ({ theme, typing }) => {
   );
 };
 
-const Composer: FC<ComposerProps> = ({ theme, composer }) => {
+const Composer: FC<ComposerProps> = ({ theme, composer, options }) => {
   const c = CURSOR_COLORS[theme];
   const hasText = composer.text.length > 0;
+  const model =
+    typeof options?.model === "string" && options.model.trim()
+      ? options.model
+      : "Mythos";
   const chip: CSSProperties = {
     fontSize: 11,
     color: c.dim,
@@ -166,7 +172,7 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
         >
           <div style={{ display: "flex", gap: 6 }}>
             <span style={chip}>∞ Agent</span>
-            <span style={chip}>claude-4.5-sonnet</span>
+            <span style={chip}>{model}</span>
           </div>
           <span
             style={{

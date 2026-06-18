@@ -17,6 +17,7 @@ const KNOWN_OPTIONS: Record<
   title: { label: "Title", placeholder: "Chat" },
   contact: { label: "Contact", placeholder: "Sam Carter" },
   status: { label: "Status", placeholder: "online" },
+  model: { label: "Model", placeholder: "Mythos" },
 };
 
 /**

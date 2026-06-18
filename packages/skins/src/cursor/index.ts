@@ -24,6 +24,8 @@ const cursorCapabilities: Capabilities = {
 
 const cursorOptionsSchema = z.object({
   title: z.string().optional(),
+  /** Model name shown in the reply box's model chip (defaults to "Mythos"). */
+  model: z.string().optional(),
 });
 
 /** A Cursor-style AI side-panel skin (dark + light) — covers "MCP in Cursor". */

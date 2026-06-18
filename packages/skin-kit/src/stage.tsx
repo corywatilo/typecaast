@@ -160,6 +160,7 @@ export function TypecaastStage({
             theme={theme}
             composer={state.composer}
             author={composerAuthor}
+            options={options}
           />
         ) : null}
         {typingPlacement === "below-composer" ? typingNodes : null}

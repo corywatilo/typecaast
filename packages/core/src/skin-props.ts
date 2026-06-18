@@ -60,6 +60,10 @@ export interface ComposerProps {
   composer: ComposerState;
   /** The participant using the composer (usually self). */
   author?: Participant;
+  /** Skin-specific options (validated by the skin's `optionsSchema`), mirroring
+   *  `FrameProps.options` — e.g. the Cursor skin reads `options.model` to label
+   *  the model chip in the reply box. */
+  options?: Record<string, unknown>;
 }
 
 export interface AvatarProps {

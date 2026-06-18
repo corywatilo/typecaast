@@ -34,14 +34,18 @@ const byId = new Map<string, Participant>(
   config.participants.map((p) => [p.id, p]),
 );
 
-function render(state: SimState, theme: ResolvedTheme): string {
+function render(
+  state: SimState,
+  theme: ResolvedTheme,
+  options: Record<string, unknown> = { title: "Chat" },
+): string {
   const { Frame, Message, TypingIndicator, Composer } = cursor.components;
   const composerAuthor = state.composer.from
     ? byId.get(state.composer.from)
     : undefined;
   return renderToStaticMarkup(
     <ThemeProvider theme={theme} tokens={cursor.tokens?.[theme]}>
-      <Frame theme={theme} options={{ title: "Chat" }}>
+      <Frame theme={theme} options={options}>
         {state.messages.map((m) => (
           <Message
             key={m.id}
@@ -63,6 +67,7 @@ function render(state: SimState, theme: ResolvedTheme): string {
             theme={theme}
             composer={state.composer}
             author={composerAuthor}
+            options={options}
           />
         ) : null}
       </Frame>
@@ -82,7 +87,17 @@ describe("cursor panel skin", () => {
     expect(html).toContain("Chat"); // header
     expect(html).toContain("dark mode toggle"); // user message
     expect(html).toContain("useTheme"); // inline code in assistant reply
-    expect(html).toContain("claude-4.5-sonnet"); // model chip
+    expect(html).toContain("Mythos"); // default model chip
     expect(html).toContain(CURSOR_COLORS.dark.bg); // dark panel bg
+  });
+
+  it("uses the `model` option for the model chip when provided", () => {
+    const engine = createEngine(config, "dark", cursor.meta.capabilities);
+    const html = render(engine.getStateAt(engine.durationMs), "dark", {
+      title: "Chat",
+      model: "GPT-9",
+    });
+    expect(html).toContain("GPT-9");
+    expect(html).not.toContain("Mythos");
   });
 });
