@@ -1,5 +1,51 @@
 # @typecaast/builder
 
+## 0.3.1
+
+### Patch Changes
+
+- f5a71da: Clean up the App (formerly "Skin") selector: rename the field to **App** and
+  group the built-in apps by type — **Chat** (Slack, Discord), **Code** (Claude
+  Code, Cursor), **Messaging** (iMessage, Messages, Telegram, WhatsApp) — with the
+  Cursor skin shown simply as "Cursor". A **Custom** entry explains how to bring
+  your own UI (author a skin or capture one with the Chrome extension) and links to
+  the docs.
+- 5ae1937: Move builder settings to where they apply: **Background** and **FPS** (video-only)
+  now live in Export → **Video**; **Loop** (code-only) moves into Export → **Code**
+  as part of an **"Options"** group alongside **Responsive**. The Options panel keeps
+  the canvas size, seed, and pacing. The embed snippet note now documents the
+  `className`, `style`, and `theme` props.
+- 3d0f6f7: Skin components' `Composer` now receives the skin's `options` (mirroring
+  `FrameProps.options`), so a skin can label reply-box chrome from config. The
+  **Cursor** skin uses it for a new **`model`** option — the reply box's model chip
+  (defaults to "Mythos", editable in the builder). Cursor code snippets also get a
+  hairline border to match Cursor's outlined code style.
+- 31b9ef4: When **Custom** is selected in the App tab, the editor now pauses instead of
+  silently keeping the previous preview: the canvas and the Options/Export panels
+  fade out and become non-interactive, with an "Editor paused" indicator prompting
+  you to pick a built-in app to continue. The App selector stays live so you can
+  switch back.
+- 10ef525: Tweak two canvas size presets: **Slack** is now 600×500 (was 880×720) and
+  **Phone** is a bit shorter at 390×760 (was 390×844).
+- e2c8d52: The playground preview's **Auto** color mode now follows the **page/host theme**
+  instead of only `prefers-color-scheme`: when the preview theme is Auto it uses
+  the builder's resolved chrome theme (which already reflects the page's Light /
+  Dark / Auto setting, falling back to the browser preference when the page is also
+  Auto). Explicit Light/Dark in the preview still override.
+- 7a4034c: Rework the sizing controls around a clearer model. The 3-way **Fit** dropdown is
+  gone; **Options** now shows the canvas **Size preset + Width/Height** always (the
+  authoring/preview size, also the video frame size and the responsive fallback
+  aspect ratio). The reflow-vs-scale choice moves to **Export → Code** as a
+  **"Responsive widget"** checkbox (on by default): on = the embed fills its parent
+  (`fit: "reflow"`), off = it downscales to fit the parent preserving aspect ratio
+  (`fit: "scale"`). Video still renders at the canvas dimensions. (`"fixed"` is no
+  longer offered in the builder but remains valid in the schema for older configs.)
+- Updated dependencies [3d0f6f7]
+- Updated dependencies [d5b3c8f]
+  - @typecaast/core@0.4.0
+  - @typecaast/skin-kit@0.3.2
+  - @typecaast/react@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

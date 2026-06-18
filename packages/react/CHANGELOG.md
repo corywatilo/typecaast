@@ -1,5 +1,32 @@
 # @typecaast/react
 
+## 0.4.0
+
+### Minor Changes
+
+- d5b3c8f: `<Typecaast>` gains declarative + imperative playback control:
+
+  - **`paused?: boolean`** — controlled pause/resume. `true` freezes in place;
+    `false` resumes **from the current position** (never restarts). Omit it to keep
+    today's `autoplay` behavior. No-op under `prefers-reduced-motion`. Solves the
+    pause-on-hidden-tab case without unmounting.
+  - A **`ref`** handle (`TypecaastHandle`) for imperative control — `play`, `pause`,
+    `seek` (jump to a time), `scrubTo`, `setRate`, `stepNext`, `stepPrev`, plus live
+    `currentMs` / `duration` / `playing`.
+  - **`onPlay` / `onPause` / `onEnded`** lifecycle callbacks.
+
+  Internally, `useTypecaast` now applies `autoplay` once per player (mount) rather
+  than reactively, so toggling the controlled `paused` no longer tears down and
+  recreates the live player.
+
+### Patch Changes
+
+- Updated dependencies [3d0f6f7]
+- Updated dependencies [6537d63]
+  - @typecaast/core@0.4.0
+  - @typecaast/skin-kit@0.3.2
+  - @typecaast/skins@0.3.1
+
 ## 0.3.1
 
 ### Patch Changes
