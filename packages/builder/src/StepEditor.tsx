@@ -143,10 +143,7 @@ function ActionsEditor({
               <option value="secondary">Secondary</option>
             </Select>
             <Tooltip text="Remove action">
-              <IconButton
-                aria-label="Remove action"
-                onClick={() => remove(i)}
-              >
+              <IconButton aria-label="Remove action" onClick={() => remove(i)}>
                 <IconTrash size={14} />
               </IconButton>
             </Tooltip>
@@ -216,7 +213,10 @@ export function StepEditor({
           }}
         >
           <Badge tone="warn">drop</Badge>
-          <span className="tc-muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
+          <span
+            className="tc-muted"
+            style={{ fontSize: 12.5, lineHeight: 1.4 }}
+          >
             {currentCap.reason} It will be skipped at render time until you
             change the skin or this step.
           </span>
@@ -266,19 +266,17 @@ export function StepEditor({
           style={{ fontSize: 12, margin: 0, lineHeight: 1.45 }}
         >
           Animates text being typed into the reply box, separately from{" "}
-          <code>send</code>. Use this when you need typing to overlap with
-          other timeline events — e.g. another participant sends a message
-          while the viewer is mid-sentence, or the viewer types, pauses,
-          edits, then sends. For a simple &ldquo;viewer types and sends&rdquo;
-          a plain <code>message</code> from the viewer auto-animates through
-          the composer.
+          <code>send</code>. Use this when you need typing to overlap with other
+          timeline events — e.g. another participant sends a message while the
+          viewer is mid-sentence, or the viewer types, pauses, edits, then
+          sends. For a simple &ldquo;viewer types and sends&rdquo; a plain{" "}
+          <code>message</code> from the viewer auto-animates through the
+          composer.
         </p>
       ) : null}
 
       {hasFrom ? (
-        <Field
-          label={<L tip="Which participant performs this step.">From</L>}
-        >
+        <Field label={<L tip="Which participant performs this step.">From</L>}>
           <Select
             value={(get(step, "from") as string) ?? ""}
             onChange={(e) => onChange({ from: e.currentTarget.value })}

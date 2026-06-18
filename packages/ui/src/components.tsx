@@ -130,7 +130,9 @@ export function Field({
           {hint ? (
             <InfoTip
               text={hint}
-              label={typeof label === "string" ? `${label}: more info` : undefined}
+              label={
+                typeof label === "string" ? `${label}: more info` : undefined
+              }
             />
           ) : null}
         </div>

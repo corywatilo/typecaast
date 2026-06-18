@@ -108,7 +108,11 @@ describe("config store", () => {
 
   it("addStepAutoPaced inserts a delay before the new step", () => {
     // Append: prior step is a non-delay → auto-prepend a delay.
-    const appended = addStepAutoPaced(base, { type: "send", from: "a" }, undefined);
+    const appended = addStepAutoPaced(
+      base,
+      { type: "send", from: "a" },
+      undefined,
+    );
     expect(appended.config.timeline).toHaveLength(4);
     expect(appended.config.timeline[2]).toMatchObject({
       type: "delay",

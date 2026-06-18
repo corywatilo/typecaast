@@ -391,8 +391,9 @@ const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
               {actions.map((a, i) => {
                 // First action defaults to primary unless explicitly overridden.
-                const primary = (a.variant ?? (i === 0 ? "primary" : "secondary"))
-                  === "primary";
+                const primary =
+                  (a.variant ?? (i === 0 ? "primary" : "secondary")) ===
+                  "primary";
                 const style = buttonStyle(c, primary, !!a.href);
                 return a.href ? (
                   <a

@@ -1,12 +1,6 @@
 import { useState } from "react";
 import type { ConfigInput } from "@typecaast/schema";
-import {
-  Button,
-  Field,
-  IconButton,
-  Segmented,
-  Select,
-} from "@typecaast/ui";
+import { Button, Field, IconButton, Segmented, Select } from "@typecaast/ui";
 import { updateMeta } from "../store.js";
 import {
   embedSnippet,

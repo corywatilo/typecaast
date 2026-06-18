@@ -27,7 +27,9 @@ interface Feature {
  */
 function supportedFeatures(skin: Skin): Feature[] {
   const caps = skin.meta.capabilities;
-  const ev = (k: keyof typeof caps.events): "native" | "fallback" | undefined =>
+  const ev = (
+    k: keyof typeof caps.events,
+  ): "native" | "fallback" | undefined =>
     caps.events[k] === "native"
       ? "native"
       : caps.events[k] === "fallback"
@@ -47,7 +49,8 @@ function supportedFeatures(skin: Skin): Feature[] {
 
   // Reactions need both the per-event flag *and* the top-level boolean.
   const r = ev("reaction");
-  if (r && caps.reactions) out.push({ label: "Reactions", native: r === "native" });
+  if (r && caps.reactions)
+    out.push({ label: "Reactions", native: r === "native" });
 
   const e = ev("edit");
   if (e) out.push({ label: "Edits", native: e === "native" });
@@ -192,7 +195,9 @@ export function SkinPanel({
                     fontWeight: 800,
                     fontSize: 11,
                   }}
-                  title={f.native ? "Native" : "Rendered with a generic fallback"}
+                  title={
+                    f.native ? "Native" : "Rendered with a generic fallback"
+                  }
                 >
                   ✓
                 </span>
@@ -245,10 +250,7 @@ export function SkinPanel({
             }}
           >
             {warnings.map((w, i) => (
-              <li
-                key={i}
-                style={{ fontSize: 12.5, color: "var(--tc-text)" }}
-              >
+              <li key={i} style={{ fontSize: 12.5, color: "var(--tc-text)" }}>
                 {w.stepIndex !== undefined ? (
                   <strong>Step {w.stepIndex + 1}: </strong>
                 ) : null}

@@ -70,8 +70,8 @@ can't hide it).
 Capability awareness is woven through the timeline:
 
 - The **+ Step picker** dims unsupported step types and refuses to add them,
-  with a tooltip explaining why (e.g. *"Slack doesn't support 'readReceipt'
-  steps."*).
+  with a tooltip explaining why (e.g. _"Slack doesn't support 'readReceipt'
+  steps."_).
 - The **Type select** inside the expanded step editor disables the same
   unsupported options. Your current step type stays selectable so you can
   switch back to it later.
@@ -150,6 +150,7 @@ Three numbered steps:
 
    The skin is lazy-loaded from `config.meta.skin.id` — no skin import, no
    `"use client"`. Drop straight into a React Server Component.
+
 3. **Content** — a truncated, fading preview of the JSON config. Click the
    preview to expand to the full document; the corner `⧉` button copies the
    complete JSON either way. A primary `⬇ Download typecaast.json` button

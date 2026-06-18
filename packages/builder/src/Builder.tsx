@@ -297,7 +297,13 @@ export function Builder({
                 variant="ghost"
                 onClick={() => setModal("import")}
               >
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                  }}
+                >
                   Import
                   <span
                     aria-hidden

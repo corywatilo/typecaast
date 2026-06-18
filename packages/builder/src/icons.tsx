@@ -102,7 +102,10 @@ export function IconClose({ size }: { size?: number } = {}) {
 export function IconPlay({ size }: { size?: number } = {}) {
   return (
     <Svg size={size} strokeWidth={1.4}>
-      <path d="M4.5 3.2v9.6a.6.6 0 0 0 .9.5l7.5-4.8a.6.6 0 0 0 0-1l-7.5-4.8a.6.6 0 0 0-.9.5z" fill="currentColor" />
+      <path
+        d="M4.5 3.2v9.6a.6.6 0 0 0 .9.5l7.5-4.8a.6.6 0 0 0 0-1l-7.5-4.8a.6.6 0 0 0-.9.5z"
+        fill="currentColor"
+      />
     </Svg>
   );
 }
@@ -112,7 +115,14 @@ export function IconPause({ size }: { size?: number } = {}) {
   return (
     <Svg size={size} strokeWidth={0}>
       <rect x="4" y="3" width="2.6" height="10" rx="0.6" fill="currentColor" />
-      <rect x="9.4" y="3" width="2.6" height="10" rx="0.6" fill="currentColor" />
+      <rect
+        x="9.4"
+        y="3"
+        width="2.6"
+        height="10"
+        rx="0.6"
+        fill="currentColor"
+      />
     </Svg>
   );
 }
@@ -122,7 +132,10 @@ export function IconStepBack({ size }: { size?: number } = {}) {
   return (
     <Svg size={size} strokeWidth={1.4}>
       <path d="M4 3.5v9" />
-      <path d="M13 3.4v9.2a.5.5 0 0 1-.78.42L5.6 8.42a.5.5 0 0 1 0-.84l6.62-4.6A.5.5 0 0 1 13 3.4z" fill="currentColor" />
+      <path
+        d="M13 3.4v9.2a.5.5 0 0 1-.78.42L5.6 8.42a.5.5 0 0 1 0-.84l6.62-4.6A.5.5 0 0 1 13 3.4z"
+        fill="currentColor"
+      />
     </Svg>
   );
 }
@@ -132,7 +145,10 @@ export function IconStepForward({ size }: { size?: number } = {}) {
   return (
     <Svg size={size} strokeWidth={1.4}>
       <path d="M12 3.5v9" />
-      <path d="M3 3.4v9.2a.5.5 0 0 0 .78.42l6.62-4.6a.5.5 0 0 0 0-.84L3.78 2.98A.5.5 0 0 0 3 3.4z" fill="currentColor" />
+      <path
+        d="M3 3.4v9.2a.5.5 0 0 0 .78.42l6.62-4.6a.5.5 0 0 0 0-.84L3.78 2.98A.5.5 0 0 0 3 3.4z"
+        fill="currentColor"
+      />
     </Svg>
   );
 }
