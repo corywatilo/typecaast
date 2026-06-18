@@ -103,13 +103,22 @@ const columnHeader: CSSProperties = {
 /**
  * Section divider used in the right column. The right column has no tab bar —
  * Options and Export are stacked sections, separated by a sticky-feeling
- * heading bar (Figma-style).
+ * heading bar (Figma-style). `topBorder` is set on every header except the
+ * first so adjacent sections read as separate slabs rather than one big run
+ * of content.
  */
-function SectionHeader({ children }: { children: ReactNode }) {
+function SectionHeader({
+  children,
+  topBorder = false,
+}: {
+  children: ReactNode;
+  topBorder?: boolean;
+}) {
   return (
     <div
       style={{
         padding: "10px 16px",
+        borderTop: topBorder ? "1px solid var(--tc-border)" : undefined,
         borderBottom: "1px solid var(--tc-border)",
         background: "var(--tc-bg-subtle)",
         fontSize: 11,
@@ -440,8 +449,10 @@ export function Builder({
           <div
             style={{
               flex: "1 1 auto",
+              // No `scrollbar-gutter: stable` — that reserved a permanent
+              // ~14px gap on the right even when nothing was scrolling, so
+              // the section backgrounds didn't reach the edge of the panel.
               overflowY: "auto",
-              scrollbarGutter: "stable",
             }}
           >
             <SectionHeader>Options</SectionHeader>
@@ -452,7 +463,7 @@ export function Builder({
                 exportMode={exportMode}
               />
             </div>
-            <SectionHeader>Export</SectionHeader>
+            <SectionHeader topBorder>Export</SectionHeader>
             <div style={{ padding: "12px 16px 18px" }}>
               <ExportPanel
                 config={config}
