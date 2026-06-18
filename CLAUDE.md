@@ -63,6 +63,32 @@ Filter a package: `pnpm --filter @typecaast/<pkg> run <script>`.
 - `apps/site` and the builder render via the **built `dist`** of the workspace packages, so rebuild
   (`pnpm build` or the package's `dev` watch) after changing a package before checking the site.
 
+## Consumer compatibility (React 18+ and older `@types/react`)
+
+The shipped client packages (`@typecaast/react`, `skin-kit`, `skins`) must install and type-check
+cleanly in a wide range of host apps — **including React 18 and old `@types/react`** (e.g. Gatsby 4
+pins React 18 + `@types/react@16`). Our own build/typecheck runs on the _newest_ React types, so none
+of these surface in-repo — they only appear in a consumer install. Each of these bit us shipping into
+such an app; when changing package boundaries or component signatures, sanity-check a fresh install
+under React 18 + an old `@types/react`.
+
+- **`react`/`react-dom` are the _only_ peer dependencies; everything else a package imports is a regular
+  `dependency` — including `zod`.** zod is internal to the schema (consumers pass plain JSON, never zod
+  objects). As a peer it forced the host to provide `zod@^4`, which **conflicted** with apps already on
+  `zod@^3` (e.g. via `openai`): pnpm reported `Conflicting peer dependencies: zod` and silently refused
+  to upgrade. As a dependency, our `zod@4` installs in isolation and coexists with the host's `zod@3`.
+- **No React-19-only APIs in shipped code** — the peer is `react >=18`, so it must run on 18. `use()`
+  (reading a lazily-imported skin) is 19-only; on 18 it's `undefined` → `react.use is not a function`.
+  Use the universal Suspense primitive instead — a status-tracked promise, thrown while pending (see
+  `readBuiltinSkin` in `packages/react/src/builtin-skins.ts`). Same caution for `useOptimistic`,
+  `useActionState`, `useFormStatus`.
+- **Exported components return `ReactElement`, not `ReactNode`.** Older `@types/react` (16/17) only accept
+  `ReactElement | null` as a component return; a `ReactNode` return is rejected with **ts2786**
+  ("'X' cannot be used as a JSX component … 'ReactNode' is not a valid JSX element"). Annotate every
+  _exported_ component (`Typecaast`, `FitBox`, `TypecaastStage`, `ThemeProvider`, `MessageContent`,
+  `TypingDots`, …) as `ReactElement`; keep `ReactNode` only for `children` props and helpers that
+  genuinely return strings/null.
+
 ## Changing the config schema / step types
 
 The config schema (`packages/schema/src/timeline.ts`, `meta.ts`, …) is the contract between the
