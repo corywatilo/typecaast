@@ -126,72 +126,98 @@ export function OutputPanel({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {/* Fit comes first: it decides whether an explicit canvas size matters
+          at all. Responsive fills its container, so the size controls below are
+          hidden in that mode. */}
       <Field
         label={
-          <L tip="Pick a canvas size. The label stays on the preset until you change the width or height.">
-            Size preset
+          <L tip="How the sim fits its container. Responsive re-wraps to the available width and fills its height; Scale renders at the exact canvas size, scaled to fit; Fixed is the exact size, clipped.">
+            Fit
           </L>
         }
       >
         <Select
-          value={currentPreset}
-          onChange={(e) => {
-            const p = ASPECT_PRESETS[e.currentTarget.value];
-            if (p) onChange(setCanvas(config, p.width, p.height));
-          }}
+          value={config.meta.fit ?? "reflow"}
+          onChange={(e) =>
+            onChange(
+              updateMeta(config, {
+                fit: e.currentTarget.value as "reflow" | "scale" | "fixed",
+              }),
+            )
+          }
         >
-          <option value="">
-            Custom ({width}×{height})
-          </option>
-          {Object.keys(ASPECT_PRESETS).map((k) => (
-            <option key={k} value={k}>
-              {k} ({ASPECT_PRESETS[k]!.width}×{ASPECT_PRESETS[k]!.height})
-            </option>
-          ))}
+          <option value="reflow">Responsive</option>
+          <option value="scale">Scale to fit</option>
+          <option value="fixed">Fixed size</option>
         </Select>
       </Field>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <Field label="Width">
-          <Input
-            type="number"
-            value={width}
-            onChange={(e) =>
-              onChange(setCanvas(config, Number(e.currentTarget.value), height))
-            }
-          />
-        </Field>
-        <Field label="Height">
-          <Input
-            type="number"
-            value={height}
-            onChange={(e) =>
-              onChange(setCanvas(config, width, Number(e.currentTarget.value)))
-            }
-          />
-        </Field>
-        <Field
-          label={
-            <L tip="How the sim fits its container. Responsive re-wraps to the available width; Scale renders at the exact canvas size, scaled to fit; Fixed is the exact size, clipped.">
-              Fit
-            </L>
-          }
-        >
-          <Select
-            value={config.meta.fit ?? "reflow"}
-            onChange={(e) =>
-              onChange(
-                updateMeta(config, {
-                  fit: e.currentTarget.value as "reflow" | "scale" | "fixed",
-                }),
-              )
+      {config.meta.fit !== "reflow" ? (
+        <>
+          <Field
+            label={
+              <L tip="Pick a canvas size. The label stays on the preset until you change the width or height.">
+                Size preset
+              </L>
             }
           >
-            <option value="reflow">Responsive</option>
-            <option value="scale">Scale to fit</option>
-            <option value="fixed">Fixed size</option>
-          </Select>
-        </Field>
+            <Select
+              value={currentPreset}
+              onChange={(e) => {
+                const p = ASPECT_PRESETS[e.currentTarget.value];
+                if (p) onChange(setCanvas(config, p.width, p.height));
+              }}
+            >
+              <option value="">
+                Custom ({width}×{height})
+              </option>
+              {Object.keys(ASPECT_PRESETS).map((k) => (
+                <option key={k} value={k}>
+                  {k} ({ASPECT_PRESETS[k]!.width}×{ASPECT_PRESETS[k]!.height})
+                </option>
+              ))}
+            </Select>
+          </Field>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 10,
+            }}
+          >
+            <Field label="Width">
+              <Input
+                type="number"
+                value={width}
+                onChange={(e) =>
+                  onChange(
+                    setCanvas(config, Number(e.currentTarget.value), height),
+                  )
+                }
+              />
+            </Field>
+            <Field label="Height">
+              <Input
+                type="number"
+                value={height}
+                onChange={(e) =>
+                  onChange(
+                    setCanvas(config, width, Number(e.currentTarget.value)),
+                  )
+                }
+              />
+            </Field>
+          </div>
+        </>
+      ) : (
+        <p className="tc-muted" style={{ margin: 0, fontSize: 12 }}>
+          Responsive fills its container; the canvas size only sets the fallback
+          aspect ratio for video and width-only layouts.
+        </p>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <DisabledWrap
           disabled={fpsDisabled}
           reason="FPS only applies when rendering video — the live code embed plays at the browser's frame rate."
