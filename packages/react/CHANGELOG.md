@@ -1,5 +1,13 @@
 # @typecaast/react
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [854dea0]
+  - @typecaast/skin-kit@0.4.0
+  - @typecaast/skins@0.3.2
+
 ## 0.5.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/builder",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Embeddable visual builder for Typecaast configs (source-available, FSL-1.1-Apache-2.0).",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
