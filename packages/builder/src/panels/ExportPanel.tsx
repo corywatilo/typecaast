@@ -265,8 +265,11 @@ export function ExportPanel({
   onExportModeChange: (mode: ExportMode) => void;
 }) {
   const [pm, setPm] = useState<PackageManager>("npm");
+  // Shadow-DOM isolation is a `<Typecaast>` prop (how you embed), not config —
+  // builder-only UI state, like the package-manager picker.
+  const [isolate, setIsolate] = useState(false);
   const install = installSnippet(pm);
-  const embed = embedSnippet(config);
+  const embed = embedSnippet(config, { isolate });
   const render = renderSnippet(config);
   const json = toJSON(config);
 
@@ -363,6 +366,35 @@ export function ExportPanel({
                 >
                   Loop
                   <InfoTip text="Auto-replay when the timeline reaches the end. Honored by the preview and zero-prop embeds." />
+                </span>
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <input
+                  type="checkbox"
+                  checked={isolate}
+                  onChange={(e) => setIsolate(e.currentTarget.checked)}
+                />
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    fontSize: 13,
+                  }}
+                >
+                  Render in shadow DOM
+                  <InfoTip
+                    text={`Isolates the widget from the host page's CSS (resets, Tailwind .prose, inherited line-height/font) by rendering it in a shadow root. Trade-off: client-only — the embedding file must be a client component (add "use client" in the Next.js App Router), not a pure Server Component.`}
+                  />
+                  <a
+                    href="https://github.com/corywatilo/typecaast#props"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="tc-muted"
+                    style={{ fontSize: 11.5 }}
+                  >
+                    Docs ↗
+                  </a>
                 </span>
               </label>
             </div>

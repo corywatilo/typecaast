@@ -37,15 +37,23 @@ export function installSnippet(pm: PackageManager = "npm"): string {
  * serializable `config` is passed — the embed drops straight into a React Server
  * Component (Next.js App Router) with no skin import and no `"use client"`.
  */
-export function embedSnippet(_config: ConfigInput): string {
-  return [
+export function embedSnippet(
+  _config: ConfigInput,
+  opts: { isolate?: boolean } = {},
+): string {
+  const lines: string[] = [];
+  // `isolate` renders in a shadow root (attachShadow) → client-only, so the file
+  // must be a client component in the App Router.
+  if (opts.isolate) lines.push(`"use client";`, ``);
+  lines.push(
     `import { Typecaast } from "@typecaast/react";`,
     `import config from "./typecaast.json";`,
     ``,
     `export default function Demo() {`,
-    `  return <Typecaast config={config} autoplay />;`,
+    `  return <Typecaast config={config} autoplay${opts.isolate ? " isolate" : ""} />;`,
     `}`,
-  ].join("\n");
+  );
+  return lines.join("\n");
 }
 
 /** A `typecaast render` CLI command for the config. */

@@ -42,6 +42,14 @@ describe("export helpers", () => {
     expect(s).not.toContain("use client");
   });
 
+  it('adds `isolate` + a "use client" directive when isolating', () => {
+    const s = embedSnippet(config, { isolate: true });
+    expect(s.startsWith('"use client";')).toBe(true);
+    expect(s).toContain("<Typecaast config={config} autoplay isolate />");
+    // Default (no opts) stays RSC-safe.
+    expect(embedSnippet(config)).not.toContain("isolate");
+  });
+
   it("emits an install line per package manager", () => {
     expect(installSnippet()).toBe("npm install @typecaast/react");
     expect(installSnippet("npm")).toBe("npm install @typecaast/react");

@@ -187,12 +187,16 @@ in regardless.
 
 ### Code
 
-An **Options** group sits at the top (writes `config.meta.fit` / `loop`):
+An **Options** group sits at the top:
 
 - **Responsive** — on (default) fills the parent (`fit: "reflow"`); off
   downscales the canvas to fit the parent, preserving aspect ratio
-  (`fit: "scale"`).
+  (`fit: "scale"`). Writes `config.meta.fit`.
 - **Loop** — auto-replay when the timeline ends (`config.meta.loop`).
+- **Render in shadow DOM** — adds the **`isolate`** prop (and a `"use client"`
+  line) to the embed snippet, so the widget renders in a shadow root and the host
+  page's CSS can't leak in. Client-only — an export choice, not config (it just
+  changes the generated snippet, not the preview).
 
 Then three numbered steps:
 
@@ -213,7 +217,8 @@ Then three numbered steps:
    The skin is lazy-loaded from `config.meta.skin.id` — no skin import, no
    `"use client"`. Drop straight into a React Server Component. `<Typecaast>`
    also accepts `className`/`style`, a controlled `theme` and `paused`, a `ref`
-   for imperative control (`seek`, …), and `onPlay`/`onPause`/`onEnded` — see the
+   for imperative control (`seek`, …), `onPlay`/`onPause`/`onEnded`, and
+   `isolate` (shadow-DOM style isolation for hostile host CSS) — see the
    [README props](../README.md#props).
 
 3. **Content** — a truncated, fading preview of the JSON config. Click the
