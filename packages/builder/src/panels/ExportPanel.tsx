@@ -384,7 +384,7 @@ export function ExportPanel({
                 >
                   Render in shadow DOM
                   <InfoTip
-                    text={`Isolates the widget from the host page's CSS (resets, Tailwind .prose, inherited line-height/font) by rendering it in a shadow root. Trade-off: client-only — the embedding file must be a client component (add "use client" in the Next.js App Router), not a pure Server Component.`}
+                    text={`Renders the widget in a shadow root so it's fully isolated from the host page's styles — handy when embedding into a site with its own global CSS, resets, or design system that would otherwise bleed into the widget. Trade-off: it's client-only, so the embedding file must be a client component (add "use client" in the Next.js App Router), not a pure Server Component.`}
                   />
                   <a
                     href="https://github.com/corywatilo/typecaast#props"
