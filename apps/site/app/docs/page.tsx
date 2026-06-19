@@ -122,14 +122,6 @@ typecaast render billing-toast.json --aspect 9:16 --scale 2 --theme dark`}</Code
               Rendering video →
             </Link>
           </li>
-          <li>
-            <Link
-              style={{ color: "var(--tc-accent)" }}
-              href={`${REPO}/PLAN.md`}
-            >
-              The full design spec →
-            </Link>
-          </li>
         </ul>
       </main>
       <Footer />

@@ -149,7 +149,7 @@ The shipped runtime contains **zero telemetry** — no analytics SDK, no phone-h
 
 ## Status
 
-`0.1.0` (beta). The site is live at [typecaast.com](https://typecaast.com); packages publish to npm under `@typecaast/*`. See [`BUILD-CHECKLIST.md`](./BUILD-CHECKLIST.md) for progress and [`PLAN.md`](./PLAN.md) for the full design spec. Deployment topology: [`DEPLOY.md`](./DEPLOY.md).
+`0.1.0` (beta). The site is live at [typecaast.com](https://typecaast.com); packages publish to npm under `@typecaast/*`. See [`BUILD-CHECKLIST.md`](./BUILD-CHECKLIST.md) for progress. Deployment topology: [`DEPLOY.md`](./DEPLOY.md).
 
 ## Licensing
 
