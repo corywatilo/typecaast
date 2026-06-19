@@ -146,17 +146,12 @@ function CustomBlurb() {
         Bring your own UI
       </p>
       <p className="tc-muted" style={{ margin: 0 }}>
-        The playground previews the built-in skins above. To use a different
-        app, author a skin (from a screenshot or platform) or capture a live UI
-        with the Typecaast Chrome extension, then pass it to{" "}
-        <code>&lt;Typecaast skin=&#123;…&#125; /&gt;</code> in your app.{" "}
-        <a
-          href="https://typecaast.com/docs"
-          target="_blank"
-          rel="noreferrer noopener"
-          style={{ color: "var(--tc-accent)" }}
-        >
-          Read the docs →
+        The playground previews the built-in skins above. To build your own —
+        from a captured chat UI or by hand — open the Create skin editor: paste
+        HTML+CSS, drop a captured draft, see it run against a live conversation,
+        then download the result.{" "}
+        <a href="/create-skin" style={{ color: "var(--tc-accent)" }}>
+          Open Create skin →
         </a>
       </p>
     </div>

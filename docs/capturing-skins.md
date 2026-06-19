@@ -110,3 +110,44 @@ leakage, ≤ 10-min manual fix), keep it as a **draft** with a warning rather th
 ship it as a finished skin — or build that one by hand. The captured template
 adapter is a faithful _playback_; for full fidelity (rich content, reactions,
 read receipts), graduate to a hand-written component skin.
+
+## What gets captured (and what doesn't)
+
+The distiller emits a `SkinDraft` with four pieces:
+
+1. **Slot HTML** (`frame`, `message`, `composer`, `system`, `typing`) — the
+   sanitized markup for each region, with `{{author}}`/`{{avatar}}`/
+   `{{body}}`/`{{time}}` / `{{composer}}` substitution markers.
+2. **Inline computed styles** — every element carries a `style="…"` baked
+   from `getComputedStyle`. We inline both **look** (color/font/border/etc.)
+   _and_ **layout** (width/max-width/flex-grow/position/overflow/…) so
+   class-driven layouts survive the trip into a small canvas.
+3. **Matched page CSS** — rules whose selectors match anything in the
+   captured subtree are extracted from `document.styleSheets` and bundled
+   into `draft.css`. This is what makes Tailwind-style utility classes
+   (`mx-auto`, `max-w-180`, `flex-grow`) actually do anything once the
+   captured `class` attribute leaves its stylesheet.
+4. **Design tokens** — extracted colors, fonts, radii, spacing.
+
+### Known failure modes
+
+| Symptom                                      | Cause                                                                                                                                      | Fix                                                                                                                                                                                                                         |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Text renders in vertical single-char columns | The captured root has a desktop-pixel margin (`margin: 0 234.5px`) that survives into a 480-px canvas                                      | Normalised automatically (large symmetric horizontal margins → `margin: 0 auto`). If you still see it, the captured root has a `width:` or `max-width:` constraint — edit it in the `/create-skin` editor's Frame HTML tab. |
+| Layout collapses; bubbles overlap            | The page uses utility classes whose CSS lives on a cross-origin sheet (CORS-blocked)                                                       | The draft's `cssSkipped` array names the unreadable sheets. Manually paste the needed rules into the CSS tab in `/create-skin`.                                                                                             |
+| No composer slot                             | The composer is a non-standard custom widget (no `aria-label`, no `role="textbox"`, no `contenteditable`, no class matching the heuristic) | Find the composer div in the Frame HTML tab, add `data-tc-slot="composer"` to it, and put `{{composer}}` inside.                                                                                                            |
+| Bubbles aren't detected (no `message` slot)  | The thread doesn't have enough repeating rows for `findRepeatingRows` to lock on                                                           | Capture a tighter subtree (just one bubble's parent list), or hand-craft the message slot in `/create-skin`.                                                                                                                |
+| Author/avatar/time slots missed              | Captured row uses non-semantic class names                                                                                                 | Set them manually in the Message HTML tab: `data-tc-slot="author"`, `="avatar"`, `="time"`.                                                                                                                                 |
+
+### The `/create-skin` editor
+
+Drop the captured `*-skin-draft.json` onto
+[typecaast.com/create-skin](https://typecaast.com/create-skin). Each region
+is editable in its own tab, the preview re-renders live against a dummy
+conversation, and a "Show slot outlines" toggle outlines each
+`data-tc-slot` so you can confirm `{{body}}` lands where you expect.
+
+Once it looks right, download the new `draft.json` — same shape as the
+capture, so you can keep iterating, ship it as a private skin via
+`<Typecaast skin={…} />`, or contribute it to the built-in library (see
+[extension/README.md](../extension/README.md#contributing-your-skin-to-the-built-in-library)).

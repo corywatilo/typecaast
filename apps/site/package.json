@@ -13,6 +13,12 @@
     "clean": "rm -rf .next .turbo"
   },
   "dependencies": {
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.36.1",
     "@typecaast/builder": "workspace:*",
     "@typecaast/core": "workspace:*",
     "@typecaast/react": "workspace:*",
@@ -20,6 +26,7 @@
     "@typecaast/skin-kit": "workspace:*",
     "@typecaast/skins": "workspace:*",
     "@typecaast/ui": "workspace:*",
+    "codemirror": "^6.0.1",
     "next": "^15.1.6",
     "posthog-js": "^1.205.0",
     "posthog-node": "^5.37.0",

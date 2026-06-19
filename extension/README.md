@@ -23,12 +23,82 @@ unpacked** → select `extension/dist`.
 
 ## Turn a draft into a skin
 
+Three paths, all start with a capture.
+
+### Easiest: drop the JSON into the Create-skin editor on typecaast.com
+
+Open [typecaast.com/create-skin](https://typecaast.com/create-skin), drag
+the downloaded `*-skin-draft.json` onto the page, and you'll see the slots
+rendering against a live dummy conversation in seconds. Each region
+(frame / message / composer / system / typing / CSS / tokens) is in its
+own tab, so you can fix the auto-detected slot markers, adjust margins,
+and iterate against the preview. Download the polished result back to a
+`draft.json` and either keep using it as a private skin in your own app
+or contribute it to the built-in library (below).
+
+This is the right path if you're going from capture to running skin and
+don't need a hand-written component file.
+
+### With an agent: the `/create-skin` Claude Code skill
+
+If you use Claude Code in this repo, run **`/create-skin`** and hand it the
+captured draft (or a reference screenshot). The skill walks reference →
+tokens → components → capabilities → fonts → stories + visual regression
+baseline. Use this when you want a hand-written component skin (Slack /
+Discord pattern) rather than the slot-template skin.
+
+### Headless: scaffold a template skin from the CLI
+
 ```bash
-typecaast scaffold-skin path/to/skin-draft.json --name "Slack-style"
+npx @typecaast/cli scaffold-skin path/to/skin-draft.json --name "Slack-style"
 ```
 
-Open the generated `README.md` and confirm the slots the distiller auto-detected
-— capture gets you ~80% of the way (PLAN §10).
+(or install once with `npm i -g @typecaast/cli` and run `typecaast scaffold-skin …`).
+
+The output is a usable template skin you can drop into your own React app
+and pass to `<Typecaast skin={…} />`.
+
+## Contributing your skin to the built-in library
+
+If you'd like your skin to ship with `@typecaast/skins` (so it shows up in the
+playground and builder for everyone), the path is:
+
+1. **Capture** with this extension and run **`/create-skin`** (or
+   `scaffold-skin`) against the draft.
+2. **Move** the generated folder into `packages/skins/src/<your-skin>/`.
+3. **Register** the skin in the four touchpoints we use for lazy loading:
+   - `packages/skins/src/registry.ts` (the `builtinSkins` map)
+   - `packages/skins/package.json` `exports` (`./<your-skin>` subpath)
+   - `packages/react/src/builtin-skins.ts` (one line in `BUILTIN_SKIN_LOADERS`)
+   - `registry/skins.json` (row for the CI `check:registry` gate)
+4. **Group it** in the App picker by editing `APP_GROUPS` /
+   `APP_LABELS` in `packages/builder/src/panels/SkinPanel.tsx`. Community
+   submissions live under the **Community** group.
+5. **Build & gate**: `pnpm build && pnpm typecheck && pnpm test &&
+pnpm check:registry`. Add a changeset (`pnpm changeset`) for any publishable
+   change.
+6. **Open a PR** with the changeset, a screenshot of the running skin in the
+   playground, and a note about the source page.
+
+### Guidelines
+
+We aim to keep the built-in library focused on **widely-adopted apps** — chat
+UIs, code/agent surfaces, and messengers most people will recognize at a
+glance. A skin is a better candidate if:
+
+- The app has broad usage (consumer or developer audience) so the skin
+  unlocks recognizable demos for many users.
+- It plays back the core experience: messages, composer, and at least one
+  affordance the platform is known for (reactions, system cards, typing, …).
+- Trade dress only — **no third-party logos, brand icons, or proprietary
+  fonts** in the repo. Reference open-licensed substitutes; users supply the
+  rest. See `TRADEMARKS.md`.
+- Both themes when feasible; light-only or dark-only is fine if the source
+  app only has one.
+
+Niche or single-tenant UIs are still welcome as **community skins** you ship
+in your own package; the [registry](../registry/) lists those alongside the
+built-ins.
 
 ## Security
 
