@@ -72,6 +72,15 @@ a React Server Component (Next.js App Router); no `"use client"` needed. (Using 
   it to keep the default `autoplay` behavior. Ideal for tab/visibility UIs
   without unmounting: `<Typecaast config={config} autoplay paused={activeTab !== "demo"} />`.
 - **`onPlay`** / **`onPause`** / **`onEnded`** — playback lifecycle callbacks.
+- **`isolate`** — render the widget inside an **open shadow root** so the host
+  page's global CSS (resets, Tailwind `.prose`, tag rules, inherited
+  `line-height`/font) can't leak in and distort it. Recommended when embedding
+  into a page with its own styles. **Client-only** — a shadow root can't be
+  attached during SSR, so an isolated widget renders a correctly-sized box on the
+  server and hydrates its visuals in; it no longer drops into a pure React Server
+  Component, so the embedding file must be a client component (`"use client"` in
+  the Next.js App Router). Fonts are unaffected (skins register them via the
+  `FontFace` API, which applies across the shadow boundary).
 
 ### Imperative control (ref)
 

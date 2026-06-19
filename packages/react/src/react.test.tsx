@@ -230,3 +230,38 @@ describe("<Typecaast> controlled playback (paused + ref)", () => {
     expect(onPause).toHaveBeenCalled();
   });
 });
+
+describe("<Typecaast isolate> (shadow DOM)", () => {
+  const figureOf = (root: HTMLElement) =>
+    root.querySelector("[data-typecaast]") as HTMLElement;
+  const shadowHost = (fig: HTMLElement) =>
+    [...fig.querySelectorAll("div")].find((d) => d.shadowRoot) ?? null;
+
+  it("renders the visuals in a shadow root, keeping the transcript in light DOM", () => {
+    const { container } = render(
+      <Typecaast config={config} skin={testSkin} theme="light" isolate />,
+    );
+    const fig = figureOf(container);
+    expect(fig).toBeTruthy();
+    // The accessible transcript stays in the light DOM.
+    expect(fig.querySelector("ol")?.textContent).toContain(
+      "billing toast error",
+    );
+    // The skin renders inside an open shadow root — not the light DOM.
+    const host = shadowHost(fig);
+    expect(host).toBeTruthy();
+    expect(
+      host!.shadowRoot!.querySelector('[data-testid="frame"]'),
+    ).toBeTruthy();
+    expect(container.querySelector('[data-testid="frame"]')).toBeNull();
+  });
+
+  it("does not attach a shadow root without isolate", () => {
+    const { container } = render(
+      <Typecaast config={config} skin={testSkin} theme="light" />,
+    );
+    expect(shadowHost(figureOf(container))).toBeNull();
+    // …and the skin renders in the light DOM as before.
+    expect(container.querySelector('[data-testid="frame"]')).toBeTruthy();
+  });
+});

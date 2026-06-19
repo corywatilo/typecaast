@@ -21,6 +21,7 @@ import {
   type Skin,
 } from "@typecaast/skin-kit";
 import { useTypecaast } from "./use-typecaast.js";
+import { ShadowFrame } from "./shadow-frame.js";
 import { useSkinFonts } from "./use-skin-fonts.js";
 import { useReducedMotion } from "./use-reduced-motion.js";
 import { buildTranscript } from "./transcript.js";
@@ -95,6 +96,16 @@ export interface TypecaastProps {
   onPause?: () => void;
   /** Called once when playback reaches the end (non-looping). */
   onEnded?: () => void;
+  /**
+   * Render the widget inside an **open shadow root** so the host page's global
+   * CSS (resets, Tailwind `.prose`, tag rules, inherited `line-height`/font)
+   * can't leak in and distort it. Recommended when embedding into a page with
+   * its own styles. Note: this is **client-only** (a shadow root can't be
+   * attached during SSR), so an isolated widget renders a correctly-sized box
+   * on the server and hydrates its visuals in — it no longer works inside a
+   * pure React Server Component. Default `false`.
+   */
+  isolate?: boolean;
 }
 
 /**
@@ -237,6 +248,7 @@ const Player = forwardRef<
     onPlay,
     onPause,
     onEnded,
+    isolate,
   },
   ref: ForwardedRef<TypecaastHandle>,
 ): ReactElement {
@@ -320,17 +332,30 @@ const Player = forwardRef<
           </li>
         ))}
       </ol>
-      <div aria-hidden="true" style={{ width: "100%", height: "100%" }}>
-        <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
-          <TypecaastStage
-            state={tc.state}
-            skin={skin}
-            participants={config.participants}
-            options={config.meta.skin.options}
-            composer={composer ?? config.meta.composer}
-          />
-        </FitBox>
-      </div>
+      {(() => {
+        const visuals = (
+          <FitBox fit={fit ?? config.meta.fit} canvas={config.meta.canvas}>
+            <TypecaastStage
+              state={tc.state}
+              skin={skin}
+              participants={config.participants}
+              options={config.meta.skin.options}
+              composer={composer ?? config.meta.composer}
+            />
+          </FitBox>
+        );
+        const fill = { width: "100%", height: "100%" } as const;
+        // `isolate` renders the visuals inside a shadow root so the host page's
+        // CSS can't leak in (client-only). Either way the content is aria-hidden;
+        // the accessible transcript above carries the conversation.
+        return isolate ? (
+          <ShadowFrame style={fill}>{visuals}</ShadowFrame>
+        ) : (
+          <div aria-hidden="true" style={fill}>
+            {visuals}
+          </div>
+        );
+      })()}
     </div>
   );
 });
