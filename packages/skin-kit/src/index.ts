@@ -19,3 +19,8 @@ export {
   type TypecaastStageProps,
   type ComposerMode,
 } from "./stage.js";
+export {
+  slotSkinFromDraft,
+  type SlotSkinDraft,
+  type SlotSkinOptions,
+} from "./slot-skin.js";
