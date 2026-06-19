@@ -29,6 +29,7 @@ function markStyles(c: (typeof CURSOR_COLORS)[ResolvedTheme]): ContentStyles {
       border: `1px solid ${c.border}`,
       borderRadius: 4,
       padding: "1px 4px",
+      overflowWrap: "anywhere",
     },
   };
 }
@@ -91,12 +92,14 @@ const SystemMessage: FC<SystemProps> = ({ theme, message }) => {
       style={{
         margin: "4px 12px",
         padding: "6px 10px",
+        border: `1px solid ${c.border}`,
         borderLeft: `2px solid ${c.accent}`,
         background: c.userBg,
         borderRadius: 4,
         color: c.dim,
         fontSize: 12,
         fontFamily: "Menlo, monospace",
+        overflowWrap: "anywhere",
         ...fadeSlideIn(message.revealProgress, { distance: 0 }),
       }}
     >
@@ -139,7 +142,7 @@ const Composer: FC<ComposerProps> = ({ theme, composer, options }) => {
     padding: "2px 7px",
   };
   return (
-    <div style={{ flex: "0 0 auto", padding: "8px 12px 12px" }}>
+    <div style={{ flex: "0 0 auto", padding: "0 12px 12px" }}>
       <div
         style={{
           border: `1px solid ${c.composerBorder}`,
@@ -239,7 +242,7 @@ const Frame: FC<FrameProps & { children?: ReactNode }> = ({
           flexDirection: "column",
           justifyContent: "flex-end",
           overflow: "hidden",
-          padding: "6px 0",
+          padding: "6px 0 0",
         }}
       >
         {children}
