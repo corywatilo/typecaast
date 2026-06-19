@@ -1,5 +1,14 @@
 # @typecaast/site
 
+## 0.0.12
+
+### Patch Changes
+
+- Updated dependencies [7936528]
+- Updated dependencies [afd7111]
+  - @typecaast/builder@0.3.2
+  - @typecaast/react@0.5.0
+
 ## 0.0.11
 
 ### Patch Changes
