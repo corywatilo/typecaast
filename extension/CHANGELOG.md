@@ -1,5 +1,12 @@
 # @typecaast/extension
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [854dea0]
+  - @typecaast/capture@0.1.0
+
 ## 0.0.8
 
 ### Patch Changes
