@@ -82,6 +82,7 @@ const ALLOWED_ATTR = [
   "class",
   "style",
   "role",
+  "contenteditable",
   "alt",
   "src",
   "srcset",
@@ -197,8 +198,11 @@ export function sanitizeHtml(html: string, opts: SanitizeOptions = {}): string {
   return purify.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
-    // Keep our slot marker even though data-* is otherwise dropped.
-    ADD_ATTR: ["data-tc-slot"],
+    // Keep our slot marker even though data-* is otherwise dropped, and
+    // keep `contenteditable` so the composer-detection heuristic can find
+    // div-based composers (Slack/PostHog/etc. fake the textarea with a
+    // contenteditable div). The distiller strips it later, after marking.
+    ADD_ATTR: ["data-tc-slot", "contenteditable"],
     ALLOW_DATA_ATTR: false,
     ALLOW_ARIA_ATTR: true,
     FORBID_TAGS: [

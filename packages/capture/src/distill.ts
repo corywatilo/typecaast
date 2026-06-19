@@ -35,12 +35,38 @@ export interface DistillOptions {
    * cascade. Off for saved-page import (the source CSS comes inline already).
    */
   inlineComputedStyles?: boolean;
+  /**
+   * Page CSS captured by `captureMatchedCss` to embed in the slot-template
+   * renderer's shadow root. Without this, class-driven layout (Tailwind, CSS
+   * modules) collapses because the captured class names lose their meaning.
+   */
+  css?: string;
+  /** Stylesheets the CSS capture had to skip (CORS, parse errors). */
+  cssSkipped?: string[];
+  /**
+   * Page context the capture was taken in. Forwarded into `meta.capturedAt`
+   * so the renderer can expose `--captured-viewport-width` to authored CSS.
+   */
+  capturedAt?: {
+    viewportWidth?: number;
+    viewportHeight?: number;
+    pixelRatio?: number;
+  };
 }
 
 /** The slot-marker attribute the `TemplateSkinAdapter` keys off. */
 export const SLOT_ATTR = "data-tc-slot";
 
-/** Computed properties worth inlining — look, not frozen layout geometry. */
+/**
+ * Computed properties worth inlining. **Visual fidelity** (color, font,
+ * border, padding, gap) plus **load-bearing layout** (width/max-width,
+ * flex-grow/shrink/basis, position, overflow). The layout group used to be
+ * omitted on the theory that "we only want look, not frozen geometry", but
+ * modern apps drive layout from utility classes (Tailwind, CSS modules) and
+ * those classes lose all meaning once they leave their stylesheet — without
+ * the inlined layout properties, captures collapse into single-character
+ * vertical columns when reflowed into a small canvas.
+ */
 const INLINE_PROPS = [
   "color",
   "background-color",
@@ -60,10 +86,36 @@ const INLINE_PROPS = [
   "gap",
   "display",
   "flex-direction",
+  "flex-wrap",
   "align-items",
+  "align-self",
   "justify-content",
+  "justify-self",
   "box-shadow",
   "opacity",
+  // Layout-bearing properties (added 2026-Q2 to fix Tailwind-style captures):
+  "width",
+  "max-width",
+  "min-width",
+  "height",
+  "max-height",
+  "min-height",
+  "flex",
+  "flex-grow",
+  "flex-shrink",
+  "flex-basis",
+  "position",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "z-index",
+  "overflow",
+  "overflow-x",
+  "overflow-y",
+  "white-space",
+  "overflow-wrap",
+  "word-break",
 ];
 
 const HIDDEN_CLASS_RE = /\b(sr-only|visually-hidden|hidden)\b/;
@@ -90,6 +142,44 @@ function isHidden(el: Element, win: WindowLike): boolean {
   return false;
 }
 
+/**
+ * Parse a pixel value (`"234.5px"` → 234.5; `"auto"`/`""` → null). Used by
+ * `normaliseDesktopMargins` to detect centering margins.
+ */
+function pxValue(v: string | undefined): number | null {
+  if (!v) return null;
+  const m = /^(-?\d+(?:\.\d+)?)px$/.exec(v.trim());
+  return m ? Number(m[1]) : null;
+}
+
+/**
+ * Captured pages run on desktop viewports, so a `mx-auto` ends up as
+ * `margin-left: 234.5px; margin-right: 234.5px` once computed. Baked in
+ * verbatim, that margin survives into a 480-px canvas and squeezes content
+ * into a vertical column. When we see two horizontal margins that are
+ * both > 24px and within 10% of each other, rewrite them to `margin: 0 auto`
+ * (preserving top/bottom) so layout re-centers in any canvas size.
+ */
+function normaliseDesktopMargins(
+  decls: string[],
+  cs: CSSStyleDeclaration,
+): void {
+  const left = pxValue(cs.getPropertyValue("margin-left"));
+  const right = pxValue(cs.getPropertyValue("margin-right"));
+  if (left == null || right == null) return;
+  if (left < 24 || right < 24) return;
+  const ratio = Math.max(left, right) / Math.min(left, right);
+  if (ratio > 1.1) return;
+  const top = pxValue(cs.getPropertyValue("margin-top")) ?? 0;
+  const bot = pxValue(cs.getPropertyValue("margin-bottom")) ?? 0;
+  // Remove any margin entries we already pushed, then replace with the
+  // responsive form so the captured layout re-centers fluidly.
+  for (let i = decls.length - 1; i >= 0; i--) {
+    if (decls[i]?.startsWith("margin:")) decls.splice(i, 1);
+  }
+  decls.push(`margin: ${top}px auto ${bot}px`);
+}
+
 function inlineStyles(orig: Element, clone: Element, win: WindowLike): void {
   const cs = win.getComputedStyle?.(orig);
   if (!cs) return;
@@ -99,6 +189,7 @@ function inlineStyles(orig: Element, clone: Element, win: WindowLike): void {
     if (v && v !== "none" && v !== "normal" && v.trim() !== "")
       decls.push(`${prop}: ${v}`);
   }
+  normaliseDesktopMargins(decls, cs);
   if (decls.length) clone.setAttribute("style", decls.join("; "));
 }
 
@@ -193,6 +284,14 @@ const TIME_TEXT_RE =
 
 function classOf(el: Element): string {
   return el.getAttribute("class") ?? "";
+}
+
+/** Recursively drop `contenteditable` from a subtree (used after composer
+ *  detection — the attribute survives sanitize only to help detection and
+ *  shouldn't ship in the final slot templates). */
+function stripContenteditable(el: Element): void {
+  if (el.hasAttribute("contenteditable")) el.removeAttribute("contenteditable");
+  for (const child of el.children) stripContenteditable(child);
 }
 
 function markSlot(el: Element, slot: string, token: string): void {
@@ -303,18 +402,75 @@ function slotifyRow(row: Element): {
 }
 
 const COMPOSER_RE =
-  /\b(composer|compose|reply|message-?box|message-?input|input-?box|textbox|editor|prompt)\b/i;
+  /\b(composer|compose|reply|message-?box|message-?input|input-?box|textbox|editor|prompt|chat-?input)\b/i;
+const COMPOSER_ARIA_RE = /\b(compose|reply|message|prompt|input|chat)\b/i;
 
+/** Climb to the nearest container that *looks like* the composer outer block
+ *  (flex/grid parent, per its inlined `display:`), not the inner contenteditable.
+ *  Falls back to the node itself if no such ancestor exists below `root`. */
+function blockAncestor(node: Element, root: Element): Element {
+  let cur: Element = node;
+  while (cur.parentElement && cur.parentElement !== root) {
+    const parent = cur.parentElement;
+    const style = (parent.getAttribute("style") ?? "").toLowerCase();
+    if (/display\s*:\s*(flex|grid)/.test(style)) return parent;
+    cur = parent;
+  }
+  return cur;
+}
+
+/**
+ * Find the composer container in the sanitised frame tree. Priority order:
+ *   1. `aria-label` matching `/compose|reply|message|prompt|input|chat/i`
+ *   2. `[role="textbox"]`
+ *   3. ancestor of `[contenteditable]` (preserved through sanitise via the
+ *      sanitiser's ADD_ATTR list)
+ *   4. class name matching the broadened composer regex
+ *   5. structural — the next block sibling after the message list, or
+ *      walking up & forward
+ * Returns null if none found; caller emits a draft warning.
+ */
 function findComposer(root: Element, exclude: Element): Element | null {
-  const candidates = [...root.querySelectorAll("*")].filter(
+  const all = [...root.querySelectorAll("*")].filter(
     (e) => !exclude.contains(e) && !e.contains(exclude),
   );
-  return (
-    candidates.find((e) => e.getAttribute("role") === "textbox") ??
-    candidates.find((e) => e.hasAttribute("contenteditable")) ??
-    candidates.find((e) => COMPOSER_RE.test(classOf(e))) ??
-    null
-  );
+
+  const byAria = all.find((e) => {
+    const label = e.getAttribute("aria-label");
+    return label && COMPOSER_ARIA_RE.test(label);
+  });
+  if (byAria) return blockAncestor(byAria, root);
+
+  const byRole = all.find((e) => e.getAttribute("role") === "textbox");
+  if (byRole) return blockAncestor(byRole, root);
+
+  const byCe = all.find((e) => e.hasAttribute("contenteditable"));
+  if (byCe) return blockAncestor(byCe, root);
+
+  const byClass = all.find((e) => COMPOSER_RE.test(classOf(e)));
+  if (byClass) return byClass;
+
+  // Structural fallback: the composer typically sits as a block after the
+  // message list. Walk forward siblings, then walk up & forward again.
+  let cursor: Element | null = exclude;
+  while (cursor && cursor !== root) {
+    let sib: Element | null = cursor.nextElementSibling;
+    while (sib) {
+      const style = (sib.getAttribute("style") ?? "").toLowerCase();
+      const isBlock = !/display\s*:\s*inline/.test(style);
+      const hasButtonish = sib.querySelector(
+        "[role='button'], [contenteditable]",
+      );
+      const txt = (sib.textContent ?? "").trim();
+      if (isBlock && (hasButtonish || txt.length === 0 || txt.length < 200)) {
+        return sib;
+      }
+      sib = sib.nextElementSibling;
+    }
+    cursor = cursor.parentElement;
+  }
+
+  return null;
 }
 
 function emptyReport(): SlotReport {
@@ -404,7 +560,7 @@ export function distill(root: Element, opts: DistillOptions = {}): SkinDraft {
     if (composer) {
       const c = composer.cloneNode(true) as Element;
       c.setAttribute(SLOT_ATTR, "composer");
-      c.removeAttribute("contenteditable");
+      stripContenteditable(c);
       c.textContent = "{{composer}}";
       composerHtml = c.outerHTML;
       detection.composer = {
@@ -417,6 +573,12 @@ export function distill(root: Element, opts: DistillOptions = {}): SkinDraft {
         "No composer detected — add one by hand if the skin needs it.",
       );
     }
+    // contenteditable was only kept through sanitize to help composer
+    // detection; strip it from every output template so it doesn't ship.
+    if (frameHtml)
+      frameHtml = frameHtml.replace(/\s+contenteditable="[^"]*"/g, "");
+    if (messageHtml)
+      messageHtml = messageHtml.replace(/\s+contenteditable="[^"]*"/g, "");
   } else {
     warnings.push(
       "No repeating message row found — capture a tighter subtree around the thread.",
@@ -442,16 +604,18 @@ export function distill(root: Element, opts: DistillOptions = {}): SkinDraft {
       ...(opts.sourceUrl ? { sourceUrl: opts.sourceUrl } : {}),
       ...(opts.theme ? { theme: opts.theme } : {}),
       ...(canvas ? { canvas } : {}),
+      ...(opts.capturedAt ? { capturedAt: opts.capturedAt } : {}),
     },
     slots: {
       ...(frameHtml ? { frame: frameHtml } : {}),
       ...(messageHtml ? { message: messageHtml } : {}),
       ...(composerHtml ? { composer: composerHtml } : {}),
     },
-    css: "",
+    css: opts.css ?? "",
     tokens,
     detection,
     warnings,
+    ...(opts.cssSkipped?.length ? { cssSkipped: opts.cssSkipped } : {}),
   };
 }
 

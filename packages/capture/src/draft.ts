@@ -57,6 +57,19 @@ export const skinDraftSchema = z.object({
     canvas: z
       .object({ width: z.number().int(), height: z.number().int() })
       .optional(),
+    /**
+     * Snapshot of the page context the draft was taken from. Used by the
+     * slot-template renderer to expose a `--captured-viewport-width` CSS
+     * variable so authored CSS can ratio-scale against the original
+     * viewport instead of the (much smaller) playback canvas.
+     */
+    capturedAt: z
+      .object({
+        viewportWidth: z.number().int().optional(),
+        viewportHeight: z.number().int().optional(),
+        pixelRatio: z.number().optional(),
+      })
+      .optional(),
   }),
   /**
    * Slotted, sanitized HTML per region. Elements carry inline `style`
@@ -86,6 +99,12 @@ export const skinDraftSchema = z.object({
   }),
   /** Human-readable warnings (hidden content dropped, slots missing, …). */
   warnings: z.array(z.string()),
+  /**
+   * Stylesheets the matched-CSS capture couldn't read (typically blocked by
+   * CORS). Informational — the slot template still renders, just without
+   * the rules those sheets defined.
+   */
+  cssSkipped: z.array(z.string()).optional(),
 });
 
 export type SkinDraft = z.infer<typeof skinDraftSchema>;

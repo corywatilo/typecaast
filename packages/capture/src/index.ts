@@ -18,6 +18,11 @@ export {
 } from "./draft.js";
 export { distill, type DistillOptions } from "./distill.js";
 export {
+  captureMatchedCss,
+  type CaptureCssOptions,
+  type CaptureCssResult,
+} from "./css-capture.js";
+export {
   templateSkinFromDraft,
   type TemplateSkinOptions,
 } from "./template-skin.js";

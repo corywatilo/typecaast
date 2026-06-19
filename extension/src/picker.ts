@@ -1,4 +1,4 @@
-import { distill } from "@typecaast/capture";
+import { captureMatchedCss, distill } from "@typecaast/capture";
 import type { ExtMessage } from "./messages.js";
 
 /**
@@ -99,15 +99,28 @@ function startPicker(): void {
 }
 
 function capture(target: Element): void {
+  // Capture matched CSS *before* distill — the captured subtree's class
+  // attributes lose their meaning when they leave the page's stylesheet.
+  // We embed the matched rules in draft.css so the slot-template renderer
+  // can re-apply them inside the shadow root.
+  const cssCapture = captureMatchedCss(target, document);
   const draft = distill(target, {
     inlineComputedStyles: true,
     sourceUrl: location.href,
     name: document.title || slugifyHost(),
+    css: cssCapture.css,
+    cssSkipped: cssCapture.skipped.length ? cssCapture.skipped : undefined,
+    capturedAt: {
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      pixelRatio: window.devicePixelRatio,
+    },
   });
   const json = JSON.stringify(draft, null, 2);
   const detected = draft.detection.message.detected;
+  const cssNote = cssCapture.truncated ? " (css truncated)" : "";
   const summary = draft.detection.message.found
-    ? `Captured ${detected.length} slot(s): ${detected.join(", ") || "none"}`
+    ? `Captured ${detected.length} slot(s): ${detected.join(", ") || "none"}${cssNote}`
     : "No message row detected — try a tighter selection.";
   const message: ExtMessage = {
     type: "tc-capture",
