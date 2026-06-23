@@ -1,150 +1,107 @@
 import Link from "next/link";
-import { Badge, Heading } from "@typecaast/ui";
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
-import { HeroSim } from "../components/HeroSim";
+import { StudioStage } from "../components/StudioStage";
 
-const SKINS = [
-  "Slack",
-  "iMessage",
-  "Messages (macOS)",
-  "WhatsApp",
-  "Discord",
-  "Claude Code (TUI)",
-  "Cursor panel",
+const FEATURES = [
+  {
+    title: "Script it beat by beat",
+    body: "Messages, typing, reactions, the agentic reply and the result card — arrange the whole take in a visual timeline until it lands.",
+  },
+  {
+    title: "A version for every persona",
+    body: "Fork the script, swap who's talking and what the bot says, and keep each variation a click away.",
+  },
+  {
+    title: "Embed it or export it",
+    body: "One script, two outputs: a live React component you drop on a page, or a deterministic MP4 — the exact same frames.",
+  },
+  {
+    title: "It's code, so it won't go stale",
+    body: "Built from real components — even captured from your own site's HTML — so when your product's UI changes, the demo follows. No human re-rendering.",
+  },
 ];
-
-function Feature({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="tc-panel"
-      style={{ padding: 22, display: "flex", flexDirection: "column", gap: 8 }}
-    >
-      <Heading level={2}>{title}</Heading>
-      <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.6 }}>
-        {children}
-      </p>
-    </div>
-  );
-}
 
 export default function Home() {
   return (
-    <>
+    <div className="tc-studio">
       <Nav />
       <main>
         {/* Hero */}
-        <section className="wrap" style={{ padding: "72px 24px 48px" }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.1fr 0.9fr",
-              gap: 48,
-              alignItems: "center",
-            }}
-          >
+        <section className="wrap tc-studio-hero">
+          <div className="tc-studio-hero-grid">
             <div>
-              <Badge tone="accent">Open-core · early beta</Badge>
-              <Heading
-                level={0}
-                style={{ marginTop: 18, marginBottom: 18, maxWidth: 640 }}
-              >
-                Simulate &amp; record chat interactions in the UIs people know.
-              </Heading>
-              <p
-                className="tc-muted"
-                style={{ fontSize: 17, lineHeight: 1.6, maxWidth: 520 }}
-              >
-                Script a conversation once — typing, reactions, a reply being
-                sent — and play it back inside a pixel-faithful Slack, iMessage,
-                terminal, or your own captured UI. Drop a{" "}
-                <code className="tc-mono">&lt;Typecaast&gt;</code> on a page, or
-                export an MP4. One JSON config, two render targets, identical
-                frames.
+              <h1 className="tc-studio-h1">
+                Demo your AI bot{" "}
+                <span className="tc-studio-accent">
+                  without faking screenshots.
+                </span>
+              </h1>
+              <p className="tc-studio-sub">
+                Script the conversation — the question, your bot typing, the
+                reply, the result card — and Typecaast plays it back in a
+                pixel-perfect Slack. Embed it live on your site or export an
+                MP4. Change a line, both update.
               </p>
-              <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
+              <div className="tc-studio-cta">
                 <Link
                   href="/playground"
                   className="tc-btn tc-btn--primary tc-btn--lg"
                 >
                   Open the playground →
                 </Link>
-                <a
-                  href="https://github.com/corywatilo/typecaast"
+                <Link
+                  href="/gallery"
                   className="tc-btn tc-btn--outline tc-btn--lg"
-                  target="_blank"
-                  rel="noreferrer"
                 >
-                  View on GitHub
-                </a>
+                  Browse examples
+                </Link>
               </div>
             </div>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <HeroSim />
+            <div className="tc-studio-stage-col">
+              <StudioStage />
             </div>
           </div>
         </section>
 
-        {/* Skins strip */}
-        <section className="wrap" style={{ padding: "8px 24px 24px" }}>
-          <p
-            className="tc-label"
-            style={{ textAlign: "center", marginBottom: 16 }}
-          >
-            Pixel-faithful presets, light &amp; dark
+        {/* Statement band */}
+        <section className="tc-studio-band">
+          <p className="wrap tc-studio-band-text">
+            No screenshots. No re-shoots.{" "}
+            <span className="tc-muted">
+              Script it once — rewrite a line and every embed and export
+              updates.
+            </span>
           </p>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 10,
-              justifyContent: "center",
-            }}
-          >
-            {SKINS.map((s) => (
-              <span
-                key={s}
-                className="tc-badge"
-                style={{ height: 28, fontSize: 13 }}
-              >
-                {s}
-              </span>
-            ))}
-          </div>
         </section>
 
         {/* Features */}
-        <section
-          className="wrap"
-          style={{
-            padding: "48px 24px",
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
-          }}
-        >
-          <Feature title="Embed it live">
-            A real React component with a real-time player.
-            `theme=&quot;auto&quot;` follows the page, fonts load so it looks
-            right everywhere.
-          </Feature>
-          <Feature title="Export it to video">
-            The same engine + skins render deterministically through Remotion to
-            MP4/GIF/WebM — frame-for-frame identical to the live preview.
-          </Feature>
-          <Feature title="Build any UI">
-            Hand-authored presets, a public skin contract, a scaffold, and an AI
-            skill — anyone can add a platform.
-          </Feature>
+        <section className="wrap tc-studio-features">
+          {FEATURES.map((f, i) => (
+            <div key={f.title} className="tc-studio-card">
+              <span className="tc-studio-card-n tc-mono">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h2 className="tc-studio-card-title">{f.title}</h2>
+              <p className="tc-studio-card-body">{f.body}</p>
+            </div>
+          ))}
+        </section>
+
+        {/* Closing CTA */}
+        <section className="wrap tc-studio-closing">
+          <h2 className="tc-studio-closing-title">
+            Write your bot&apos;s best demo.
+          </h2>
+          <Link
+            href="/playground"
+            className="tc-btn tc-btn--primary tc-btn--lg"
+          >
+            Open the playground →
+          </Link>
         </section>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

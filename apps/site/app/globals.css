@@ -58,3 +58,224 @@ a {
     grid-column: span 1;
   }
 }
+
+/* =========================================================================
+ * Studio landing page. Scoped to `.tc-studio` so it can carry an ownable
+ * amber accent (the app keeps its iris) and a "screen on a set" hero. All of
+ * it reads from `--tc-*` tokens, so light + dark follow the site toggle.
+ * ===================================================================== */
+.tc-studio {
+  --tc-accent: #c2620a;
+  --tc-accent-hover: #a8540a;
+  --tc-accent-contrast: #ffffff;
+}
+[data-tc-theme="dark"] .tc-studio {
+  --tc-accent: #f5b041;
+  --tc-accent-hover: #f7bd5e;
+  --tc-accent-contrast: #1a1206;
+}
+.tc-studio-accent {
+  color: var(--tc-accent);
+}
+
+/* Hero */
+.tc-studio-hero {
+  padding: clamp(48px, 8vw, 100px) 24px clamp(40px, 6vw, 72px);
+}
+.tc-studio-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+}
+@media (max-width: 880px) {
+  .tc-studio-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .tc-studio-stage-col {
+    order: -1;
+  }
+}
+.tc-studio-h1 {
+  margin: 0 0 22px;
+  font-size: clamp(38px, 6.2vw, 62px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 720;
+  max-width: 13ch;
+}
+.tc-studio-sub {
+  margin: 0;
+  max-width: 46ch;
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.55;
+  color: var(--tc-text-muted);
+}
+.tc-studio-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+/* Hero "stage": the demo screen, a warm glow, a faint grid, a live pill. */
+.tc-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+}
+.tc-stage-screen {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  aspect-ratio: 480 / 640;
+  display: flex;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--tc-border);
+  background: var(--tc-panel);
+  box-shadow: var(--tc-shadow);
+}
+.tc-stage-glow {
+  position: absolute;
+  z-index: 0;
+  inset: -14% -10% -6%;
+  background: radial-gradient(
+    58% 48% at 50% 16%,
+    color-mix(in srgb, var(--tc-accent) 34%, transparent),
+    transparent 70%
+  );
+  filter: blur(30px);
+  opacity: 0.8;
+  pointer-events: none;
+}
+.tc-stage-grid {
+  position: absolute;
+  z-index: 0;
+  inset: -24px;
+  background-image:
+    linear-gradient(var(--tc-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--tc-border) 1px, transparent 1px);
+  background-size: 30px 30px;
+  -webkit-mask-image: radial-gradient(
+    68% 58% at 50% 44%,
+    #000,
+    transparent 78%
+  );
+  mask-image: radial-gradient(68% 58% at 50% 44%, #000, transparent 78%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.tc-stage-live {
+  position: absolute;
+  z-index: 2;
+  top: -2px;
+  right: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--tc-panel-raised);
+  border: 1px solid var(--tc-border-strong);
+  color: var(--tc-text-muted);
+  box-shadow: var(--tc-shadow);
+}
+.tc-stage-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tc-accent);
+  animation: tc-stage-pulse 1.9s var(--tc-ease) infinite;
+}
+@keyframes tc-stage-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--tc-accent) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Statement band */
+.tc-studio-band {
+  border-top: 1px solid var(--tc-border);
+  border-bottom: 1px solid var(--tc-border);
+  background: var(--tc-bg-subtle);
+}
+.tc-studio-band-text {
+  padding-top: clamp(28px, 5vw, 52px);
+  padding-bottom: clamp(28px, 5vw, 52px);
+  margin: 0 auto;
+  text-align: center;
+  font-size: clamp(21px, 3vw, 33px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 640;
+  max-width: 22ch;
+}
+
+/* Feature cards */
+.tc-studio-features {
+  padding: clamp(40px, 6vw, 72px) 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 760px) {
+  .tc-studio-features {
+    grid-template-columns: 1fr;
+  }
+}
+.tc-studio-card {
+  position: relative;
+  padding: 24px;
+  border: 1px solid var(--tc-border);
+  border-radius: 14px;
+  background: var(--tc-panel);
+  transition:
+    border-color var(--tc-dur) var(--tc-ease),
+    transform var(--tc-dur) var(--tc-ease);
+}
+.tc-studio-card:hover {
+  border-color: var(--tc-border-strong);
+  transform: translateY(-2px);
+}
+.tc-studio-card-n {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--tc-accent);
+}
+.tc-studio-card-title {
+  margin: 10px 0 6px;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  font-weight: 640;
+}
+.tc-studio-card-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--tc-text-muted);
+}
+
+/* Closing CTA */
+.tc-studio-closing {
+  padding: clamp(40px, 6vw, 76px) 24px clamp(56px, 8vw, 96px);
+  text-align: center;
+}
+.tc-studio-closing-title {
+  margin: 0 0 22px;
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 680;
+}
