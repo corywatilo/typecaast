@@ -19,6 +19,7 @@ export function LiveSim({
   autoplay = true,
   // Rest on the final frame by default; opt into cycling with loop.
   loop = false,
+  isolate,
 }: {
   config: ConfigInput;
   skin: Skin;
@@ -27,6 +28,7 @@ export function LiveSim({
   composer?: ComposerMode;
   autoplay?: boolean;
   loop?: boolean;
+  isolate?: boolean;
 }) {
   const parsed = useMemo(() => configSchema.parse(config), [config]);
   return (
@@ -38,6 +40,7 @@ export function LiveSim({
       composer={composer}
       autoplay={autoplay}
       loop={loop}
+      isolate={isolate}
     />
   );
 }
