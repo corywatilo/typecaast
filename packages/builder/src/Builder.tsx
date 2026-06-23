@@ -18,7 +18,6 @@ import {
 import type { Skin } from "@typecaast/skin-kit";
 import type { ResolvedTheme } from "@typecaast/core";
 import {
-  Badge,
   Button,
   Heading,
   IconButton,
@@ -251,7 +250,6 @@ export function Builder({
           <Heading level={2} style={{ fontSize: 15, margin: 0 }}>
             Typecaast
           </Heading>
-          <Badge tone="accent">Builder</Badge>
         </a>
         {headerNav}
         <span style={{ flex: 1 }} />
