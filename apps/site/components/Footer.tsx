@@ -46,6 +46,9 @@ export function Footer() {
             <Link href="/docs" className="tc-muted">
               Docs
             </Link>
+            <Link href="/donate" className="tc-muted">
+              Support
+            </Link>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <span className="tc-label">Open source</span>
@@ -64,6 +67,14 @@ export function Footer() {
               rel="noreferrer"
             >
               Licensing
+            </a>
+            <a
+              href="https://x.com/intent/follow?screen_name=ninepixelgrid"
+              className="tc-muted"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Follow on X
             </a>
             <ManageAnalyticsLink className="tc-muted" />
           </div>
