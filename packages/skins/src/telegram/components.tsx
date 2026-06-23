@@ -301,7 +301,7 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
   );
 };
 
-/** Bubble meta: time, plus read ticks on outgoing messages. */
+/** Bubble meta: time, plus a sent tick on outgoing messages. */
 const Meta: FC<{ c: TelegramColors; atMs: number; outgoing: boolean }> = ({
   c,
   atMs,
@@ -323,7 +323,7 @@ const Meta: FC<{ c: TelegramColors; atMs: number; outgoing: boolean }> = ({
     }}
   >
     {formatTime(atMs)}
-    {outgoing ? <span style={{ color: c.tick }}>✓✓</span> : null}
+    {outgoing ? <span style={{ color: c.tick }}>✓</span> : null}
   </span>
 );
 
