@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Badge } from "@typecaast/ui";
 import { NavLinks } from "./NavLinks";
 
 export function Nav() {
@@ -30,7 +29,6 @@ export function Nav() {
           <strong style={{ fontSize: 16, letterSpacing: "-0.01em" }}>
             Typecaast
           </strong>
-          <Badge tone="accent">beta</Badge>
         </Link>
         <NavLinks style={{ marginLeft: "auto" }} />
       </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Nav } from "../components/Nav";
 import { Footer } from "../components/Footer";
 import { StudioStage } from "../components/StudioStage";
+import { GitHubStar } from "../components/GitHubStar";
 
 const FEATURES = [
   {
@@ -38,8 +39,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="tc-studio-sub">
-                Script the conversation — the question, your bot typing, the
-                reply, the result card — and Typecaast plays it back in a
+                Script the conversation and Typecaast plays it back in a
                 pixel-perfect Slack. Embed it live on your site or export an
                 MP4. Change a line, both update.
               </p>
@@ -54,8 +54,22 @@ export default function Home() {
                   href="/gallery"
                   className="tc-btn tc-btn--outline tc-btn--lg"
                 >
-                  Browse examples
+                  Browse demos
                 </Link>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 12,
+                  marginTop: 20,
+                }}
+              >
+                <GitHubStar label="Star on GitHub" />
+                <span className="tc-muted" style={{ fontSize: 13 }}>
+                  Open source
+                </span>
               </div>
             </div>
             <div className="tc-studio-stage-col">
@@ -75,17 +89,24 @@ export default function Home() {
           </p>
         </section>
 
-        {/* Features */}
-        <section className="wrap tc-studio-features">
-          {FEATURES.map((f, i) => (
-            <div key={f.title} className="tc-studio-card">
-              <span className="tc-studio-card-n tc-mono">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h2 className="tc-studio-card-title">{f.title}</h2>
-              <p className="tc-studio-card-body">{f.body}</p>
-            </div>
-          ))}
+        {/* How it works — a flowing, numbered list */}
+        <section className="wrap tc-studio-flow">
+          <h2 className="tc-studio-flow-title">
+            One script. Everything a screenshot can&apos;t do.
+          </h2>
+          <ol className="tc-studio-steps">
+            {FEATURES.map((f, i) => (
+              <li key={f.title} className="tc-studio-step">
+                <span className="tc-studio-step-n tc-mono">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="tc-studio-step-title">{f.title}</h3>
+                  <p className="tc-studio-step-body">{f.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </section>
 
         {/* Closing CTA */}
@@ -93,12 +114,24 @@ export default function Home() {
           <h2 className="tc-studio-closing-title">
             Write your bot&apos;s best demo.
           </h2>
-          <Link
-            href="/playground"
-            className="tc-btn tc-btn--primary tc-btn--lg"
+          <div
+            style={{
+              display: "inline-flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 12,
+            }}
           >
-            Open the playground →
-          </Link>
+            <Link
+              href="/playground"
+              className="tc-btn tc-btn--primary tc-btn--lg"
+            >
+              Open the playground →
+            </Link>
+            <Link href="/donate" className="tc-btn tc-btn--outline tc-btn--lg">
+              Support the project
+            </Link>
+          </div>
         </section>
       </main>
       <Footer />

@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { GitHubStar } from "./GitHubStar";
+import { GitHubLink } from "./GitHubLink";
+import { XFollow } from "./XFollow";
 
 /**
  * The site's primary nav links — the single source of truth, shared by the site
@@ -19,15 +22,16 @@ export function NavLinks({ style }: { style?: CSSProperties }) {
       }}
     >
       <Link href="/playground">Playground</Link>
-      <Link href="/gallery">Gallery</Link>
+      <Link href="/gallery">Demos</Link>
       <Link href="/docs">Docs</Link>
-      <a
-        href="https://github.com/corywatilo/typecaast"
-        target="_blank"
-        rel="noreferrer"
-      >
-        GitHub
-      </a>
+      <Link href="/donate">Support</Link>
+      {/* The GitHub star button doubles as the repo link (replacing the old
+          plain "GitHub" text link); the X follow sits beside it. */}
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+        <GitHubStar />
+        <GitHubLink />
+        <XFollow />
+      </span>
     </nav>
   );
 }
