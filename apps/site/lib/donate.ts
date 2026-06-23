@@ -7,9 +7,9 @@
  * entirely by Stripe-hosted checkout, and each link redirects back to
  * `/donate/thanks` on success.
  *
- * ⚠️ TEST MODE — the URLs below are Stripe *test-mode* links
- * (donate.stripe.com/test_…). Before going live, recreate the product, prices,
- * and payment links in live mode and swap these URLs in a single commit.
+ * These are LIVE-mode links — they take real payments. To regenerate them,
+ * recreate the product, prices, and payment links in Stripe live mode (submit
+ * type "donate", redirect to https://typecaast.com/donate/thanks).
  */
 export interface DonatePreset {
   /** Whole-dollar amount (USD). */
@@ -19,15 +19,12 @@ export interface DonatePreset {
 }
 
 export const DONATE_PRESETS: DonatePreset[] = [
-  { amount: 5, url: "https://donate.stripe.com/test_5kQ14m9hpbV62f44qw5c400" },
-  { amount: 15, url: "https://donate.stripe.com/test_00wbJ0519cZa3j88GM5c401" },
-  { amount: 50, url: "https://donate.stripe.com/test_8x26oGctB1gs6vk8GM5c402" },
-  {
-    amount: 100,
-    url: "https://donate.stripe.com/test_aFa00i8dlbV69Hw0ag5c403",
-  },
+  { amount: 5, url: "https://donate.stripe.com/7sY3cuankfyR3pC8UKbAs00" },
+  { amount: 15, url: "https://donate.stripe.com/14A00i7b83Q91hu1sibAs01" },
+  { amount: 50, url: "https://donate.stripe.com/dRmbJ02US3Q94tGgncbAs02" },
+  { amount: 100, url: "https://donate.stripe.com/bJecN41QO4UdbW89YObAs03" },
 ];
 
 /** Payment Link with a customer-chosen amount (Stripe `custom_unit_amount`). */
 export const DONATE_CUSTOM_URL =
-  "https://donate.stripe.com/test_14AdR8bpx4sE06W0ag5c404";
+  "https://donate.stripe.com/00wdR853072laS4c6WbAs04";
