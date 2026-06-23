@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NavLinks } from "./NavLinks";
+import { Logo } from "./Logo";
 
 export function Nav() {
   return (
@@ -26,6 +27,7 @@ export function Nav() {
           href="/"
           style={{ display: "flex", alignItems: "center", gap: 8 }}
         >
+          <Logo className="tc-logo" />
           <strong style={{ fontSize: 16, letterSpacing: "-0.01em" }}>
             Typecaast
           </strong>

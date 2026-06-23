@@ -29,8 +29,11 @@ export function NavLinks({ style }: { style?: CSSProperties }) {
           plain "GitHub" text link); the X follow sits beside it. */}
       <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
         <GitHubStar />
-        <GitHubLink />
-        <XFollow />
+        {/* The two icon-only links read as one social cluster — keep them tight. */}
+        <span style={{ display: "inline-flex", alignItems: "center" }}>
+          <GitHubLink />
+          <XFollow />
+        </span>
       </span>
     </nav>
   );

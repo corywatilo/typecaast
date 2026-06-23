@@ -61,12 +61,13 @@ a {
 
 /* =========================================================================
  * Studio landing page. Scoped to `.tc-studio` so it can carry an ownable
- * amber accent (the app keeps its iris) and a "screen on a set" hero. All of
- * it reads from `--tc-*` tokens, so light + dark follow the site toggle.
+ * brand accent (purple in light, warm amber in dark — matching the logo mark)
+ * and a "screen on a set" hero. All of it reads from `--tc-*` tokens, so
+ * light + dark follow the site toggle.
  * ===================================================================== */
 .tc-studio {
-  --tc-accent: #c2620a;
-  --tc-accent-hover: #a8540a;
+  --tc-accent: #5a18de;
+  --tc-accent-hover: #4a14b8;
   --tc-accent-contrast: #ffffff;
 }
 [data-tc-theme="dark"] .tc-studio {
@@ -76,6 +77,15 @@ a {
 }
 .tc-studio-accent {
   color: var(--tc-accent);
+}
+
+/* The logo mark follows the brand: purple in light, warm amber in dark. */
+.tc-logo {
+  color: #5a18de;
+  flex: none;
+}
+[data-tc-theme="dark"] .tc-logo {
+  color: #ffc26b;
 }
 
 /* Hero */
