@@ -305,7 +305,12 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
   const c = SLACK_COLORS[theme];
   const hasText = composer.text.length > 0;
   return (
-    <div style={{ flex: "0 0 auto", padding: "4px 16px 14px" }}>
+    // No top padding, plus a negative top margin, so the reply box butts up
+    // against the last message. The thread keeps its 16px in-scroll
+    // padding-bottom (which protects the newest message from the
+    // `column-reverse` scroll-edge clip), so this only closes the *visual* gap —
+    // the margin eats empty padding, never message content.
+    <div style={{ flex: "0 0 auto", padding: "0 16px 14px", marginTop: -8 }}>
       <div
         style={{
           border: `1px solid ${c.composerBorder}`,
