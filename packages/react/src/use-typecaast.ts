@@ -62,23 +62,38 @@ export function useTypecaast(
   } = options;
   const resolved = useResolvedTheme(theme ?? config.meta.theme);
 
+  // The player is built **theme-agnostic**. Theme has no effect on the timeline —
+  // `sampleState` only stamps it onto `state.theme` (it never changes messages,
+  // timings, or the composer) — so it's a pure *render* concern. Keeping it out of
+  // the player's deps means a light/dark toggle re-paints the current frame instead
+  // of destroying the player and restarting the conversation from t=0. The baked
+  // "light" is irrelevant; the live theme is overlaid on the sampled state below.
   const player = useMemo<Player>(() => {
-    const engine = configToEngine(config, resolved, capabilities);
+    const engine = configToEngine(config, "light", capabilities);
     return createPlayer(engine.getStateAt, {
       durationMs: engine.durationMs,
       steps: engine.steps,
       loop,
       rate,
     });
-  }, [config, resolved, capabilities, loop, rate]);
+  }, [config, capabilities, loop, rate]);
 
-  const [state, setState] = useState<SimState>(() => player.state);
+  const [rawState, setRawState] = useState<SimState>(() => player.state);
   const [currentMs, setCurrentMs] = useState<number>(() => player.currentMs);
   const [playing, setPlaying] = useState<boolean>(() => player.playing);
 
+  // Overlay the live theme onto the sampled state at the render seam (not in the
+  // engine), so flipping the theme yields a new state object against the *same*
+  // player — the clock is untouched. Cheap spread; identity-stable when unchanged.
+  const state = useMemo<SimState>(
+    () =>
+      rawState.theme === resolved ? rawState : { ...rawState, theme: resolved },
+    [rawState, resolved],
+  );
+
   useEffect(() => {
     const sync = () => {
-      setState(player.state);
+      setRawState(player.state);
       setCurrentMs(player.currentMs);
     };
     sync();

@@ -61,7 +61,11 @@ a React Server Component (Next.js App Router); no `"use client"` needed. (Using 
 - **`theme`** — `"light"` / `"dark"` / `"auto"`. Overrides `config.meta.theme` and
   resolves at render time, so pass your site's value to keep it in sync:
   `<Typecaast config={config} theme={isDark ? "dark" : "light"} />`. `"auto"`
-  follows the OS `prefers-color-scheme`.
+  follows the OS `prefers-color-scheme`. Changing it re-paints in place — like any
+  unrelated host re-render, it **never restarts** playback (the embed holds its own
+  clock). Keep the element mounted with a stable `key` to preserve that; a
+  remount is a fresh instance and starts over. A structurally-identical inline
+  `config` is fine — the component de-dupes it by content.
 - **`className`** / **`style`** — applied to the widget's outer container; `style`
   overrides the default width/height/aspect-ratio. The widget fills its parent, so
   give the parent a size (add `overflow-hidden` for rounded corners).

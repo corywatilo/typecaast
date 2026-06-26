@@ -231,6 +231,64 @@ describe("<Typecaast> controlled playback (paused + ref)", () => {
   });
 });
 
+describe("<Typecaast> survives host re-renders (no restart)", () => {
+  // A theme toggle or an unrelated host re-render must NOT rebuild the player and
+  // restart the conversation — playback keeps its position; only the theme re-paints.
+  it("keeps its position through a theme toggle and re-paints the new theme", () => {
+    const ref = createRef<TypecaastHandle>();
+    const props = (theme: "light" | "dark") => (
+      <Typecaast
+        config={config}
+        skin={testSkin}
+        theme={theme}
+        paused={false}
+        ref={ref}
+      />
+    );
+    const { rerender } = render(props("light")); // controlled, playing
+    act(() => ref.current!.seek(ref.current!.duration / 2));
+    const mid = ref.current!.currentMs;
+    expect(mid).toBeGreaterThan(0);
+    expect(screen.getByTestId("frame").getAttribute("data-theme")).toBe(
+      "light",
+    );
+
+    rerender(props("dark")); // flip the theme
+    // Same player — the clock is untouched (a hair of real-time drift is fine),
+    // never reset to 0.
+    expect(ref.current!.currentMs).toBeGreaterThanOrEqual(mid);
+    expect(ref.current!.currentMs).toBeLessThan(mid + 100);
+    expect(ref.current!.playing).toBe(true);
+    // …and the frame now renders in the new theme.
+    expect(screen.getByTestId("frame").getAttribute("data-theme")).toBe("dark");
+  });
+
+  it("keeps its position when the config prop changes identity but not content", () => {
+    const ref = createRef<TypecaastHandle>();
+    // A host rebuilding an equal config inline each render hands us a new object
+    // with identical content — this must not churn a new player.
+    const clone = JSON.parse(JSON.stringify(config)) as Config;
+    const props = (c: Config) => (
+      <Typecaast
+        config={c}
+        skin={testSkin}
+        theme="light"
+        paused={false}
+        ref={ref}
+      />
+    );
+    const { rerender } = render(props(config));
+    act(() => ref.current!.seek(ref.current!.duration / 2));
+    const mid = ref.current!.currentMs;
+    expect(mid).toBeGreaterThan(0);
+
+    rerender(props(clone)); // new identity, identical content
+    expect(ref.current!.currentMs).toBeGreaterThanOrEqual(mid);
+    expect(ref.current!.currentMs).toBeLessThan(mid + 100);
+    expect(ref.current!.playing).toBe(true);
+  });
+});
+
 describe("<Typecaast isolate> (shadow DOM)", () => {
   const figureOf = (root: HTMLElement) =>
     root.querySelector("[data-typecaast]") as HTMLElement;

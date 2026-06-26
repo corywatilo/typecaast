@@ -4,6 +4,7 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   type CSSProperties,
   type ForwardedRef,
   type ReactElement,
@@ -187,9 +188,23 @@ export const Typecaast = forwardRef<TypecaastHandle, TypecaastProps>(
   function Typecaast(props, ref): ReactElement {
     // Normalize once: validate and apply schema defaults (pacing, fit, theme, …)
     // so a raw exported `typecaast.json` works without the caller pre-parsing it.
-    const config = useMemo<Config>(
-      () => configSchema.parse(props.config),
+    //
+    // Key the parse on the config's *content*, not its object identity, so a host
+    // that rebuilds an equal config inline on each render (common on customer
+    // sites, where unrelated state changes re-render the tree) doesn't churn a new
+    // `Config` → new compiled timeline → new player → restart. A stable digest ⇒
+    // stable `Config` identity ⇒ `compile`'s WeakMap hits ⇒ the player holds and
+    // playback continues. `JSON.stringify` runs only when `props.config` identity
+    // changes; configs are small, plain-JSON scripts (no cycles).
+    const configKey = useMemo(
+      () => JSON.stringify(props.config),
       [props.config],
+    );
+    const rawConfigRef = useRef(props.config);
+    rawConfigRef.current = props.config;
+    const config = useMemo<Config>(
+      () => configSchema.parse(rawConfigRef.current),
+      [configKey],
     );
 
     // Explicit skin object → render synchronously, no lazy load.
@@ -272,8 +287,8 @@ const Player = forwardRef<
 
   // Controlled `paused`: reconcile only when the consumer drives it (so an
   // uncontrolled instance keeps its autoplay behavior). Runs after the hook's
-  // mount-autoplay effect, and re-applies on player recreation (theme change)
-  // via the `tc` dep. No-op under reduced motion.
+  // mount-autoplay effect; re-applies whenever the controls object changes
+  // (play/pause are idempotent). No-op under reduced motion.
   useEffect(() => {
     if (paused === undefined || reduced) return;
     if (paused) tc.pause();

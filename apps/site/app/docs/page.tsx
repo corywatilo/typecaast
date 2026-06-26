@@ -74,6 +74,17 @@ import config from "./billing-toast.json";
 // The skin comes from config.meta.skin.id (lazy-loaded). Only the serializable
 // config is passed, so this works in a Server Component — no "use client".
 export default () => <Typecaast config={config} autoplay loop />;`}</Code>
+        <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
+          The embed owns its own playback clock and holds it across host
+          re-renders: toggling your site&apos;s light/dark theme or any
+          unrelated state change re-paints in place — it never restarts the
+          conversation. Two things preserve that: keep the element{" "}
+          <strong>mounted</strong> with a stable React <code>key</code>{" "}
+          (remounting it is a fresh instance, which does start over), and pass
+          the same <code>config</code> (and explicit <code>skin</code>, if you
+          use one) — an inline object that is structurally identical each render
+          is fine, since the component de-dupes it by content.
+        </p>
 
         <Heading level={2} style={{ marginTop: 28 }}>
           Render it to video
