@@ -9,9 +9,27 @@ export const billingToast: ConfigInput = {
     composer: "always",
   },
   participants: [
-    { id: "cory", name: "Cory Watilo", isSelf: true },
-    { id: "paul", name: "Paul D'Ambra", color: "#5b3a8e" },
-    { id: "posthog-bot", name: "PostHog", kind: "app" },
+    {
+      id: "cory",
+      name: "Cory Watilo",
+      isSelf: true,
+      avatar:
+        "https://res.cloudinary.com/dmukukwp6/image/upload/avatar_cory_1a344a0625.jpg",
+    },
+    {
+      id: "paul",
+      name: "Paul D'Ambra",
+      color: "#5b3a8e",
+      avatar:
+        "https://res.cloudinary.com/dmukukwp6/image/upload/avatar_paul_03bae10f76.png",
+    },
+    {
+      id: "posthog-bot",
+      name: "PostHog",
+      kind: "app",
+      avatar:
+        "https://res.cloudinary.com/dmukukwp6/image/upload/avatar_posthog_f85279a2ad.png",
+    },
   ],
   timeline: [
     // Cory's opening line is already in the thread when the demo starts —
