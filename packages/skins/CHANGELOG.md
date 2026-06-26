@@ -1,5 +1,15 @@
 # @typecaast/skins
 
+## 0.3.3
+
+### Patch Changes
+
+- 445393b: Slack: the reply box now butts up snugly against the last message. Its wrapper dropped the top padding and gained a small negative top margin, closing the visual gap between the newest message and the composer. The thread keeps its in-scroll bottom padding (which protects the newest message from the `column-reverse` scroll-edge clip when a host constrains the widget height), so this only tightens the gap — it never clips message content.
+- 9d5f591: Slack reaction tooltip now uses a dark popover in both light and dark mode, matching the real Slack UI (the tooltip there does not follow the color theme). Previously the light-mode surface was white with dark muted text; it's now Slack's near-black `#1d1c1d` with light text in every theme.
+- 4b0280b: Telegram: show a single sent tick (✓) on outgoing messages instead of the double read tick (✓✓). Without a read-receipt step there's no "read" signal to represent, so a single sent tick is the accurate state.
+- Updated dependencies [61811b8]
+  - @typecaast/skin-kit@0.4.1
+
 ## 0.3.2
 
 ### Patch Changes
