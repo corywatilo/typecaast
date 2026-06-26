@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/site",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",

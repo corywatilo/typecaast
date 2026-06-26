@@ -1,5 +1,18 @@
 # @typecaast/react
 
+## 0.5.2
+
+### Patch Changes
+
+- bd86eca: `<Typecaast>` no longer restarts the conversation when the host re-renders. Theme is now a pure render concern — flipping light/dark re-paints the current frame instead of rebuilding the player at t=0 — and the config prop is de-duped by content, so a host that passes a structurally-identical config inline on each render (or re-renders for any unrelated reason) keeps playing in place. The embed only starts over if it is actually unmounted/remounted.
+- 4b701db: `<Typecaast>` now preloads a config's images (participant avatars and in-message images) on mount, so they're cached before their message appears and no longer "pop in" late mid-playback. Warming starts as soon as the component mounts — even while the skin chunk is still loading — and is SSR-safe (a no-op where `Image` is undefined).
+- Updated dependencies [61811b8]
+- Updated dependencies [445393b]
+- Updated dependencies [9d5f591]
+- Updated dependencies [4b0280b]
+  - @typecaast/skin-kit@0.4.1
+  - @typecaast/skins@0.3.3
+
 ## 0.5.1
 
 ### Patch Changes

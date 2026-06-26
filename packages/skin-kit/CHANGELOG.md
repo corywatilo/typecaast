@@ -1,5 +1,11 @@
 # @typecaast/skin-kit
 
+## 0.4.1
+
+### Patch Changes
+
+- 61811b8: Reset `fadeSlideIn` to `transform: none` once settled. A residual `translateY(0px)` on every revealed message created a stacking context that trapped descendant overlays — so a reaction's hover tooltip rendered _below_ later sibling messages and their text bled over its opaque background, making it read as transparent. Settled messages now drop the transform, letting the Slack/Telegram reaction tooltips layer above neighbouring content in both light and dark mode.
+
 ## 0.4.0
 
 ### Minor Changes
