@@ -151,19 +151,20 @@ function clippingAncestor(el: HTMLElement | null): HTMLElement | null {
  */
 const ReactionTooltip: FC<{
   reaction: ReactionProps["reaction"];
-  theme: ReactionProps["theme"];
-}> = ({ reaction, theme }) => {
+}> = ({ reaction }) => {
   const ref = useRef<HTMLSpanElement>(null);
   const [dx, setDx] = useState(0);
   const code = reaction.shortcode;
-  const c = SLACK_COLORS[theme];
 
-  // A solid, elevated popover. In dark mode the surface is lifted above the
-  // message column (which is `c.bg` = #1a1d21) so it doesn't read as
-  // transparent; a hairline border + shadow separate it in both themes.
-  const surface = theme === "dark" ? "#272a2e" : c.bg;
-  const border = theme === "dark" ? "rgba(255,255,255,0.12)" : c.border;
-  const fg = theme === "dark" ? "#e8e8e8" : c.text;
+  // Slack's reaction tooltip is a **dark popover in both light and dark mode** —
+  // it doesn't follow the color theme. Match that for fidelity: a near-black
+  // surface (Slack's own `#1d1c1d`) with light text. A hairline border + shadow
+  // separate it from the column, which matters most in dark mode where the
+  // surface sits close to the column background.
+  const surface = "#1d1c1d";
+  const border = "rgba(255,255,255,0.08)";
+  const fg = "#f8f8f8";
+  const muted = "#ababad";
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -206,8 +207,8 @@ const ReactionTooltip: FC<{
         {reaction.emoji}
       </span>
       <span style={{ fontWeight: 700 }}>{joinNames(reaction.byNames)}</span>
-      <span style={{ color: c.subtle }}> reacted with </span>
-      <span style={{ color: c.subtle }}>
+      <span style={{ color: muted }}> reacted with </span>
+      <span style={{ color: muted }}>
         {code ? `:${code}:` : reaction.emoji}
       </span>
       {/* downward tail — offset opposite the clamp shift so it stays on the chip */}
@@ -262,9 +263,7 @@ const Reaction: FC<ReactionProps> = ({ theme, reaction }) => {
           {reaction.count}
         </span>
       </span>
-      {hover && hasReactors ? (
-        <ReactionTooltip reaction={reaction} theme={theme} />
-      ) : null}
+      {hover && hasReactors ? <ReactionTooltip reaction={reaction} /> : null}
     </span>
   );
 };
