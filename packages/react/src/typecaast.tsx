@@ -24,6 +24,7 @@ import {
 import { useTypecaast } from "./use-typecaast.js";
 import { ShadowFrame } from "./shadow-frame.js";
 import { useSkinFonts } from "./use-skin-fonts.js";
+import { usePreloadImages } from "./use-preload-images.js";
 import { useReducedMotion } from "./use-reduced-motion.js";
 import { buildTranscript } from "./transcript.js";
 import { FitBox } from "./fit-box.js";
@@ -206,6 +207,11 @@ export const Typecaast = forwardRef<TypecaastHandle, TypecaastProps>(
       () => configSchema.parse(rawConfigRef.current),
       [configKey],
     );
+
+    // Warm the cache for every avatar / in-message image up front (even while the
+    // skin chunk is still loading) so they don't pop in late once their message
+    // appears mid-playback.
+    usePreloadImages(config);
 
     // Explicit skin object → render synchronously, no lazy load.
     if (props.skin)
