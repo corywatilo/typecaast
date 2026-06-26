@@ -1,6 +1,6 @@
 {
   "name": "@typecaast/skins",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Built-in Typecaast skins (Slack, …).",
   "license": "Apache-2.0",
   "repository": {

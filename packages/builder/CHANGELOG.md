@@ -1,5 +1,17 @@
 # @typecaast/builder
 
+## 0.3.4
+
+### Patch Changes
+
+- 4ce58a7: Add an optional `logo` prop to `<Builder>`, rendered immediately left of the header wordmark (mirroring `headerNav`/`headerActions`). Lets a host inject its brand mark into the builder/playground header.
+- 6ecfdce: Remove the "Builder" badge from the playground header — the wordmark stands on its own.
+- Updated dependencies [bd86eca]
+- Updated dependencies [4b701db]
+- Updated dependencies [61811b8]
+  - @typecaast/react@0.5.2
+  - @typecaast/skin-kit@0.4.1
+
 ## 0.3.3
 
 ### Patch Changes
