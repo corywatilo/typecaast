@@ -35,10 +35,13 @@ describe("fadeSlideIn", () => {
     });
   });
 
-  it("is shown and settled at progress 1", () => {
+  it("is shown and settled at progress 1, with no idle transform", () => {
+    // A settled element must reset to `transform: none` — a residual
+    // `translateY(0px)` would create a stacking context that traps overlays
+    // (e.g. reaction hover tooltips) under later sibling messages.
     expect(fadeSlideIn(1)).toEqual({
       opacity: 1,
-      transform: "translateY(0px)",
+      transform: "none",
     });
   });
 

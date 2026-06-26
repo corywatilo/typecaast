@@ -34,6 +34,12 @@ export function fadeSlideIn(
   const eased = (options.easing ?? easeOutCubic)(clamp01(progress));
   const distance = options.distance ?? 8;
   const offset = (1 - eased) * distance;
+  // Once settled, drop the transform entirely. Any non-`none` transform — even
+  // `translateY(0px)` — establishes a stacking context, which would trap a
+  // descendant overlay (e.g. a reaction's hover tooltip) *below* later sibling
+  // messages, so neighbouring text paints over the opaque tooltip and it reads
+  // as transparent. `none` at rest lets overlays layer above adjacent content.
+  if (offset === 0) return { opacity: eased, transform: "none" };
   const translate =
     options.axis === "x"
       ? `translateX(${offset}px)`
