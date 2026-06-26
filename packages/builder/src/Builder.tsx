@@ -74,6 +74,8 @@ export interface BuilderProps {
   headerActions?: ReactNode;
   /** Content rendered immediately right of the wordmark (e.g. site nav links). */
   headerNav?: ReactNode;
+  /** Brand mark rendered immediately left of the wordmark (e.g. the site logo). */
+  logo?: ReactNode;
   /** Persist to localStorage + the URL hash (shareable links). Default true. */
   persist?: boolean;
   className?: string;
@@ -142,6 +144,7 @@ export function Builder({
   onEvent,
   headerActions,
   headerNav,
+  logo,
   persist = true,
   className,
   style,
@@ -247,6 +250,7 @@ export function Builder({
             gap: 8,
           }}
         >
+          {logo}
           <Heading level={2} style={{ fontSize: 15, margin: 0 }}>
             Typecaast
           </Heading>
