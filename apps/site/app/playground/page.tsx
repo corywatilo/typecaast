@@ -9,6 +9,7 @@ import { track } from "../../lib/analytics";
 import { useResolvedSiteTheme } from "../../lib/theme";
 import { ThemeToggle } from "../../components/ThemeToggle";
 import { NavLinks } from "../../components/NavLinks";
+import { Logo } from "../../components/Logo";
 
 // The builder reads localStorage to restore the working config, so it can only
 // render correctly on the client — render it client-only to avoid an
@@ -67,6 +68,7 @@ export default function PlaygroundPage() {
         theme={siteTheme}
         onChange={handleChange}
         onEvent={(event) => track(event)}
+        logo={<Logo className="tc-logo" />}
         headerNav={<NavLinks style={{ marginLeft: 22 }} />}
         headerActions={<ThemeToggle />}
       />

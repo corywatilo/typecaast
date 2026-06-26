@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ManageAnalyticsLink } from "../lib/analytics";
 import { ThemeToggle } from "./ThemeToggle";
+import { Logo } from "./Logo";
 
 export function Footer() {
   return (
@@ -16,7 +17,10 @@ export function Footer() {
         style={{ display: "flex", flexWrap: "wrap", gap: 24 }}
       >
         <div style={{ flex: 1, minWidth: 220 }}>
-          <strong style={{ fontSize: 15 }}>Typecaast</strong>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Logo className="tc-logo" />
+            <strong style={{ fontSize: 15 }}>Typecaast</strong>
+          </div>
           <p
             className="tc-muted"
             style={{
