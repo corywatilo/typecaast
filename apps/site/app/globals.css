@@ -1,5 +1,17 @@
 @import "@typecaast/ui/styles.css";
 
+/*
+ * Site-level font: swap the design-system's default sans (Inter) for RoundHog,
+ * loaded by next/font/local in layout.tsx and surfaced as --font-roundhog. Same
+ * selector as @typecaast/ui's token but later in the cascade, so it wins here
+ * only — the shipped package and the chat skins keep their own fonts.
+ */
+[data-tc-theme] {
+  --tc-font-sans:
+    var(--font-roundhog), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+}
+
 * {
   box-sizing: border-box;
 }
