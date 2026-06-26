@@ -33,15 +33,19 @@ export default function Home() {
           <div className="tc-studio-hero-grid">
             <div>
               <h1 className="tc-studio-h1">
-                Demo your AI bot{" "}
-                <span className="tc-studio-accent">
-                  without faking screenshots.
-                </span>
+                Simulate a conversation{" "}
+                <div className="tc-studio-accent">in real chat UIs</div>
               </h1>
-              <p className="tc-studio-sub">
-                Script the conversation and Typecaast plays it back in a
-                pixel-perfect Slack. Embed it live on your site or export an
-                MP4. Change a line, both update.
+              <p className="tc-studio-sub" style={{ paddingBottom: 12 }}>
+                Script a conversation in JSON, then watch it play back in
+                popular apps or even your own custom UI. Embed it on your site
+                with React or export to MP4.
+              </p>
+              <p
+                className="tc-studio-sub"
+                style={{ fontSize: 15, marginBottom: 0 }}
+              >
+                <em>Finally, an easy way to make demos of AI chatbots!</em>
               </p>
               <div className="tc-studio-cta">
                 <Link

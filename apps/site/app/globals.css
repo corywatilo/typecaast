@@ -125,7 +125,7 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 20px;
 }
 
 /* Hero "stage": a tab bar + the demo screen, a warm glow, a faint grid. The

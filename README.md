@@ -12,7 +12,7 @@ One engine and one set of skins drive **two render targets**:
 1. **JavaScript / React** — embeddable on a webpage, real-time playback.
 2. **Video export** — deterministic frame rendering via Remotion → MP4 / GIF / WebM.
 
-A visual **builder** assembles the timeline and emits the JSON config; a **hosted site** offers the builder as a playground 
+A visual **builder** assembles the timeline and emits the JSON config; a **hosted site** offers the builder as a playground
 
 > Note: This project is very much a work in progress and has not yet been fully tested. The Chrome Extension is not yet production-ready (nor even alpha-ready) and video exports have yet to be tested. Yolo!
 
