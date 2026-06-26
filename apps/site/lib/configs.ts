@@ -14,11 +14,15 @@ export const billingToast: ConfigInput = {
     { id: "posthog-bot", name: "PostHog", kind: "app" },
   ],
   timeline: [
+    // Cory's opening line is already in the thread when the demo starts —
+    // `instant` skips the self-message type-then-send animation and opens the
+    // player at t=0, so Paul is the only person shown typing.
     {
       type: "message",
       id: "m1",
       from: "cory",
       text: "i got a billing toast error on the dashboard but i think it's a bug?",
+      instant: true,
     },
     // Paul escalates to the PostHog app — we show him typing it in the reply box.
     {
@@ -37,7 +41,7 @@ export const billingToast: ConfigInput = {
       from: "posthog-bot",
       delay: 900,
     },
-    { type: "delay", duration: 1400 },
+    { type: "delay", duration: 700 },
     {
       type: "message",
       from: "posthog-bot",
