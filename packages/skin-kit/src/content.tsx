@@ -11,6 +11,9 @@ export interface ContentClassNames {
   link?: string;
   mention?: string;
   code?: string;
+  bold?: string;
+  italic?: string;
+  strike?: string;
   emoji?: string;
   image?: string;
 }
@@ -21,6 +24,9 @@ export interface ContentStyles {
   link?: CSSProperties;
   mention?: CSSProperties;
   code?: CSSProperties;
+  bold?: CSSProperties;
+  italic?: CSSProperties;
+  strike?: CSSProperties;
   emoji?: CSSProperties;
 }
 
@@ -48,6 +54,39 @@ function renderInline(
         <code key={key} data-tc-mark="code" className={cn.code} style={st.code}>
           {span.value}
         </code>
+      );
+    case "bold":
+      return (
+        <strong
+          key={key}
+          data-tc-mark="bold"
+          className={cn.bold}
+          style={st.bold}
+        >
+          {span.value}
+        </strong>
+      );
+    case "italic":
+      return (
+        <em
+          key={key}
+          data-tc-mark="italic"
+          className={cn.italic}
+          style={st.italic}
+        >
+          {span.value}
+        </em>
+      );
+    case "strike":
+      return (
+        <s
+          key={key}
+          data-tc-mark="strike"
+          className={cn.strike}
+          style={st.strike}
+        >
+          {span.value}
+        </s>
       );
     case "link":
       return (

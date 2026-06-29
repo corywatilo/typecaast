@@ -17,11 +17,19 @@ describe("timelineStepSchema", () => {
         ],
       },
       {
-        type: "system",
+        // App card = a message from an app participant + Block Kit content.
+        type: "message",
         from: "posthog-bot",
-        card: "pr-opened",
-        text: "Pull request opened.",
-        actions: [{ label: "View PR" }, { label: "Open in PostHog Code" }],
+        content: [
+          { type: "section", text: "Pull request opened." },
+          {
+            type: "actions",
+            elements: [
+              { type: "button", label: "View PR", style: "primary" },
+              { type: "button", label: "Open in PostHog Code" },
+            ],
+          },
+        ],
       },
       { type: "composerType", from: "cory", text: "Let me check." },
       { type: "send" },

@@ -68,18 +68,30 @@ describe("toContentNodes", () => {
   });
 
   it("lets explicit content win over sugar", () => {
-    const explicit = [{ type: "text", spans: [] }];
-    expect(toContentNodes({ text: "ignored", content: explicit })).toBe(
+    const explicit = [{ type: "text" as const, spans: [] }];
+    // Explicit content is authoritative (text sugar ignored); it's normalized,
+    // so a deep-equal array comes back.
+    expect(toContentNodes({ text: "ignored", content: explicit })).toEqual(
       explicit,
     );
   });
 });
 
 describe("content registry & schema", () => {
-  it("knows text and image as built-in types", () => {
-    expect(knownContentNodeTypes()).toEqual(["text", "image"]);
+  it("knows the built-in node types (text/image + Block Kit blocks)", () => {
+    expect(knownContentNodeTypes()).toEqual([
+      "text",
+      "image",
+      "header",
+      "section",
+      "context",
+      "divider",
+      "actions",
+      "attachment",
+    ]);
     expect(isKnownContentNodeType("text")).toBe(true);
-    expect(isKnownContentNodeType("attachment")).toBe(false);
+    expect(isKnownContentNodeType("attachment")).toBe(true);
+    expect(isKnownContentNodeType("linkPreview")).toBe(false);
   });
 
   it("validates a well-formed text node and image node", () => {
@@ -104,6 +116,145 @@ describe("content registry & schema", () => {
     expect(() => contentNodeSchema.parse({ type: "text" })).toThrow();
     expect(() =>
       contentNodeSchema.parse({ type: "image", src: 123 }),
+    ).toThrow();
+  });
+});
+
+describe("parseInline — mrkdwn emphasis & mentions", () => {
+  it("extracts bold, italic, and strike", () => {
+    expect(parseInline("a *b* _c_ ~d~ e")).toEqual([
+      { type: "text", value: "a " },
+      { type: "bold", value: "b" },
+      { type: "text", value: " " },
+      { type: "italic", value: "c" },
+      { type: "text", value: " " },
+      { type: "strike", value: "d" },
+      { type: "text", value: " e" },
+    ]);
+  });
+
+  it("leaves snake_case and underscored URLs alone", () => {
+    expect(parseInline("file_name_here")).toEqual([
+      { type: "text", value: "file_name_here" },
+    ]);
+    expect(parseInline("https://x.com/a_b_c")).toEqual([
+      { type: "link", href: "https://x.com/a_b_c" },
+    ]);
+  });
+
+  it("does not emphasize across leading/trailing spaces", () => {
+    expect(parseInline("2 * 3 * 4")).toEqual([
+      { type: "text", value: "2 * 3 * 4" },
+    ]);
+  });
+
+  it("resolves a `<@id>` mention to an id + placeholder label", () => {
+    expect(parseInline("ping <@cory> now")).toEqual([
+      { type: "text", value: "ping " },
+      { type: "mention", id: "cory", label: "@cory" },
+      { type: "text", value: " now" },
+    ]);
+  });
+});
+
+describe("Block Kit content nodes", () => {
+  it("normalizes block `text` sugar to spans (incl. nested attachment)", () => {
+    const nodes = toContentNodes({
+      content: [
+        { type: "header", text: "Title" },
+        { type: "section", text: "Sales *reps* hit <@joe>" },
+        {
+          type: "context",
+          elements: [{ type: "text", text: "🟠 P2 · _replay_" }],
+        },
+        { type: "divider" },
+        {
+          type: "attachment",
+          color: "#36a64f",
+          content: [{ type: "section", text: "nested `code`" }],
+        },
+      ],
+    });
+    expect(nodes).toEqual([
+      { type: "header", text: "Title" },
+      {
+        type: "section",
+        spans: [
+          { type: "text", value: "Sales " },
+          { type: "bold", value: "reps" },
+          { type: "text", value: " hit " },
+          { type: "mention", id: "joe", label: "@joe" },
+        ],
+      },
+      {
+        type: "context",
+        elements: [
+          {
+            type: "text",
+            spans: [
+              { type: "text", value: "🟠 P2 · " },
+              { type: "italic", value: "replay" },
+            ],
+          },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "attachment",
+        color: "#36a64f",
+        content: [
+          {
+            type: "section",
+            spans: [
+              { type: "text", value: "nested " },
+              { type: "code", value: "code" },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("validates header/section/context/divider/actions/attachment", () => {
+    expect(() =>
+      contentSchema.parse([
+        { type: "header", text: "perf(inbox): Fix 26s load" },
+        {
+          type: "section",
+          spans: [{ type: "text", value: "body" }],
+          accessory: { type: "button", label: "Open", href: "https://x.com" },
+        },
+        {
+          type: "context",
+          elements: [
+            { type: "image", src: "i.png", alt: "icon" },
+            { type: "text", spans: [{ type: "text", value: "2 signals" }] },
+          ],
+        },
+        { type: "divider" },
+        {
+          type: "actions",
+          elements: [
+            { type: "button", label: "Review PR", style: "primary" },
+            { type: "button", label: "Dismiss", style: "danger" },
+            { type: "button", label: "Open in PostHog" },
+          ],
+        },
+        {
+          type: "attachment",
+          color: "#36a64f",
+          content: [{ type: "section", spans: [] }],
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  it("rejects an unknown button style", () => {
+    expect(() =>
+      contentNodeSchema.parse({
+        type: "actions",
+        elements: [{ type: "button", label: "x", style: "warning" }],
+      }),
     ).toThrow();
   });
 });

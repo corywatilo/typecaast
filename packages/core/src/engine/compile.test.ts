@@ -191,4 +191,54 @@ describe("compile", () => {
     ];
     expect(compile(cfg(timeline))).toEqual(compile(cfg(timeline)));
   });
+
+  it("resolves <@id> mentions to the participant's display name", () => {
+    const t = compile(
+      cfg([
+        {
+          type: "message",
+          from: "b",
+          instant: true,
+          content: [{ type: "section", text: "ping <@a> now" }],
+        },
+      ]),
+    );
+    const section = t.messages[0]!.content[0] as {
+      spans: { type: string; id?: string; label?: string }[];
+    };
+    expect(section.spans.find((s) => s.type === "mention")).toEqual({
+      type: "mention",
+      id: "a",
+      label: "@A",
+    });
+  });
+
+  it("paces reading time from Block Kit content, not just text nodes", () => {
+    const gapFor = (first: ConfigInput["timeline"][number]) => {
+      const t = compile(
+        cfg([first, { type: "message", from: "b", text: "next" }]),
+      );
+      return t.messages[1]!.appearMs - t.messages[0]!.appearMs;
+    };
+    const rich = gapFor({
+      type: "message",
+      from: "b",
+      instant: true,
+      content: [
+        { type: "header", text: "A reasonably long header line to read" },
+        {
+          type: "section",
+          text: "And a section body with several more words.",
+        },
+      ],
+    });
+    const bare = gapFor({
+      type: "message",
+      from: "b",
+      instant: true,
+      content: [{ type: "divider" }],
+    });
+    // The header+section text drives the reading gap; the divider has none.
+    expect(rich).toBeGreaterThan(bare);
+  });
 });

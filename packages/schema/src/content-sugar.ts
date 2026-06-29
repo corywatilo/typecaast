@@ -1,20 +1,32 @@
 import type {
+  AttachmentNode,
   ContentNode,
+  ContextNode,
   ImageNode,
   InlineNode,
+  SectionNode,
   TextNode,
 } from "./content-nodes.js";
 
 /**
- * Matches an inline mark: a backtick code span, an http(s) link, or an
- * `@mention`. Everything else becomes plain text runs.
+ * Matches an inline mark, in priority order: a backtick code span, Slack mrkdwn
+ * emphasis (`*bold*`, `_italic_`, `~strike~`), an http(s) link, a `<@id>`
+ * mention (Slack's encoded form — resolved to a display name at compile), or a
+ * bare `@name` mention. Everything else becomes plain text runs.
+ *
+ * Emphasis delimiters must hug their content (no leading/trailing space), and
+ * `_italic_` requires non-alphanumeric boundaries so `snake_case` and URLs with
+ * underscores are left alone.
  */
-const INLINE_TOKEN = /`([^`]+)`|(https?:\/\/[^\s]+)|(@[A-Za-z0-9_][\w.-]*)/g;
+const INLINE_TOKEN =
+  /`([^`]+)`|\*(?!\s)([^*\n]+?)(?<!\s)\*|(?<![A-Za-z0-9])_(?!\s)([^_\n]+?)(?<!\s)_(?![A-Za-z0-9])|~(?!\s)([^~\n]+?)(?<!\s)~|(https?:\/\/[^\s]+)|<@([A-Za-z0-9_.-]+)>|(@[A-Za-z0-9_][\w.-]*)/g;
 
 /**
  * Parse a plain authoring string into inline nodes, extracting inline `code`,
- * links, and `@mentions`. Emoji are left inside text runs in v1 (they render
- * fine and a dedicated emoji mark can be authored explicitly).
+ * `bold`/`italic`/`strike`, links, and mentions. Emoji are left inside text
+ * runs (they render fine; a dedicated emoji mark can be authored explicitly).
+ * A `<@id>` mention carries its `id` and a placeholder label; the engine
+ * resolves the label to the participant's display name at compile time.
  */
 export function parseInline(text: string): InlineNode[] {
   if (text.length === 0) return [];
@@ -30,9 +42,17 @@ export function parseInline(text: string): InlineNode[] {
     if (match[1] !== undefined) {
       spans.push({ type: "code", value: match[1] });
     } else if (match[2] !== undefined) {
-      spans.push({ type: "link", href: match[2] });
+      spans.push({ type: "bold", value: match[2] });
     } else if (match[3] !== undefined) {
-      spans.push({ type: "mention", label: match[3] });
+      spans.push({ type: "italic", value: match[3] });
+    } else if (match[4] !== undefined) {
+      spans.push({ type: "strike", value: match[4] });
+    } else if (match[5] !== undefined) {
+      spans.push({ type: "link", href: match[5] });
+    } else if (match[6] !== undefined) {
+      spans.push({ type: "mention", id: match[6], label: `@${match[6]}` });
+    } else if (match[7] !== undefined) {
+      spans.push({ type: "mention", label: match[7] });
     }
     lastIndex = match.index + matchText.length;
   }
@@ -75,12 +95,58 @@ export interface MessageBodySugar {
 }
 
 /**
+ * Resolve a block's `text` sugar to `spans` (and recurse into attachments), so
+ * skins only ever read resolved inline content. Non-text blocks pass through.
+ */
+export function normalizeContentNode(node: ContentNode): ContentNode {
+  // Explicit casts: `ContentNode` includes the lenient `UnknownContentNode`
+  // (index signature), so a plain `switch` widens the narrowed fields to
+  // `unknown`. The runtime `type` check is authoritative.
+  if (node.type === "section") {
+    const s = node as SectionNode;
+    return {
+      type: "section",
+      spans: s.spans ?? parseInline(s.text ?? ""),
+      ...(s.accessory ? { accessory: s.accessory } : {}),
+      ...(s.fields
+        ? {
+            fields: s.fields.map((f) => ({
+              spans: f.spans ?? parseInline(f.text ?? ""),
+            })),
+          }
+        : {}),
+    };
+  }
+  if (node.type === "context") {
+    const c = node as ContextNode;
+    return {
+      type: "context",
+      elements: c.elements.map((el) =>
+        el.type === "text"
+          ? { type: "text", spans: el.spans ?? parseInline(el.text ?? "") }
+          : el,
+      ),
+    };
+  }
+  if (node.type === "attachment") {
+    const a = node as AttachmentNode;
+    return {
+      type: "attachment",
+      ...(a.color ? { color: a.color } : {}),
+      content: a.content.map(normalizeContentNode),
+    };
+  }
+  return node;
+}
+
+/**
  * Resolve a message's body sugar to content nodes. Explicit `content` is
- * authoritative; otherwise the text node (if any) comes first, then images —
- * matching the "here's the toast: [image]" ordering in the spec example.
+ * authoritative (block `text` sugar is normalized to spans); otherwise the text
+ * node (if any) comes first, then images — matching the "here's the toast:
+ * [image]" ordering in the spec example.
  */
 export function toContentNodes(body: MessageBodySugar): ContentNode[] {
-  if (body.content) return body.content;
+  if (body.content) return body.content.map(normalizeContentNode);
   const nodes: ContentNode[] = [];
   if (body.text !== undefined && body.text.length > 0) {
     nodes.push(textToContentNode(body.text));

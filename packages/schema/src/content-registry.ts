@@ -1,13 +1,33 @@
 import { z } from "zod";
 import {
+  actionsNodeSchema,
+  contextNodeSchema,
+  dividerNodeSchema,
+  headerNodeSchema,
   imageNodeSchema,
+  sectionNodeSchema,
   textNodeSchema,
+  type AttachmentNode,
   type ContentNode,
 } from "./content-nodes.js";
 
 /**
+ * A legacy-style attachment node — nested blocks behind a colored left bar.
+ * Recursive (its `content` is the full node array), so it's defined here where
+ * `contentSchema` is in scope and wrapped in `z.lazy` to defer the reference.
+ */
+export const attachmentNodeSchema: z.ZodType<AttachmentNode> = z.lazy(() =>
+  z.object({
+    type: z.literal("attachment"),
+    color: z.string().optional(),
+    content: contentSchema,
+  }),
+);
+
+/**
  * The content-type registry. Each message body node has a `type` resolved
- * through here. v1 registers `text` and `image`; additional types can be
+ * through here. Built-ins cover text/image plus the Block Kit blocks
+ * (header/section/context/divider/actions/attachment); additional types can be
  * registered (with their own strict schema) without a schema-version bump.
  *
  * Nodes whose `type` is **not** registered validate leniently (only `type` is
@@ -18,6 +38,12 @@ import {
 const registry = new Map<string, z.ZodTypeAny>([
   ["text", textNodeSchema],
   ["image", imageNodeSchema],
+  ["header", headerNodeSchema],
+  ["section", sectionNodeSchema],
+  ["context", contextNodeSchema],
+  ["divider", dividerNodeSchema],
+  ["actions", actionsNodeSchema],
+  ["attachment", attachmentNodeSchema],
 ]);
 
 /** Register (or override) the strict schema for a content node type. */

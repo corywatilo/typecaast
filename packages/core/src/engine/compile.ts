@@ -1,8 +1,13 @@
 import {
   toContentNodes,
+  type ActionsNode,
+  type AttachmentNode,
   type Config,
   type ContentNode,
+  type ContextNode,
+  type HeaderNode,
   type InlineNode,
+  type SectionNode,
   type TextNode,
 } from "@typecaast/schema";
 import { createRng, withJitter } from "./rng.js";
@@ -31,6 +36,9 @@ function inlineText(span: InlineNode): string {
   switch (span.type) {
     case "text":
     case "code":
+    case "bold":
+    case "italic":
+    case "strike":
     case "emoji":
       return span.value;
     case "mention":
@@ -40,16 +48,94 @@ function inlineText(span: InlineNode): string {
   }
 }
 
+/** Concatenate a span list to plain text. */
+function spansText(spans: InlineNode[]): string {
+  return spans.map(inlineText).join("");
+}
+
+/** Flatten a single content node (incl. Block Kit blocks) to plain text. */
+function nodeText(node: ContentNode): string {
+  switch (node.type) {
+    case "text":
+      return spansText((node as TextNode).spans);
+    case "header":
+      return (node as HeaderNode).text;
+    case "section":
+      return spansText((node as SectionNode).spans ?? []);
+    case "context":
+      return (node as ContextNode).elements
+        .map((el) => (el.type === "text" ? spansText(el.spans ?? []) : ""))
+        .join(" ");
+    case "actions":
+      return (node as ActionsNode).elements.map((b) => b.label).join(" ");
+    case "attachment":
+      return (node as AttachmentNode).content.map(nodeText).join(" ");
+    default:
+      return ""; // image, divider, unknown — no readable text
+  }
+}
+
 /** Flatten content nodes to plain text for pacing math. */
 function plainText(content: ContentNode[]): string {
-  return content
-    .map((node) =>
-      node.type === "text"
-        ? (node as TextNode).spans.map(inlineText).join("")
-        : "",
-    )
-    .join(" ")
-    .trim();
+  return content.map(nodeText).join(" ").trim();
+}
+
+/** Resolve `<@id>` mentions to the participant's display name. */
+function resolveSpans(
+  spans: InlineNode[],
+  names: Map<string, string>,
+): InlineNode[] {
+  return spans.map((s) =>
+    s.type === "mention" && s.id !== undefined
+      ? { type: "mention", id: s.id, label: `@${names.get(s.id) ?? s.id}` }
+      : s,
+  );
+}
+
+/** Walk content nodes resolving mention labels (recurses into attachments). */
+function resolveMentions(
+  nodes: ContentNode[],
+  names: Map<string, string>,
+): ContentNode[] {
+  return nodes.map((node) => {
+    if (node.type === "text") {
+      const t = node as TextNode;
+      return { ...t, spans: resolveSpans(t.spans, names) };
+    }
+    if (node.type === "section") {
+      const s = node as SectionNode;
+      return {
+        ...s,
+        spans: resolveSpans(s.spans ?? [], names),
+        ...(s.fields
+          ? {
+              fields: s.fields.map((f) => ({
+                spans: resolveSpans(f.spans ?? [], names),
+              })),
+            }
+          : {}),
+      };
+    }
+    if (node.type === "context") {
+      const c = node as ContextNode;
+      return {
+        ...c,
+        elements: c.elements.map((el) =>
+          el.type === "text"
+            ? {
+                type: "text" as const,
+                spans: resolveSpans(el.spans ?? [], names),
+              }
+            : el,
+        ),
+      };
+    }
+    if (node.type === "attachment") {
+      const a = node as AttachmentNode;
+      return { ...a, content: resolveMentions(a.content, names) };
+    }
+    return node;
+  });
 }
 
 const cache = new WeakMap<Config, CompiledTimeline>();
@@ -76,6 +162,10 @@ export function compile(config: Config): CompiledTimeline {
     config.participants.filter((p) => p.isSelf).map((p) => p.id),
   );
   const nameById = new Map(config.participants.map((p) => [p.id, p.name]));
+  /** Resolve a step's body sugar to content nodes with mentions bound. */
+  const resolveContent = (
+    body: Parameters<typeof toContentNodes>[0],
+  ): ContentNode[] => resolveMentions(toContentNodes(body), nameById);
   const messages: CompiledMessage[] = [];
   const typings: CompiledTimeline["typings"] = [];
   const composers: CompiledComposer[] = [];
@@ -119,7 +209,8 @@ export function compile(config: Config): CompiledTimeline {
         const isSelfMessage =
           step.type === "message" && selfIds.has(step.from) && !step.instant;
         if (isSelfMessage) {
-          const text = plainText(toContentNodes(step));
+          const content = resolveContent(step);
+          const text = plainText(content);
           const typingDur = typingDurationMs(text, pacing.typingCps);
           const sendAt = cursor + typingDur;
           const id = nextId(step.id);
@@ -136,7 +227,7 @@ export function compile(config: Config): CompiledTimeline {
             from: step.from,
             isSelf: true,
             variant: "message",
-            content: toContentNodes(step),
+            content,
             appearMs: sendAt,
             revealMs: SEND_REVEAL_MS,
             atMs: sendAt,
@@ -166,7 +257,7 @@ export function compile(config: Config): CompiledTimeline {
             (typeof step.typing === "object"
               ? step.typing.showTypingFor
               : undefined) ??
-            typingDurationMs(plainText(toContentNodes(step)), pacing.typingCps);
+            typingDurationMs(plainText(resolveContent(step)), pacing.typingCps);
           typings.push({
             from: step.from,
             startMs: appearAt,
@@ -184,7 +275,7 @@ export function compile(config: Config): CompiledTimeline {
           from,
           isSelf: selfIds.has(from),
           variant: step.type === "system" ? "system" : "message",
-          content: toContentNodes(step),
+          content: resolveContent(step),
           appearMs: appearAt,
           revealMs: reveal,
           atMs: appearAt,
@@ -237,7 +328,7 @@ export function compile(config: Config): CompiledTimeline {
             from: sendFrom,
             isSelf: selfIds.has(sendFrom),
             variant: "message",
-            content: toContentNodes({ text: lastComposer.text }),
+            content: resolveContent({ text: lastComposer.text }),
             appearMs: cursor,
             revealMs: SEND_REVEAL_MS,
             atMs: cursor,
@@ -281,7 +372,7 @@ export function compile(config: Config): CompiledTimeline {
           // Edits/deletes happen at the cursor; insert a `delay` step before
           // them to add breathing room.
           target.editedAtMs = cursor;
-          target.editedContent = toContentNodes(step);
+          target.editedContent = resolveContent(step);
           cursor += REVEAL_MS;
         }
         break;
