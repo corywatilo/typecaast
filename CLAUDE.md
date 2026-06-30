@@ -22,6 +22,7 @@ Dependency order — **schema → core → {react, remotion, skin-kit} → skins
 - `packages/skins` — the built-in skins (one folder each). `getSkin`/`builtinSkins` registry.
 - `packages/react` — `<Typecaast>` + `useTypecaast`. `packages/remotion` — video composition + `renderVideo`.
 - `packages/cli` — `typecaast validate|render`. `packages/capture` — capture a live UI → a skin draft.
+- `packages/mcp` — stdio MCP server (`validate_config`/`get_json_schema`/`list_skins`/`scaffold_config`/`get_docs`) for authoring configs from any editor; depends only on `schema`.
 - `packages/builder` (FSL) + `packages/ui` (FSL) — the visual editor + design system. `apps/site` — the website/playground.
 
 ## Commands
@@ -30,7 +31,7 @@ Dependency order — **schema → core → {react, remotion, skin-kit} → skins
 Filter a package: `pnpm --filter @typecaast/<pkg> run <script>`.
 
 **Before committing, run the full gate locally** (CI runs exactly these and will block on any):
-`pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && pnpm validate:examples && pnpm check:registry && pnpm check:no-telemetry`.
+`pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && pnpm validate:examples && pnpm check:registry && pnpm check:no-telemetry && pnpm check:docs`.
 `pnpm typecheck` is workspace-wide — a per-package `vitest` run will miss cross-package type errors.
 
 ## Working agreement
@@ -60,6 +61,7 @@ Filter a package: `pnpm --filter @typecaast/<pkg> run <script>`.
   (`packages/builder/src/Tooltip.tsx`) to escape clipping `overflow:auto` columns. `@typecaast/ui`'s `InfoTip`
   stays **CSS-only / SSR-safe** — don't make it stateful (it's imported into server components elsewhere).
 - **No telemetry in shipped runtime packages** — enforced by `pnpm check:no-telemetry`. Analytics live only in `apps/site`.
+- **Authoring docs are part of the schema contract.** `docs/authoring-configs.md` (every step type + the built-in skin ids) and `docs/pacing.md` (every `pacing` field) must stay current with the schema — `pnpm check:docs` reads the live `STEP_TYPES`/`pacingSchema`/`builtinSkins` and fails CI if a token is undocumented. Update the docs in the **same change** as any schema/step-type/pacing edit. These docs are the source the site serves (`/docs/<slug>`, `/docs/<slug>/raw`, `/llms.txt`, `/schema/v1/typecaast.schema.json`) and that `@typecaast/mcp` bundles; `apps/site` copies them via `scripts/sync-docs.mjs` (generated `apps/site/content`, gitignored).
 - `apps/site` and the builder render via the **built `dist`** of the workspace packages, so rebuild
   (`pnpm build` or the package's `dev` watch) after changing a package before checking the site.
 
@@ -105,9 +107,10 @@ The config schema (`packages/schema/src/timeline.ts`, `meta.ts`, …) is the con
   `case "<type>"`), every `packages/skins/src/*/capabilities.ts` (the `events.<type>` entry), and in the
   builder — `steps.tsx` (icon, description, group), `format.ts` (`stepLabel`), `store.ts` (`blankStep`
   and the fields `changeStepType` carries), and `StepEditor.tsx` (type-specific fields). Also
-  `examples/*.json`, tests, and the `PLAN.md` step list. TypeScript catches the `Record<StepType, …>`
-  and exhaustive-switch sites; JSON examples, docs, and the release are on you — run
-  `pnpm validate:examples` and the full gate.
+  `examples/*.json`, **`docs/authoring-configs.md`** (the step's row + a one-line example; and
+  `docs/pacing.md` if it affects timing), tests, and the `PLAN.md` step list. TypeScript catches the
+  `Record<StepType, …>` and exhaustive-switch sites; JSON examples, docs, and the release are on you —
+  run `pnpm validate:examples`, `pnpm check:docs`, and the full gate.
 
 ## Releases
 
@@ -118,4 +121,5 @@ publishable change; merging the auto "Version Packages" PR triggers `release.yml
 ## More docs
 
 `CONTRIBUTING.md` (dev setup) · `DEPLOY.md` (hosting/DNS/OIDC) · `ANALYTICS.md` (consent model) ·
-`docs/` (authoring/capturing skins, fonts, errors, performance, RSC notes) · `registry/` (community skins).
+`docs/` (authoring configs + pacing, message content, authoring/capturing skins, fonts, errors,
+performance, RSC notes) · `packages/mcp` (MCP server for config authoring) · `registry/` (community skins).

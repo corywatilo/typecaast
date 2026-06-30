@@ -1,0 +1,32 @@
+{
+  "name": "@typecaast/mcp",
+  "version": "0.0.0",
+  "description": "Model Context Protocol server for authoring & validating Typecaast configs.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/corywatilo/typecaast.git",
+    "directory": "packages/mcp"
+  },
+  "type": "module",
+  "bin": {
+    "typecaast-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@typecaast/schema": "workspace:*",
+    "zod": "^4.4.3"
+  }
+}

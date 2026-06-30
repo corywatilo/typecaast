@@ -3,6 +3,7 @@ import { Heading } from "@typecaast/ui";
 import { Nav } from "../../components/Nav";
 import { Footer } from "../../components/Footer";
 import { DocsViewedTracker } from "../../components/DocsViewedTracker";
+import { SITE_DOCS } from "./_docs";
 
 const REPO = "https://github.com/corywatilo/typecaast/blob/master";
 
@@ -101,21 +102,67 @@ typecaast render billing-toast.json --aspect 9:16 --scale 2 --theme dark`}</Code
           <code>pacing</code>, and a <code>timeline</code> of steps — message,
           reaction, typing, composerType, send, edit, delete, readReceipt,
           system, delay. Validate it with{" "}
-          <code className="tc-mono">typecaast validate</code>.
+          <code className="tc-mono">typecaast validate</code>. Add a{" "}
+          <code>$schema</code> line for editor autocomplete:
+        </p>
+        <Code>{`"$schema": "https://typecaast.com/schema/v1/typecaast.schema.json"`}</Code>
+        <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
+          Messages <strong>auto-pace</strong> by reading time, so short messages
+          land close together — to space them out (e.g. ~1–2s), see the{" "}
+          <Link style={{ color: "var(--tc-accent)" }} href="/docs/pacing">
+            pacing guide
+          </Link>
+          .
         </p>
 
         <Heading level={2} style={{ marginTop: 28 }}>
-          Guides
+          Authoring &amp; editing configs
+        </Heading>
+        <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
+          Write or change the JSON by hand — no playground required. Great for
+          quick edits and for LLMs assembling a config in your own project.
+        </p>
+        <ul
+          style={{
+            fontSize: 14.5,
+            lineHeight: 1.5,
+            listStyle: "none",
+            padding: 0,
+          }}
+        >
+          {SITE_DOCS.map((d) => (
+            <li key={d.slug} style={{ margin: "10px 0" }}>
+              <Link
+                style={{ color: "var(--tc-accent)", fontWeight: 600 }}
+                href={`/docs/${d.slug}`}
+              >
+                {d.title} →
+              </Link>
+              <div className="tc-muted" style={{ fontSize: 13 }}>
+                {d.blurb}
+              </div>
+            </li>
+          ))}
+        </ul>
+        <p className="tc-muted" style={{ fontSize: 13, lineHeight: 1.7 }}>
+          For LLMs/agents: a machine-readable index lives at{" "}
+          <Link style={{ color: "var(--tc-accent)" }} href="/llms.txt">
+            /llms.txt
+          </Link>
+          , and the JSON Schema at{" "}
+          <Link
+            style={{ color: "var(--tc-accent)" }}
+            href="/schema/v1/typecaast.schema.json"
+          >
+            /schema/v1/typecaast.schema.json
+          </Link>
+          .
+        </p>
+
+        <Heading level={2} style={{ marginTop: 28 }}>
+          More guides
         </Heading>
         <ul style={{ fontSize: 14.5, lineHeight: 2 }}>
-          <li>
-            <Link
-              style={{ color: "var(--tc-accent)" }}
-              href={`${REPO}/docs/message-content.md`}
-            >
-              Authoring message content (Block Kit) →
-            </Link>
-          </li>
           <li>
             <Link
               style={{ color: "var(--tc-accent)" }}

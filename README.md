@@ -116,6 +116,18 @@ ref.current?.seek(5000);
 
 No build step or design work required — the skin renders the platform's exact look in light and dark. Don't want to write JSON by hand? Build it visually in the [playground](https://typecaast.com/playground) and copy the config or embed snippet — see [`docs/playground.md`](./docs/playground.md) for a tour of the builder.
 
+## Authoring & editing configs
+
+A config is plain JSON — you can write or edit it by hand (or have an LLM do it) without the playground:
+
+- [**Authoring configs**](https://typecaast.com/docs/authoring-configs) ([`docs/authoring-configs.md`](./docs/authoring-configs.md)) — every top-level field and timeline step type.
+- [**Pacing & timing**](https://typecaast.com/docs/pacing) ([`docs/pacing.md`](./docs/pacing.md)) — gaps, delays, and typing speed. Messages auto-pace by reading time, so short messages land close together; to get ~1–2s between them, drop in a `delay` step or lower `pacing.readingWpm`.
+- [**Message content**](https://typecaast.com/docs/message-content) ([`docs/message-content.md`](./docs/message-content.md)) — mrkdwn + Block Kit bodies.
+
+Validate any config with `npx @typecaast/cli validate config.json`. Add a `"$schema": "https://typecaast.com/schema/v1/typecaast.schema.json"` line for editor autocomplete.
+
+**For LLMs / agents.** A machine-readable index lives at [`typecaast.com/llms.txt`](https://typecaast.com/llms.txt) and the JSON Schema at [`/schema/v1/typecaast.schema.json`](https://typecaast.com/schema/v1/typecaast.schema.json). To assemble and validate configs from your own editor/project (e.g. turning a screenshot into a config), run the [`@typecaast/mcp`](./packages/mcp/README.md) server — it exposes `validate_config`, `get_json_schema`, `list_skins`, and `scaffold_config`.
+
 ## Export to video
 
 The same config renders deterministically to MP4 / GIF / WebM via the CLI:
@@ -156,6 +168,7 @@ Common tasks: `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm format` ·
 | `@typecaast/skin-kit` | `defineSkin`, contract, theme/font/animation helpers | Apache-2.0         |
 | `@typecaast/capture`  | Distiller + sanitizer + template-skin adapter        | Apache-2.0         |
 | `@typecaast/cli`      | `validate` / `render` / `scaffold-skin`              | Apache-2.0         |
+| `@typecaast/mcp`      | MCP server: validate / schema / skins for authoring  | Apache-2.0         |
 | `@typecaast/builder`  | Embeddable visual editor                             | FSL-1.1-Apache-2.0 |
 
 The shipped runtime contains **zero telemetry** — no analytics SDK, no phone-home (enforced in CI). Analytics live only on the hosted site; see [`ANALYTICS.md`](./ANALYTICS.md).
@@ -168,7 +181,7 @@ The shipped runtime contains **zero telemetry** — no analytics SDK, no phone-h
 
 Typecaast is **open-core** — read [`LICENSING.md`](./LICENSING.md) for the full table.
 
-- **Runtime / SDK** (`@typecaast/core`, `schema`, `react`, `remotion`, `skins`, `skin-kit`, `cli`, `capture`) — **Apache-2.0** (open source).
+- **Runtime / SDK** (`@typecaast/core`, `schema`, `react`, `remotion`, `skins`, `skin-kit`, `cli`, `capture`, `mcp`) — **Apache-2.0** (open source).
 - **Builder** (`@typecaast/builder`, `apps/site`) — **FSL-1.1-Apache-2.0** (source-available; converts to Apache-2.0 after two years).
 - **Cloud render service** — proprietary, not in this repository.
 

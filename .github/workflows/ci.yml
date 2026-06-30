@@ -56,3 +56,6 @@ jobs:
 
       - name: Telemetry guard (no analytics in runtime packages)
         run: pnpm check:no-telemetry
+
+      - name: Check authoring docs cover the schema
+        run: pnpm check:docs

@@ -16,6 +16,7 @@ const RUNTIME = [
   "skin-kit",
   "capture",
   "cli",
+  "mcp",
 ];
 
 const BANNED = [

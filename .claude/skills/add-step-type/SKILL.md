@@ -62,8 +62,11 @@ step 8 as part of the work, not after.
    - `StepEditor.tsx` → add the type-specific form fields.
 
 6. **Examples & docs** — add or extend an `examples/*.json` that exercises the
-   step (so `pnpm validate:examples` covers it), and update the step list in
-   `PLAN.md`.
+   step (so `pnpm validate:examples` covers it); add the step's row + a one-line
+   example to `docs/authoring-configs.md` (and update `docs/pacing.md` if it
+   affects timing) so `pnpm check:docs` passes; and update the step list in
+   `PLAN.md`. `pnpm check:docs` reads the live `STEP_TYPES` and fails until the
+   new type is documented.
 
 7. **Tests** — `blankStep` is exercised for every type in
    `packages/builder/src/store.test.ts` (the "valid steps for every type" loop) —
@@ -81,7 +84,8 @@ Run the **full gate** (a per-package run misses cross-package type errors):
 
 ```
 pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build \
-  && pnpm validate:examples && pnpm check:registry && pnpm check:no-telemetry
+  && pnpm validate:examples && pnpm check:registry && pnpm check:no-telemetry \
+  && pnpm check:docs
 ```
 
 TypeScript catches the `Record<StepType, …>` and exhaustive-switch sites for

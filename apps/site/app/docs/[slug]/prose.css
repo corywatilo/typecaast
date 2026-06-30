@@ -1,0 +1,104 @@
+/* Minimal prose styling for rendered markdown docs, using the site's tokens. */
+.tc-prose {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--tc-text, inherit);
+}
+
+.tc-prose h1 {
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+.tc-prose h2 {
+  font-size: 21px;
+  letter-spacing: -0.01em;
+  margin: 36px 0 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--tc-border);
+}
+.tc-prose h3 {
+  font-size: 16px;
+  margin: 28px 0 8px;
+}
+
+.tc-prose p,
+.tc-prose ul,
+.tc-prose ol {
+  margin: 12px 0;
+}
+.tc-prose ul,
+.tc-prose ol {
+  padding-left: 22px;
+}
+.tc-prose li {
+  margin: 4px 0;
+}
+
+.tc-prose a {
+  color: var(--tc-accent);
+  text-decoration: none;
+}
+.tc-prose a:hover {
+  text-decoration: underline;
+}
+
+.tc-prose code {
+  font-family: var(--tc-font-mono, ui-monospace, monospace);
+  font-size: 0.88em;
+  background: var(--tc-bg-subtle);
+  border: 1px solid var(--tc-border);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+.tc-prose pre {
+  margin: 14px 0;
+  padding: 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  background: var(--tc-bg-subtle);
+  border: 1px solid var(--tc-border);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+.tc-prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.tc-prose blockquote {
+  margin: 14px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--tc-border);
+  color: var(--tc-text-muted, inherit);
+}
+
+.tc-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+  display: block;
+  overflow-x: auto;
+}
+.tc-prose th,
+.tc-prose td {
+  border: 1px solid var(--tc-border);
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.tc-prose th {
+  background: var(--tc-bg-subtle);
+  font-weight: 600;
+}
+
+.tc-prose hr {
+  border: none;
+  border-top: 1px solid var(--tc-border);
+  margin: 28px 0;
+}
