@@ -34,17 +34,12 @@ const config: Config = configSchema.parse({
       type: "message",
       from: "posthog-bot",
       content: [
+        { type: "section", text: "Pull request opened." },
         {
-          type: "attachment",
-          content: [
-            { type: "section", text: "Pull request opened." },
-            {
-              type: "actions",
-              elements: [
-                { type: "button", label: "View PR", style: "primary" },
-                { type: "button", label: "Open in PostHog Code" },
-              ],
-            },
+          type: "actions",
+          elements: [
+            { type: "button", label: "View PR", style: "primary" },
+            { type: "button", label: "Open in PostHog Code" },
           ],
         },
       ],
@@ -169,10 +164,10 @@ const signalsConfig: Config = configSchema.parse({
 const codeBlockConfig: Config = configSchema.parse({
   version: 1,
   meta: {
-    canvas: { width: 800, height: 540 },
+    canvas: { width: 730, height: 620 },
     fit: "scale",
     skin: { id: "slack", options: { channel: "#growth" } },
-    composer: "never",
+    composer: "always",
   },
   participants: [
     { id: "paul", name: "Paul D'Ambra", color: "#5b3a8e" },
@@ -185,7 +180,13 @@ const codeBlockConfig: Config = configSchema.parse({
       instant: true,
       text: "<@posthog> is there a difference in retention of users or orgs that are using insight or dashboard subscriptions. are they more likely to visit posthog or to create further insights or try other products",
     },
-    { type: "reaction", target: "$prev", emoji: "👀" },
+    {
+      type: "reaction",
+      target: "$prev",
+      emoji: "👀",
+      shortcode: "eyes",
+      from: "posthog",
+    },
     {
       type: "message",
       from: "posthog",
@@ -325,8 +326,8 @@ export const CodeBlockLight: Story = {
       frac={1}
       theme="light"
       cfg={codeBlockConfig}
-      width={800}
-      height={540}
+      width={730}
+      height={620}
     />
   ),
 };
@@ -338,8 +339,8 @@ export const CodeBlockDark: Story = {
       frac={1}
       theme="dark"
       cfg={codeBlockConfig}
-      width={800}
-      height={540}
+      width={730}
+      height={620}
     />
   ),
 };

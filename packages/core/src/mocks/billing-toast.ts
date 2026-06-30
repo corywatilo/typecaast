@@ -92,25 +92,20 @@ const messageEvents: MockMessageEvent[] = [
     }),
   },
   {
-    // The app card is a regular app message whose body is a Block Kit
-    // attachment (colored bar) wrapping a section + an action row.
+    // The app card is a regular app message whose body is Block Kit: a section
+    // + an action row (no left bar, matching how Slack renders app messages).
     kind: "message",
     id: "s1",
     from: "posthog-bot",
     start: 7500,
     content: toContentNodes({
       content: [
+        { type: "section", text: "Pull request opened." },
         {
-          type: "attachment",
-          content: [
-            { type: "section", text: "Pull request opened." },
-            {
-              type: "actions",
-              elements: [
-                { type: "button", label: "View PR", style: "primary" },
-                { type: "button", label: "Open in PostHog Code" },
-              ],
-            },
+          type: "actions",
+          elements: [
+            { type: "button", label: "View PR", style: "primary" },
+            { type: "button", label: "Open in PostHog Code" },
           ],
         },
       ],

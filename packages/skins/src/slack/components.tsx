@@ -101,6 +101,13 @@ function imageStyle(c: SlackColors): CSSProperties {
 /** Vertical gap between blocks within a message (Slack's block rhythm). */
 const BLOCK_GAP = 8;
 
+/**
+ * Block types that read as prose. A message ending in one of these can sit snug
+ * at the bottom; a message ending in a non-text element (code block, buttons,
+ * image, …) gets extra bottom padding so the element isn't cramped.
+ */
+const TEXTUAL_BLOCKS = new Set(["text", "section", "header", "context"]);
+
 const AppBadge: FC<{ c: SlackColors }> = ({ c }) => (
   <span
     style={{
@@ -706,72 +713,80 @@ const Message: FC<MessageProps> = ({ theme, message, author }) => {
   // Slack reveals a small gutter timestamp (no AM/PM) when hovering a grouped
   // message — un-grouped ones already show the time next to the name.
   const gutterTime = formatTime(message.atMs).replace(/\s[AP]M$/, "");
+  // A non-text element at the bottom (code block, buttons, image, …) or a
+  // reaction row needs more room below it inside the hover highlight than prose
+  // does; plain text messages stay snug.
+  const lastNode = message.content[message.content.length - 1];
+  const endsWithBlock =
+    lastNode !== undefined && !TEXTUAL_BLOCKS.has(lastNode.type);
+  const hasReactions = message.reactions.length > 0;
+  const padBottom = endsWithBlock || hasReactions ? 8 : 4;
   return (
-    // Outer carries the inter-message gap as margin so the hover background (on
-    // the inner row) stays snug around the message and never fills the gap.
-    <div style={{ marginTop: grouped ? 8 : 10 }}>
-      <div
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        style={{
-          display: "flex",
-          gap: 8,
-          padding: "4px 16px 2px",
-          background: hover ? c.hoverBg : "transparent",
-          ...fadeSlideIn(message.revealProgress),
-        }}
-      >
-        <div style={{ flex: "0 0 36px", width: 36 }}>
-          {grouped ? (
-            hover ? (
-              <span
-                style={{
-                  display: "block",
-                  textAlign: "right",
-                  paddingTop: 3,
-                  paddingRight: 4,
-                  fontSize: 10.5,
-                  lineHeight: 1.5,
-                  color: c.subtle,
-                  fontVariantNumeric: "tabular-nums",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {gutterTime}
-              </span>
-            ) : null
-          ) : (
-            <Avatar theme={theme} participant={author} size={36} />
-          )}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {grouped ? null : (
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-              <span style={{ fontWeight: 700, color: c.text }}>
-                {author.name}
-              </span>
-              {author.kind === "app" ? <AppBadge c={c} /> : null}
-              <span style={{ fontSize: 12, color: c.subtle, marginLeft: 2 }}>
-                {formatTime(message.atMs)}
-              </span>
-            </div>
-          )}
-          <Blocks theme={theme} nodes={message.content} />
-          {message.reactions.length > 0 ? (
-            <div
+    // Inter-message spacing lives in this row's padding (never margin) so a
+    // hovered message's highlight fills the surrounding space and adjacent
+    // highlights touch with no dead gap. A new sender gets more room above;
+    // consecutive messages from the same sender sit closer (paragraph-level).
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        display: "flex",
+        gap: 8,
+        padding: `${grouped ? 3 : 12}px 16px ${padBottom}px`,
+        background: hover ? c.hoverBg : "transparent",
+        ...fadeSlideIn(message.revealProgress),
+      }}
+    >
+      <div style={{ flex: "0 0 36px", width: 36 }}>
+        {grouped ? (
+          hover ? (
+            <span
               style={{
-                display: "flex",
-                gap: 4,
-                marginTop: 4,
-                flexWrap: "wrap",
+                display: "block",
+                textAlign: "right",
+                paddingTop: 3,
+                paddingRight: 4,
+                fontSize: 10.5,
+                lineHeight: 1.5,
+                color: c.subtle,
+                fontVariantNumeric: "tabular-nums",
+                whiteSpace: "nowrap",
               }}
             >
-              {message.reactions.map((r, i) => (
-                <Reaction key={i} theme={theme} reaction={r} />
-              ))}
-            </div>
-          ) : null}
-        </div>
+              {gutterTime}
+            </span>
+          ) : null
+        ) : (
+          <Avatar theme={theme} participant={author} size={36} />
+        )}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {grouped ? null : (
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+            <span style={{ fontWeight: 700, color: c.text }}>
+              {author.name}
+            </span>
+            {author.kind === "app" ? <AppBadge c={c} /> : null}
+            <span style={{ fontSize: 12, color: c.subtle, marginLeft: 2 }}>
+              {formatTime(message.atMs)}
+            </span>
+          </div>
+        )}
+        <Blocks theme={theme} nodes={message.content} />
+        {message.reactions.length > 0 ? (
+          <div
+            style={{
+              display: "flex",
+              gap: 4,
+              marginTop: 4,
+              flexWrap: "wrap",
+            }}
+          >
+            {message.reactions.map((r, i) => (
+              <Reaction key={i} theme={theme} reaction={r} />
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );

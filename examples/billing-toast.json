@@ -59,17 +59,12 @@
       "id": "s1",
       "from": "posthog-bot",
       "content": [
+        { "type": "section", "text": "Pull request opened." },
         {
-          "type": "attachment",
-          "content": [
-            { "type": "section", "text": "Pull request opened." },
-            {
-              "type": "actions",
-              "elements": [
-                { "type": "button", "label": "View PR", "style": "primary" },
-                { "type": "button", "label": "Open in PostHog Code" }
-              ]
-            }
+          "type": "actions",
+          "elements": [
+            { "type": "button", "label": "View PR", "style": "primary" },
+            { "type": "button", "label": "Open in PostHog Code" }
           ]
         }
       ]

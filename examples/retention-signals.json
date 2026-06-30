@@ -2,12 +2,12 @@
   "$schema": "../packages/schema/typecaast.schema.json",
   "version": 1,
   "meta": {
-    "canvas": { "width": 800, "height": 540 },
+    "canvas": { "width": 730, "height": 620 },
     "fps": 30,
     "fit": "scale",
     "theme": "auto",
     "skin": { "id": "slack", "options": { "channel": "#growth" } },
-    "composer": "never",
+    "composer": "always",
     "seed": 42,
     "background": "transparent",
     "assets": "url"
@@ -27,13 +27,19 @@
     }
   ],
   "timeline": [
-    { "type": "typing", "from": "paul", "showTypingFor": 1600 },
     {
       "type": "message",
       "from": "paul",
+      "instant": true,
       "text": "<@posthog> is there a difference in retention of users or orgs that are using insight or dashboard subscriptions. are they more likely to visit posthog or to create further insights or try other products"
     },
-    { "type": "reaction", "target": "$prev", "emoji": "👀", "delay": 1200 },
+    {
+      "type": "reaction",
+      "target": "$prev",
+      "emoji": "👀",
+      "shortcode": "eyes",
+      "from": "posthog"
+    },
     {
       "type": "message",
       "from": "posthog",

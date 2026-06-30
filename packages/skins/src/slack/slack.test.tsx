@@ -103,13 +103,14 @@ describe("slack skin", () => {
     expect(html).toContain("Lato"); // font stack applied
   });
 
-  it("renders the app PR card (message + attachment) with buttons and APP badge", () => {
+  it("renders the app PR card (message + blocks) with buttons and APP badge", () => {
     const html = renderSkin(buildMockBillingToastState(7800), "light");
     expect(html).toContain("APP"); // app sender badge
     expect(html).toContain("Pull request opened.");
     expect(html).toContain("View PR");
     expect(html).toContain("Open in PostHog Code");
-    expect(html).toContain("border-left"); // attachment color bar
+    // Plain section + actions — no left-bar attachment around the app message.
+    expect(html).not.toContain("border-left");
   });
 
   it("renders the hedgehog reaction pill", () => {

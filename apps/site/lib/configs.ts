@@ -65,27 +65,22 @@ export const billingToast: ConfigInput = {
       from: "posthog-bot",
       text: "Let me check how exceptions are captured in the frontend.",
     },
-    // The PostHog app posts its PR card — an app message (app sender → APP
-    // badge) whose body is a Block Kit attachment: a colored left bar wrapping
-    // a section + an action row.
+    // The PostHog app posts its PR result — an app message (app sender → APP
+    // badge) whose body is Block Kit: a section + an action row (no left bar,
+    // matching how Slack renders app messages).
     {
       type: "message",
       from: "posthog-bot",
       content: [
         {
-          type: "attachment",
-          content: [
-            {
-              type: "section",
-              text: "Pull request opened — guards the billing/spend call so it no longer toasts on error.",
-            },
-            {
-              type: "actions",
-              elements: [
-                { type: "button", label: "View PR", style: "primary" },
-                { type: "button", label: "Open in PostHog Code" },
-              ],
-            },
+          type: "section",
+          text: "Pull request opened — guards the billing/spend call so it no longer toasts on error.",
+        },
+        {
+          type: "actions",
+          elements: [
+            { type: "button", label: "View PR", style: "primary" },
+            { type: "button", label: "Open in PostHog Code" },
           ],
         },
       ],
