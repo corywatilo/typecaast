@@ -1,5 +1,59 @@
 # @typecaast/skins
 
+## 0.5.0
+
+### Minor Changes
+
+- 40896f0: Simulate @mention tagging in the composer across skins.
+
+  While typing in the reply box, a completed `@name` (committed once you type a
+  space past it) renders as a tag — matching how each platform shows a mention in a
+  sent message; a still-being-typed trailing `@name` stays plain. Other mrkdwn is
+  left literal, the way real composers show it while you type.
+
+  - **skin-kit:** new `renderComposerMentions(text, style?, className?)` helper.
+  - **skins:** Slack, Discord, Telegram, WhatsApp, iMessage, and Messages (macOS)
+    tag mentions in their composer using that platform's own mention style.
+    WhatsApp and iMessage gain a mention style (accent text / heavier weight) so
+    tags render in their sent messages too. Cursor and Claude Code are unchanged —
+    their `@` references files/context, not people.
+
+- 3032c97: Add multi-line code blocks (Slack's fenced ``` block).
+
+  A new `codeblock` content node (`{ type: "codeblock", text, lang? }`) renders as a
+  monospaced, whitespace-preserving box — for tables, logs, and snippets. Distinct
+  from the inline `code` mark, its `text` is literal (never parsed for marks).
+
+  - **schema:** registered `codeblock` content node + `CodeBlockNode` type.
+  - **core:** the pacing flattener counts a code block's text.
+  - **skins (Slack):** renders the `codeblock` as a `<pre>` (full Block Kit fidelity);
+    declares the `codeblock` content capability.
+  - **builder:** a new "Code" block type with a monospaced, non-wrapping editor field.
+
+  Tip: a wide monospace block won't reflow — give the instance a wide
+  `meta.canvas.width` and `"fit": "scale"`, then scale it down in a sized wrapper on
+  the host page (the canvas keeps its internal width, so the table stays one line per
+  row). See the new `examples/retention-signals.json` and `docs/message-content.md`.
+
+### Patch Changes
+
+- e7a8399: Slack skin polish: seamless hover spacing and borderless app messages.
+
+  - Inter-message spacing now lives in each row's padding instead of margin, so a
+    hovered message's highlight fills the surrounding space and adjacent highlights
+    touch with no dead gap. Consecutive messages from the same sender sit closer
+    (paragraph-level); a new sender gets more room above. A non-text element at the
+    bottom (code block, buttons, image) or a reaction row gets extra bottom padding.
+  - App messages render their Block Kit content directly (section + buttons) rather
+    than wrapped in a colored left-bar attachment — matching how Slack shows app
+    messages. The `attachment` block is still supported for the explicit bar look.
+
+- Updated dependencies [40896f0]
+- Updated dependencies [3032c97]
+  - @typecaast/skin-kit@0.6.0
+  - @typecaast/schema@0.4.0
+  - @typecaast/core@0.6.0
+
 ## 0.4.0
 
 ### Minor Changes

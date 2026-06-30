@@ -1,5 +1,19 @@
 # @typecaast/site
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [40896f0]
+- Updated dependencies [3032c97]
+- Updated dependencies [e7a8399]
+  - @typecaast/skin-kit@0.6.0
+  - @typecaast/skins@0.5.0
+  - @typecaast/schema@0.4.0
+  - @typecaast/core@0.6.0
+  - @typecaast/builder@0.5.0
+  - @typecaast/react@0.5.4
+
 ## 0.0.15
 
 ### Patch Changes
