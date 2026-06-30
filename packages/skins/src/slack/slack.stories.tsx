@@ -285,6 +285,37 @@ function Frozen({
   );
 }
 
+/**
+ * A reply box mid-compose: the self participant has typed past `@PostHog`, so it
+ * commits to a tag (a trailing, still-being-typed `@name` would stay plain until
+ * a space). Exercises the shared composer-mention simulation.
+ */
+const composerTagConfig: Config = configSchema.parse({
+  version: 1,
+  meta: {
+    canvas: { width: 480, height: 300 },
+    skin: { id: "slack", options: { channel: "#papercuts" } },
+    composer: "always",
+  },
+  participants: [
+    { id: "cory", name: "Cory Watilo", isSelf: true },
+    { id: "posthog", name: "PostHog", kind: "app" },
+  ],
+  timeline: [
+    {
+      type: "message",
+      from: "posthog",
+      instant: true,
+      text: "How can I help?",
+    },
+    {
+      type: "composerType",
+      from: "cory",
+      text: "oops, @PostHog can you fix this?",
+    },
+  ],
+});
+
 const meta: Meta = { title: "Skins/Slack" };
 export default meta;
 type Story = StoryObj;
@@ -341,6 +372,19 @@ export const CodeBlockDark: Story = {
       cfg={codeBlockConfig}
       width={730}
       height={620}
+    />
+  ),
+};
+
+export const ComposerTag: Story = {
+  name: "Composer Tag",
+  render: () => (
+    <Frozen
+      frac={1}
+      theme="light"
+      cfg={composerTagConfig}
+      width={480}
+      height={300}
     />
   ),
 };
