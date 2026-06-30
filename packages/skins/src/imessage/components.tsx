@@ -13,6 +13,7 @@ import {
   fadeSlideIn,
   MessageContent,
   popIn,
+  renderComposerMentions,
   TypingDots,
   type ContentStyles,
 } from "@typecaast/skin-kit";
@@ -37,6 +38,9 @@ function markStyles(c: (typeof IMESSAGE_COLORS)[ResolvedTheme]): ContentStyles {
       fontFamily: "Menlo, monospace",
       fontSize: "0.9em",
     },
+    // iMessage shows a tagged name in a heavier weight (no color shift — it
+    // sits on the bubble fill), tappable in the real UI.
+    mention: { fontWeight: 600 },
   };
 }
 
@@ -350,7 +354,7 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
       >
         {hasText ? (
           <span>
-            {composer.text}
+            {renderComposerMentions(composer.text, markStyles(c).mention)}
             <span style={{ color: c.selfBubble }}>|</span>
           </span>
         ) : (

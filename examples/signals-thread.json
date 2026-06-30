@@ -52,11 +52,7 @@
         {
           "type": "actions",
           "elements": [
-            {
-              "type": "button",
-              "label": "Review PR",
-              "href": "https://github.com/rvenvy/rvenvy-ai/pull/1"
-            },
+            { "type": "button", "label": "Review PR" },
             { "type": "button", "label": "Open in PostHog" },
             { "type": "button", "label": "Dismiss", "style": "danger" }
           ]

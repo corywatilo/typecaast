@@ -12,6 +12,7 @@ import {
   fadeSlideIn,
   MessageContent,
   popIn,
+  renderComposerMentions,
   type ContentStyles,
 } from "@typecaast/skin-kit";
 import { TELEGRAM_COLORS, type TelegramColors } from "./tokens.js";
@@ -276,7 +277,7 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
       >
         {hasText ? (
           <span>
-            {composer.text}
+            {renderComposerMentions(composer.text, markStyles(c).mention)}
             <Caret color={c.accent} />
           </span>
         ) : (

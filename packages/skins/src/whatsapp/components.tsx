@@ -12,6 +12,7 @@ import {
   fadeSlideIn,
   MessageContent,
   popIn,
+  renderComposerMentions,
   TypingDots,
 } from "@typecaast/skin-kit";
 import { WHATSAPP_COLORS, WHATSAPP_FONT_STACK } from "./tokens.js";
@@ -134,6 +135,7 @@ const Message: FC<MessageProps> = ({ theme, message }) => {
         <div style={bubble}>
           <MessageContent
             nodes={message.content}
+            styles={{ mention: { color: c.accent, fontWeight: 500 } }}
             imageStyle={{ borderRadius: 6, maxWidth: 240, marginBottom: 2 }}
           />
           <span
@@ -323,7 +325,10 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
         </span>
         {hasText ? (
           <span>
-            {composer.text}
+            {renderComposerMentions(composer.text, {
+              color: c.accent,
+              fontWeight: 500,
+            })}
             <span style={{ color: c.accent }}>|</span>
           </span>
         ) : (

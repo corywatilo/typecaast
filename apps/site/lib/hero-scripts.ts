@@ -1,5 +1,4 @@
 import type { ConfigInput } from "@typecaast/schema";
-import { billingToast } from "./configs";
 
 /**
  * The hero tab switcher plays the *same idea* — "ship an AI bot, prove it works"
@@ -13,8 +12,97 @@ import { billingToast } from "./configs";
 /** A touch quicker than the default 14 cps so the hero demos don't dawdle. */
 const HERO_PACING = { typingCps: 22 } as const;
 
-/** Slack — the full-feature take: a mention, a 👀 reaction, a PR result card. */
-export const slackHero: ConfigInput = { ...billingToast, pacing: HERO_PACING };
+/**
+ * Slack — the full-feature take: Ian flags a broken link, Cory tags the PostHog
+ * app (`@PostHog` commits to a tag in the reply box as he types past it), the
+ * app 👀-reacts, then posts its fix as a Block Kit message with a real PR link.
+ */
+export const slackHero: ConfigInput = {
+  version: 1,
+  meta: {
+    canvas: { width: 480, height: 640 },
+    skin: { id: "slack", options: { channel: "#papercuts" } },
+    composer: "always",
+  },
+  pacing: HERO_PACING,
+  participants: [
+    {
+      id: "cory",
+      name: "Cory Watilo",
+      isSelf: true,
+      avatar:
+        "https://res.cloudinary.com/dmukukwp6/image/upload/avatar_cory_1a344a0625.jpg",
+    },
+    {
+      id: "ian",
+      name: "Ian Vanagas",
+      color: "#5b3a8e",
+      avatar:
+        "https://res.cloudinary.com/dmukukwp6/image/upload/w_200,c_limit,q_auto,f_auto/TSS_5_W8_YQZ_U0432_HMTU_57_2bfb984646d1_512_cbd653a629.jpeg",
+    },
+    {
+      id: "posthog-bot",
+      name: "PostHog",
+      kind: "app",
+      avatar:
+        "https://res.cloudinary.com/dmukukwp6/image/upload/avatar_posthog_f85279a2ad.png",
+    },
+  ],
+  timeline: [
+    {
+      type: "message",
+      id: "m1",
+      from: "ian",
+      text: "there's a broken link on https://posthog.com/handbook/brand/tone that points to localhost",
+      instant: true,
+    },
+    { type: "delay", duration: 1000 },
+    {
+      type: "composerType",
+      from: "cory",
+      text: "oops, @PostHog can you fix this?",
+    },
+    { type: "send", id: "m2" },
+    {
+      type: "reaction",
+      target: "$prev",
+      emoji: "👀",
+      shortcode: "eyes",
+      from: "posthog-bot",
+      delay: 900,
+    },
+    { type: "delay", duration: 200 },
+    {
+      type: "message",
+      from: "posthog-bot",
+      text: "Found it. Line 7 has `http://localhost:8002/handbook/content/posthog-style-guide`. Let me verify the target exists and fix it.",
+    },
+    { type: "delay", duration: 2000 },
+    {
+      type: "message",
+      from: "posthog-bot",
+      instant: true,
+      content: [
+        {
+          type: "section",
+          text: "Pull request opened – I changed it to the relative `/handbook/content/posthog-style-guide`.",
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "button",
+              label: "View PR",
+              href: "https://github.com/PostHog/posthog.com/pull/17776",
+              style: "primary",
+            },
+            { type: "button", label: "Open in PostHog Code" },
+          ],
+        },
+      ],
+    },
+  ],
+};
 
 /** Telegram — a support bot chat. Reactions are native here, so we use one. */
 export const telegramHero: ConfigInput = {

@@ -12,6 +12,7 @@ import {
   fadeSlideIn,
   MessageContent,
   popIn,
+  renderComposerMentions,
   TypingDots,
   type ContentStyles,
 } from "@typecaast/skin-kit";
@@ -253,7 +254,7 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
         <span style={{ color: c.muted, fontSize: 20 }}>＋</span>
         {hasText ? (
           <span>
-            {composer.text}
+            {renderComposerMentions(composer.text, markStyles(c).mention)}
             <span style={{ color: c.text }}>|</span>
           </span>
         ) : (

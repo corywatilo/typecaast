@@ -184,3 +184,55 @@ export function MessageContent({
     </>
   );
 }
+
+/**
+ * Render composer (reply-box) text with completed `@mentions` shown as tags —
+ * mirroring how a chat UI commits a mention once you type past the name. A
+ * still-being-typed trailing `@name` (no following space yet) stays plain text;
+ * other mrkdwn (`*bold*`, `` `code` ``) is left literal, the way composers show
+ * raw markup while you type. Pass the skin's own mention `style`/`className` so
+ * the in-composer tag matches that platform's sent-message mentions; a skin with
+ * no mention style gets plain (untagged) text, which is correct for it.
+ */
+export function renderComposerMentions(
+  text: string,
+  style?: CSSProperties,
+  className?: string,
+): ReactNode[] {
+  // A trailing "@word" at the very end (no following space) is still being
+  // typed — keep it plain until a space commits it to a tag.
+  const trailing = /@[A-Za-z0-9_][\w.-]*$/.exec(text);
+  const splitIdx =
+    trailing !== null &&
+    (trailing.index === 0 || /\s/.test(text[trailing.index - 1] ?? ""))
+      ? trailing.index
+      : text.length;
+  const head = text.slice(0, splitIdx);
+  const tail = text.slice(splitIdx);
+
+  const out: ReactNode[] = [];
+  const re = /(^|\s)(@[A-Za-z0-9_][\w.-]*)/g;
+  let last = 0;
+  let key = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(head)) !== null) {
+    const lead = m[1] ?? "";
+    const name = m[2] ?? "";
+    const at = m.index + lead.length; // index of the '@'
+    if (at > last) out.push(head.slice(last, at));
+    out.push(
+      <span
+        key={`m${key++}`}
+        data-tc-mark="mention"
+        className={className}
+        style={style}
+      >
+        {name}
+      </span>,
+    );
+    last = at + name.length;
+  }
+  if (last < head.length) out.push(head.slice(last));
+  if (tail) out.push(tail);
+  return out;
+}

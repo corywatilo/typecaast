@@ -128,6 +128,29 @@ describe("slack skin", () => {
     expect(html).toContain("Let me check");
   });
 
+  it("tags a completed @mention in the composer, not the one being typed", () => {
+    const { Composer } = slack.components;
+    const html = renderToStaticMarkup(
+      <ThemeProvider theme="light" tokens={slack.tokens?.light}>
+        <Composer
+          theme="light"
+          composer={{
+            from: "cory",
+            text: "@PostHog hi @Pau",
+            caret: 16,
+            sending: false,
+          }}
+          author={byId.get("cory")}
+        />
+      </ThemeProvider>,
+    );
+    // "@PostHog " (committed by the trailing space) becomes a mention pill…
+    expect(html).toContain('data-tc-mark="mention"');
+    expect(html).toContain("@PostHog");
+    // …while the still-being-typed "@Pau" stays plain — exactly one pill.
+    expect(html.match(/data-tc-mark="mention"/g)?.length).toBe(1);
+  });
+
   it("renders in dark theme with the dark background", () => {
     const html = renderSkin(
       buildMockBillingToastState(MOCK_BILLING_TOAST_DURATION_MS),

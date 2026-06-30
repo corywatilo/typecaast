@@ -105,7 +105,7 @@ const signalsConfig: Config = configSchema.parse({
         {
           type: "actions",
           elements: [
-            { type: "button", label: "Review PR", href: "https://example.com" },
+            { type: "button", label: "Review PR" },
             { type: "button", label: "Open in PostHog" },
             { type: "button", label: "Dismiss", style: "danger" },
           ],
