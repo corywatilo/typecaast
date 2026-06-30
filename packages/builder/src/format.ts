@@ -26,6 +26,7 @@ function contentSummary(content: unknown): string | undefined {
       Array.isArray(n.spans) ? n.spans.map((s) => s.value ?? "").join("") : "";
     if (n.type === "header" && n.text) return n.text;
     if (n.type === "section" || n.type === "text") return n.text || spans();
+    if (n.type === "codeblock" && n.text) return n.text;
     if (n.type === "attachment") {
       const inner = contentSummary(n.content);
       if (inner) return inner;

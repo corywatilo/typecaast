@@ -166,6 +166,20 @@ export const actionsNodeSchema = z.object({
 export type ActionsNode = z.infer<typeof actionsNodeSchema>;
 
 /**
+ * A multi-line preformatted code block (Slack's fenced ``` block) — a monospaced
+ * box that preserves whitespace and newlines verbatim (used for tables, logs,
+ * snippets). Distinct from the inline `code` mark; `text` is **literal** and is
+ * never parsed for inline marks. `lang` is an optional language hint (unused by
+ * the current skins, reserved for future syntax highlighting).
+ */
+export const codeBlockNodeSchema = z.object({
+  type: z.literal("codeblock"),
+  text: z.string(),
+  lang: z.string().optional(),
+});
+export type CodeBlockNode = z.infer<typeof codeBlockNodeSchema>;
+
+/**
  * A legacy-style attachment: nested blocks rendered behind a colored left bar.
  * `color` is any CSS color (defaults to a neutral bar). Recursive — its Zod
  * schema lives in `content-registry.ts` (where the node union is built).
@@ -196,5 +210,6 @@ export type ContentNode =
   | ContextNode
   | DividerNode
   | ActionsNode
+  | CodeBlockNode
   | AttachmentNode
   | UnknownContentNode;

@@ -87,6 +87,7 @@ describe("content registry & schema", () => {
       "context",
       "divider",
       "actions",
+      "codeblock",
       "attachment",
     ]);
     expect(isKnownContentNodeType("text")).toBe(true);
@@ -256,5 +257,17 @@ describe("Block Kit content nodes", () => {
         elements: [{ type: "button", label: "x", style: "warning" }],
       }),
     ).toThrow();
+  });
+
+  it("validates a codeblock and keeps its text literal (no inline parsing)", () => {
+    const code = "Metric   A   B\n*not bold*   ~no strike~   `not code`";
+    expect(() =>
+      contentSchema.parse([{ type: "codeblock", text: code }]),
+    ).not.toThrow();
+    // Sugar normalization must NOT touch a codeblock's text — it's preformatted.
+    const nodes = toContentNodes({
+      content: [{ type: "codeblock", text: code, lang: "text" }],
+    });
+    expect(nodes).toEqual([{ type: "codeblock", text: code, lang: "text" }]);
   });
 });

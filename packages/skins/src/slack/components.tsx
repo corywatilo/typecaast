@@ -20,6 +20,7 @@ import type {
   ActionsNode,
   AttachmentNode,
   ButtonElement,
+  CodeBlockNode,
   ContentNode,
   ContextNode,
   HeaderNode,
@@ -604,6 +605,30 @@ const Block: FC<{ theme: ResolvedTheme; node: ContentNode }> = ({
           buttons={(node as ActionsNode).elements}
           marginTop={0}
         />
+      );
+    case "codeblock":
+      // Slack's fenced ``` block: a monospaced box that preserves whitespace
+      // and newlines verbatim (no inline parsing). Body color (not the pink
+      // inline-code color) on a subtle grey fill, like the real client.
+      return (
+        <pre
+          style={{
+            margin: 0,
+            background: c.codeBg,
+            border: `1px solid ${c.codeBorder}`,
+            borderRadius: 8,
+            padding: "8px 12px",
+            color: c.text,
+            fontFamily: "Menlo, Monaco, Consolas, monospace",
+            fontSize: 12.5,
+            lineHeight: 1.5,
+            whiteSpace: "pre",
+            overflowX: "auto",
+            tabSize: 4,
+          }}
+        >
+          {(node as CodeBlockNode).text}
+        </pre>
       );
     case "attachment": {
       const a = node as AttachmentNode;

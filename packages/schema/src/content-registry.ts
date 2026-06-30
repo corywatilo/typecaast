@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   actionsNodeSchema,
+  codeBlockNodeSchema,
   contextNodeSchema,
   dividerNodeSchema,
   headerNodeSchema,
@@ -43,6 +44,7 @@ const registry = new Map<string, z.ZodTypeAny>([
   ["context", contextNodeSchema],
   ["divider", dividerNodeSchema],
   ["actions", actionsNodeSchema],
+  ["codeblock", codeBlockNodeSchema],
   ["attachment", attachmentNodeSchema],
 ]);
 

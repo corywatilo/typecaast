@@ -1464,6 +1464,26 @@
             "properties": {
               "type": {
                 "type": "string",
+                "const": "codeblock"
+              },
+              "text": {
+                "type": "string"
+              },
+              "lang": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
                 "const": "attachment"
               },
               "color": {

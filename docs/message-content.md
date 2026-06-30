@@ -91,15 +91,16 @@ Blocks carry a `text` string (parsed like above) or pre-resolved `spans`:
 
 ### Block types
 
-| Node         | Shape                                    | Notes                                                                                                               |
-| ------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `header`     | `{ text }`                               | Large bold heading (plain text).                                                                                    |
-| `section`    | `{ text \| spans, accessory?, fields? }` | A paragraph. `accessory` is a `button` or `image` to its right; `fields` is a 2-column grid of `{ text \| spans }`. |
-| `context`    | `{ elements: [...] }`                    | Small muted row; each element is `{ type:"text", text }` or `{ type:"image", src, alt? }`.                          |
-| `divider`    | `{}`                                     | A horizontal rule.                                                                                                  |
-| `actions`    | `{ elements: [button…] }`                | A row of buttons.                                                                                                   |
-| `image`      | `{ src, alt?, width?, height? }`         | A standalone image.                                                                                                 |
-| `attachment` | `{ color?, content: [...] }`             | Nested blocks behind a colored left bar (the legacy "attachment" look). `color` is any CSS color.                   |
+| Node         | Shape                                    | Notes                                                                                                                                                      |
+| ------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `header`     | `{ text }`                               | Large bold heading (plain text).                                                                                                                           |
+| `section`    | `{ text \| spans, accessory?, fields? }` | A paragraph. `accessory` is a `button` or `image` to its right; `fields` is a 2-column grid of `{ text \| spans }`.                                        |
+| `context`    | `{ elements: [...] }`                    | Small muted row; each element is `{ type:"text", text }` or `{ type:"image", src, alt? }`.                                                                 |
+| `divider`    | `{}`                                     | A horizontal rule.                                                                                                                                         |
+| `actions`    | `{ elements: [button…] }`                | A row of buttons.                                                                                                                                          |
+| `image`      | `{ src, alt?, width?, height? }`         | A standalone image.                                                                                                                                        |
+| `codeblock`  | `{ text, lang? }`                        | A monospaced preformatted box (Slack's fenced ` ``` ` block). `text` is **literal** — whitespace and newlines are kept and it is **not** parsed for marks. |
+| `attachment` | `{ color?, content: [...] }`             | Nested blocks behind a colored left bar (the legacy "attachment" look). `color` is any CSS color.                                                          |
 
 ### Buttons
 
@@ -118,6 +119,33 @@ A `button` element appears in an `actions` block or as a `section` accessory:
   default outlined button.
 - `href`: with one, the button is a real link (opens in a new tab); without one
   it renders inert.
+
+### Code blocks
+
+For a table, log, or snippet, use a `codeblock` — Slack's fenced ` ``` `
+block, a monospaced box that preserves whitespace and newlines verbatim. Unlike
+the inline `` `code` `` mark (a single-line pill inside a sentence), a `codeblock`
+is its own block and its `text` is **literal**: `*`, `~`, `<@id>` etc. are shown
+as typed, never parsed. Author the canvas wide enough that the widest line fits on
+one line, then scale the embed down on the page (see below).
+
+```json
+{
+  "type": "message",
+  "from": "posthog",
+  "content": [
+    {
+      "type": "codeblock",
+      "text": "Metric        A     B\nReturned      64%   96%\nActive weeks  2.9   7.2"
+    }
+  ]
+}
+```
+
+A wide monospace block won't reflow, so give the instance a wide
+`meta.canvas.width` and set `"fit": "scale"`; the host wraps it in a sized
+container and the whole instance scales down to fit (the canvas keeps its internal
+pixel width, so the table stays one line per row).
 
 ### The colored bar (attachment)
 

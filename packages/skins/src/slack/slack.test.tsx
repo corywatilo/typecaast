@@ -203,4 +203,15 @@ describe("slack skin — Block Kit blocks", () => {
     expect(html).toContain("Pull request opened.");
     expect(html).toContain("View PR");
   });
+
+  it("renders a codeblock as a monospaced <pre> preserving literal text", () => {
+    const code = "Metric    A    B\nCame back  64%  96%\n*not bold* ~no~";
+    const html = renderMessage([{ type: "codeblock", text: code }]);
+    expect(html).toContain("<pre"); // block element
+    expect(html).toContain("white-space:pre"); // preserves whitespace/newlines
+    expect(html).toContain("monospace"); // monospaced font stack
+    // Text is literal — the `*` and `~` are NOT turned into marks.
+    expect(html).toContain("*not bold* ~no~");
+    expect(html).not.toContain("<strong>not bold</strong>");
+  });
 });

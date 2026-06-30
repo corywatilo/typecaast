@@ -2,6 +2,7 @@ import {
   toContentNodes,
   type ActionsNode,
   type AttachmentNode,
+  type CodeBlockNode,
   type Config,
   type ContentNode,
   type ContextNode,
@@ -68,6 +69,8 @@ function nodeText(node: ContentNode): string {
         .join(" ");
     case "actions":
       return (node as ActionsNode).elements.map((b) => b.label).join(" ");
+    case "codeblock":
+      return (node as CodeBlockNode).text;
     case "attachment":
       return (node as AttachmentNode).content.map(nodeText).join(" ");
     default:

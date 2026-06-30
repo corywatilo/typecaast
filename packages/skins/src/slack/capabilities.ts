@@ -23,6 +23,7 @@ export const slackCapabilities: Capabilities = {
     context: true,
     divider: true,
     actions: true,
+    codeblock: true,
     attachment: true,
   },
   reactions: true,

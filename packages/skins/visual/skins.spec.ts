@@ -15,6 +15,8 @@ const STORIES = [
   "skins-slack--dark-mid-thread",
   "skins-slack--block-kit-light",
   "skins-slack--block-kit-dark",
+  "skins-slack--code-block-light",
+  "skins-slack--code-block-dark",
   "skins-claude-code-tui--complete",
   "skins-claude-code-tui--streaming",
   "skins-imessage-ios--light-complete",

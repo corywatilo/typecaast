@@ -59,8 +59,8 @@ a React Server Component (Next.js App Router); no `"use client"` needed. (Using 
 **Message content.** Bodies accept Slack-style mrkdwn (`*bold*`, `_italic_`,
 `` `code` ``, links, `@mentions`) and images. An **app message** — a `message`
 from an `app` participant — can carry **Slack Block Kit** content (header,
-section, context, divider, buttons, image, and a colored-bar attachment),
-rendered full-fidelity by the Slack skin. See
+section, context, divider, buttons, image, a multi-line code block, and a
+colored-bar attachment), rendered full-fidelity by the Slack skin. See
 [`docs/message-content.md`](./docs/message-content.md).
 
 ### Props

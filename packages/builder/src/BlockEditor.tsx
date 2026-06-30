@@ -17,6 +17,7 @@ type Participants = ConfigInput["participants"];
 const BLOCK_TYPES: { type: string; label: string }[] = [
   { type: "header", label: "Header" },
   { type: "section", label: "Text" },
+  { type: "codeblock", label: "Code" },
   { type: "context", label: "Context" },
   { type: "divider", label: "Divider" },
   { type: "actions", label: "Buttons" },
@@ -34,6 +35,8 @@ function blankBlock(type: string): Block {
       return { type: "header", text: "" };
     case "section":
       return { type: "section", text: "" };
+    case "codeblock":
+      return { type: "codeblock", text: "" };
     case "context":
       return { type: "context", elements: [{ type: "text", text: "" }] };
     case "divider":
@@ -53,20 +56,35 @@ function Area({
   value,
   placeholder,
   onChange,
+  mono = false,
+  height = 52,
 }: {
   value: string;
   placeholder?: string;
   onChange: (v: string) => void;
+  /** Monospaced, non-wrapping field for preformatted text (code blocks). */
+  mono?: boolean;
+  height?: number;
 }) {
   return (
     <textarea
       className="tc-input"
       placeholder={placeholder}
+      // `wrap=off` keeps columns aligned while authoring a table.
+      wrap={mono ? "off" : undefined}
       style={{
-        height: 52,
+        height,
         padding: "6px 9px",
         resize: "vertical",
-        lineHeight: 1.4,
+        lineHeight: mono ? 1.5 : 1.4,
+        ...(mono
+          ? {
+              fontFamily: "Menlo, Monaco, Consolas, monospace",
+              fontSize: 12.5,
+              whiteSpace: "pre",
+              overflowX: "auto",
+            }
+          : {}),
       }}
       value={value}
       onChange={(e) => onChange(e.currentTarget.value)}
@@ -208,6 +226,19 @@ function BlockFields({
         />
         <MentionInsert participants={participants} onInsert={appendText} />
       </div>
+    );
+  }
+  if (type === "codeblock") {
+    return (
+      <Area
+        value={text}
+        mono
+        height={120}
+        placeholder={
+          "Preformatted text — rendered verbatim in a monospaced box\n(tables, logs, snippets). Not parsed for *marks*."
+        }
+        onChange={(v) => onChange({ text: v })}
+      />
     );
   }
   if (type === "context") {

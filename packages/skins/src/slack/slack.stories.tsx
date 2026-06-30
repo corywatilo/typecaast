@@ -160,19 +160,86 @@ const signalsConfig: Config = configSchema.parse({
   ],
 });
 
+/**
+ * A retention analysis posted by the PostHog app — bold-rich sections plus a
+ * **multi-line code block** holding a monospaced metrics table. Authored on a
+ * wide canvas so the table stays one line per row (the host page scales it down
+ * with `fit: "scale"`). Initials avatars keep the visual baseline deterministic.
+ */
+const codeBlockConfig: Config = configSchema.parse({
+  version: 1,
+  meta: {
+    canvas: { width: 800, height: 540 },
+    fit: "scale",
+    skin: { id: "slack", options: { channel: "#growth" } },
+    composer: "never",
+  },
+  participants: [
+    { id: "paul", name: "Paul D'Ambra", color: "#5b3a8e" },
+    { id: "posthog", name: "PostHog", kind: "app" },
+  ],
+  timeline: [
+    {
+      type: "message",
+      from: "paul",
+      instant: true,
+      text: "<@posthog> is there a difference in retention of users or orgs that are using insight or dashboard subscriptions. are they more likely to visit posthog or to create further insights or try other products",
+    },
+    { type: "reaction", target: "$prev", emoji: "👀" },
+    {
+      type: "message",
+      from: "posthog",
+      instant: true,
+      content: [
+        {
+          type: "section",
+          spans: [
+            { type: "text", value: "Subscription orgs are ~" },
+            { type: "bold", value: "1.5× more likely to return" },
+            { type: "text", value: ", stay active ~" },
+            { type: "bold", value: "2.5× as many weeks" },
+            { type: "text", value: ", create ~" },
+            {
+              type: "bold",
+              value: "3× more often / ~11× the volume of insights",
+            },
+            { type: "text", value: ", and touch ~" },
+            { type: "bold", value: "3× as many products" },
+            { type: "text", value: "." },
+          ],
+        },
+        { type: "section", text: "*Setup*" },
+        {
+          type: "section",
+          text: "I looked at all orgs active on PostHog in *March 2026* (≥1 app pageview, ~118.7k orgs), split by whether they'd created an *insight or dashboard subscription* by then (2,162 orgs had; 116,527 hadn't), then measured their behaviour over the *following 8 weeks (Apr–May 2026)*. Unit = organization (",
+        },
+        { type: "section", text: "*Headline comparison (Apr–May behaviour)*" },
+        {
+          type: "codeblock",
+          text: "Metric                          No subscription (116.5k)   Has subscription (2.2k)\nCame back at all                64%                        96%\nAvg active weeks (of ~8)        2.9                        7.2\nCreated ≥1 new insight          20%                        67%\nAvg insights created            4.7                        51.8\nDistinct other products touched 0.6                        1.9",
+        },
+      ],
+    },
+  ],
+});
+
 /** A framed "window" so the skin reads like a real surface. */
 function Window({
   theme,
   children,
+  width = 480,
+  height = 720,
 }: {
   theme: ResolvedTheme;
   children: ReactNode;
+  width?: number;
+  height?: number;
 }) {
   return (
     <div
       style={{
-        width: 480,
-        height: 720,
+        width,
+        height,
         borderRadius: 12,
         overflow: "hidden",
         border: "1px solid rgba(0,0,0,0.12)",
@@ -193,15 +260,19 @@ function Frozen({
   frac,
   theme,
   cfg = config,
+  width,
+  height,
 }: {
   frac: number;
   theme: ResolvedTheme;
   cfg?: Config;
+  width?: number;
+  height?: number;
 }) {
   const engine = createEngine(cfg, theme, slack.meta.capabilities);
   const state = engine.getStateAt(engine.durationMs * frac);
   return (
-    <Window theme={theme}>
+    <Window theme={theme} width={width} height={height}>
       <TypecaastStage
         state={state}
         skin={slack}
@@ -245,4 +316,30 @@ export const BlockKitLight: Story = {
 export const BlockKitDark: Story = {
   name: "Block Kit · Dark",
   render: () => <Frozen frac={1} theme="dark" cfg={signalsConfig} />,
+};
+
+export const CodeBlockLight: Story = {
+  name: "Code Block · Light",
+  render: () => (
+    <Frozen
+      frac={1}
+      theme="light"
+      cfg={codeBlockConfig}
+      width={800}
+      height={540}
+    />
+  ),
+};
+
+export const CodeBlockDark: Story = {
+  name: "Code Block · Dark",
+  render: () => (
+    <Frozen
+      frac={1}
+      theme="dark"
+      cfg={codeBlockConfig}
+      width={800}
+      height={540}
+    />
+  ),
 };
