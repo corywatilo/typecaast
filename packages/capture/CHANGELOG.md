@@ -1,5 +1,15 @@
 # @typecaast/capture
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [40896f0]
+- Updated dependencies [3032c97]
+  - @typecaast/skin-kit@0.6.0
+  - @typecaast/schema@0.4.0
+  - @typecaast/core@0.6.0
+
 ## 0.1.2
 
 ### Patch Changes
