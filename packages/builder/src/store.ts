@@ -200,8 +200,8 @@ export function blankStep(type: Step["type"], from: string): Step {
 
 /**
  * Change a step's type in place. Preserves the shared base fields
- * (id/instant) and carries over from/text/target/emoji/card when the new type
- * uses them; type-specific fields reset to `blankStep` defaults.
+ * (id/instant) and carries over from/text/content/target/emoji when the new
+ * type uses them; type-specific fields reset to `blankStep` defaults.
  */
 export function changeStepType(
   config: ConfigInput,
@@ -218,8 +218,15 @@ export function changeStepType(
   for (const k of ["id", "instant"] as const) {
     if (old[k] !== undefined) next[k] = old[k];
   }
-  for (const k of ["from", "text", "target", "emoji", "card"] as const) {
+  for (const k of ["from", "text", "target", "emoji"] as const) {
     if (k in next && old[k] !== undefined) next[k] = old[k];
+  }
+  // Block Kit `content` lives only on message/system — carry it between them.
+  if (
+    (newType === "message" || newType === "system") &&
+    old.content !== undefined
+  ) {
+    next.content = old.content;
   }
   const timeline = config.timeline.map((s, i) =>
     i === index ? (next as unknown as Step) : s,

@@ -33,7 +33,7 @@ Demonstrating how interacting with AI chat works across different surfaces (Slac
 - Not a real chat client or backend — no networking, no live messages, no persistence of conversations beyond config files.
 - Not full interactivity — only typing, posting, and typing indicators animate; the rest of the UI is faithful but static.
 - Not an AI/LLM integration — message content is authored, not generated (a future "script from a prompt" helper is out of scope).
-- **Content types:** v1 ships **text + emoji + @mentions + code/links + in-message images** only. Attachment cards, link previews, and video embeds are explicitly **out of scope** — but the content model is built as an extensible node type registry so new kinds slot in later without schema breaks (see §6/§7).
+- **Content types:** text + emoji + @mentions + code/links + `bold`/`italic`/`strike` + in-message images, plus **Slack Block Kit** blocks (`header`, `section`, `context`, `divider`, `actions`, `attachment`) for app messages. Link previews and video embeds remain **out of scope** — but the content model is an extensible node type registry so new kinds slot in without schema breaks (see §6/§7).
 - **No audio** — these simulations are silent. No SFX, no mixing, not planned.
 
 ### Platform-specific rendering is expected
@@ -49,7 +49,7 @@ The same authored event can render differently per skin — or not at all. A typ
 | UI architecture | **Headless core + skins.** Engine owns timeline/state; each UI is reused by both renderers. Two skin kinds: hand-authored **component** skins (presets) and **captured** template skins (HTML/DOM). |
 | Custom UI capture | **Both in v1:** Chrome extension (scrape live DOM/CSS) **and** saved-webpage import (.html/MHTML). *(Highest-risk scope — see §11 sequencing.)* |
 | Light / dark mode | Skins support both. Instance prop `theme="light" \| "dark" \| "auto"`; **auto** inherits the host page's `prefers-color-scheme`. **Video export defaults to `light`** when unspecified. |
-| Content types | v1 = text/emoji/mentions/code/links + **in-message images**. Attachment cards, link previews, video embeds **out of scope**, but built on an **extensible content-node registry**. |
+| Content types | text/emoji/mentions/code/links + `bold`/`italic`/`strike` + **in-message images** + **Slack Block Kit** blocks (header/section/context/divider/actions/attachment). Link previews & video embeds **out of scope**; built on an **extensible content-node registry**. |
 | Per-platform rendering | **Capability model:** each skin declares which events/content it supports and how (e.g. typing differs Slack vs Messages, or is omitted). Unsupported items are dropped per-skin but kept in config. |
 | In-message images | Supported. Same hosting model as avatars (see below). |
 | Timeline authoring | **Auto-paced with overrides.** Engine computes delays from text length / WPM; every value is overridable per step. |
@@ -158,7 +158,7 @@ pacing: {
 Per-step overrides: `delay` (absolute or relative), `typingDuration`, `instant: true`, `showTypingFor`, `holdAfter`.
 
 ### Event/step types (v1)
-`message` (incoming, optional preceding typing indicator) · `reaction` (attached to a message id) · `typing` (standalone indicator) · `composerType` (self types char-by-char in the input) · `send` (composer commits to thread) · `edit` · `delete` · `readReceipt` · `system` (e.g. "Pull request opened" app card) · `delay` (explicit pause).
+`message` (incoming, optional preceding typing indicator; an **app message** is a `message` from an `app` participant carrying Block Kit `content`) · `reaction` (attached to a message id) · `typing` (standalone indicator) · `composerType` (self types char-by-char in the input) · `send` (composer commits to thread) · `edit` · `delete` · `readReceipt` · `system` (a system/notice line, e.g. "X joined", agent tool output) · `delay` (explicit pause).
 
 ### Player API (consumed by renderers)
 `play() · pause() · seek(t) · setRate(x) · on('tick'|'end') · state` — plus `loop`. The player is a thin clock wrapper around `getStateAt`; renderers can also drive sampling directly (Remotion does).
@@ -206,7 +206,7 @@ JSON, **versioned**, Zod-validated, with generated JSON Schema (for editor autoc
 }
 ```
 
-**Extensible content model.** Under the hood a message's body is a `ContentNode[]`, where each node has a `type` resolved through a **content-type registry**. v1 registers `text` (with inline `@mention`/`link`/`code`/`emoji` marks) and `image`. The convenience `text`/`images` fields above are sugar that compiles to nodes. Future types (`attachment`, `linkPreview`, `videoEmbed`, …) register without a schema-version bump; unknown types are validated leniently and skipped by skins that don't handle them. `$prev` / message ids let reactions and replies bind to targets.
+**Extensible content model.** Under the hood a message's body is a `ContentNode[]`, where each node has a `type` resolved through a **content-type registry**. Registered nodes: `text` (with inline `@mention`/`link`/`code`/`bold`/`italic`/`strike`/`emoji` marks), `image`, and the Block Kit blocks `header`/`section`/`context`/`divider`/`actions`/`attachment`. The convenience `text`/`images` fields (and block `text` sugar) compile to nodes. Future types (`linkPreview`, `videoEmbed`, …) register without a schema-version bump; unknown types are validated leniently and skipped by skins that don't handle them. `$prev` / message ids let reactions and replies bind to targets.
 
 **Assets (avatars + in-message images).** Resolution honors `meta.assets`: **`inline`** embeds images as data URLs (the default the generator/site uses — produces a fully self-contained config, ideal for shareable links and video) and **`url`** references hosted images (the option for embedded use, where the user keeps images in their own repo/CDN and ships a smaller config). The CLI/builder can convert a config between the two modes. In-message images use the same model; skins render them inside the bubble per the target UI's image treatment.
 
@@ -233,7 +233,7 @@ export interface Skin {
     TypingIndicator: FC<TypingProps>;
     Reaction: FC<ReactionProps>;      // single reaction pill (emoji + count)
     Composer: FC<ComposerProps>;      // input area; renders typed text + caret + send affordance
-    SystemMessage: FC<SystemProps>;   // app cards (e.g. "Pull request opened" + buttons)
+    SystemMessage: FC<SystemProps>;   // system/notice lines ("X joined", agent tool output)
     Avatar: FC<AvatarProps>;
   };
   tokens?: { light: SkinTokens; dark: SkinTokens }; // per-theme design tokens

@@ -21,12 +21,7 @@ const fixtures: Record<string, ConfigInput["timeline"]> = {
     { type: "reaction", target: "$prev", emoji: "🦔", delay: 1200 },
     { type: "typing", from: "paul", showTypingFor: 1800 },
     { type: "message", from: "paul", text: "@PostHog shouldn't error…" },
-    {
-      type: "system",
-      from: "bot",
-      card: "pr-opened",
-      text: "Pull request opened.",
-    },
+    { type: "system", from: "bot", text: "Cory joined #alerts" },
     { type: "composerType", from: "cory", text: "Let me check." },
     { type: "send" },
   ],

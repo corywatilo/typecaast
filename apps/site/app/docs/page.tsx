@@ -111,6 +111,14 @@ typecaast render billing-toast.json --aspect 9:16 --scale 2 --theme dark`}</Code
           <li>
             <Link
               style={{ color: "var(--tc-accent)" }}
+              href={`${REPO}/docs/message-content.md`}
+            >
+              Authoring message content (Block Kit) →
+            </Link>
+          </li>
+          <li>
+            <Link
+              style={{ color: "var(--tc-accent)" }}
               href={`${REPO}/docs/playground.md`}
             >
               Playground tour →

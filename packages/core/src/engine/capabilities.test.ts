@@ -64,10 +64,10 @@ describe("resolveCapabilities", () => {
     expect(types).toContain("text");
   });
 
-  it("drops system cards when unsupported", () => {
+  it("drops system notices when unsupported", () => {
     const c = build([
       { type: "message", from: "a", text: "hi" },
-      { type: "system", from: "a", text: "PR opened", card: "pr-opened" },
+      { type: "system", from: "a", text: "Cory joined #alerts" },
     ]);
     const resolved = resolveCapabilities(c, {
       ...base,

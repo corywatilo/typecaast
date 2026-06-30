@@ -75,13 +75,36 @@ describe("telegram skin", () => {
     expect(html).toContain("Roboto"); // font stack applied
   });
 
-  it("renders the bot card with author name, text, and inline buttons", () => {
-    const html = renderSkin(buildMockBillingToastState(7800), "light");
-    // Incoming bot bubbles label the sender (outgoing/self bubbles don't).
-    expect(html).toContain("PostHog");
-    expect(html).toContain("Pull request opened.");
-    expect(html).toContain("View PR");
-    expect(html).toContain("Open in PostHog Code");
+  it("renders a system notice as a centered pill", () => {
+    const state: SimState = {
+      messages: [
+        {
+          id: "sys",
+          from: "posthog-bot",
+          variant: "system",
+          content: [
+            {
+              type: "text",
+              spans: [{ type: "text", value: "Cory joined the group" }],
+            },
+          ],
+          revealProgress: 1,
+          state: "sent",
+          reactions: [],
+          isSelf: false,
+          isGrouped: false,
+          atMs: 0,
+        },
+      ],
+      typingIndicators: [],
+      composer: { from: undefined, text: "", caret: 0, sending: false },
+      scroll: { targetOffset: 0, reason: "none" },
+      durationMs: 1000,
+      theme: "light",
+    };
+    const html = renderSkin(state, "light");
+    expect(html).toContain("Cory joined the group");
+    expect(html).toContain("justify-content:center"); // centered pill
   });
 
   it("renders the reaction pill", () => {

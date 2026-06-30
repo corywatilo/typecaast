@@ -6,9 +6,35 @@ import {
   MOCK_BILLING_TOAST_DURATION_MS,
 } from "@typecaast/core/mocks";
 import type { Participant } from "@typecaast/schema";
-import type { ResolvedTheme, SimState } from "@typecaast/core";
+import type { RenderedMessage, ResolvedTheme, SimState } from "@typecaast/core";
 import { ThemeProvider } from "@typecaast/skin-kit";
 import { slack } from "./index.js";
+
+/** Render a single message (app sender) through the Slack `Message` component. */
+function renderMessage(
+  content: RenderedMessage["content"],
+  theme: ResolvedTheme = "light",
+): string {
+  const { Message } = slack.components;
+  const author: Participant = { id: "ph", name: "PostHog", kind: "app" };
+  const message: RenderedMessage = {
+    id: "b1",
+    from: "ph",
+    variant: "message",
+    content,
+    revealProgress: 1,
+    state: "sent",
+    reactions: [],
+    isSelf: false,
+    isGrouped: false,
+    atMs: 0,
+  };
+  return renderToStaticMarkup(
+    <ThemeProvider theme={theme} tokens={slack.tokens?.[theme]}>
+      <Message theme={theme} message={message} author={author} />
+    </ThemeProvider>,
+  );
+}
 
 const byId = new Map<string, Participant>(
   mockParticipants.map((p) => [p.id, p]),
@@ -77,12 +103,13 @@ describe("slack skin", () => {
     expect(html).toContain("Lato"); // font stack applied
   });
 
-  it("renders the PR system card with action buttons and APP badge", () => {
+  it("renders the app PR card (message + attachment) with buttons and APP badge", () => {
     const html = renderSkin(buildMockBillingToastState(7800), "light");
-    expect(html).toContain("APP");
+    expect(html).toContain("APP"); // app sender badge
     expect(html).toContain("Pull request opened.");
     expect(html).toContain("View PR");
     expect(html).toContain("Open in PostHog Code");
+    expect(html).toContain("border-left"); // attachment color bar
   });
 
   it("renders the hedgehog reaction pill", () => {
@@ -106,5 +133,74 @@ describe("slack skin", () => {
       "dark",
     );
     expect(html).toContain("#1a1d21");
+  });
+});
+
+describe("slack skin — Block Kit blocks", () => {
+  it("renders header, context, section (with marks + mention), divider, actions", () => {
+    const html = renderMessage([
+      { type: "header", text: "perf(inbox): Fix 26s admin inbox load" },
+      {
+        type: "context",
+        elements: [
+          {
+            type: "text",
+            spans: [
+              { type: "text", value: "🟠 P2 · " },
+              { type: "bold", value: "Session replay" },
+            ],
+          },
+        ],
+      },
+      {
+        type: "section",
+        spans: [
+          { type: "text", value: "Sales reps hit " },
+          { type: "mention", id: "joe", label: "@Joe Saunderson" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "actions",
+        elements: [
+          { type: "button", label: "Review PR", style: "primary" },
+          { type: "button", label: "Dismiss", style: "danger" },
+          { type: "button", label: "Open in PostHog" },
+        ],
+      },
+    ]);
+    // App sender → APP badge; no left border (top-level blocks).
+    expect(html).toContain("APP");
+    expect(html).toContain("perf(inbox): Fix 26s admin inbox load");
+    expect(html).toContain("<strong"); // bold mark
+    expect(html).toContain("Session replay");
+    expect(html).toContain("@Joe Saunderson"); // mention pill
+    expect(html).toContain("Review PR");
+    expect(html).toContain("Dismiss");
+    expect(html).toContain("Open in PostHog");
+    expect(html).toContain("#007a5a"); // primary green
+    expect(html).toContain("#e01e5a"); // danger red (light theme)
+  });
+
+  it("renders an attachment as a colored left bar around nested blocks", () => {
+    const html = renderMessage([
+      {
+        type: "attachment",
+        color: "#36a64f",
+        content: [
+          {
+            type: "section",
+            spans: [{ type: "text", value: "Pull request opened." }],
+          },
+          {
+            type: "actions",
+            elements: [{ type: "button", label: "View PR", style: "primary" }],
+          },
+        ],
+      },
+    ]);
+    expect(html).toContain("border-left:4px solid #36a64f");
+    expect(html).toContain("Pull request opened.");
+    expect(html).toContain("View PR");
   });
 });

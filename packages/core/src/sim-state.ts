@@ -9,19 +9,8 @@ export type ResolvedTheme = "light" | "dark";
 /** Lifecycle state of a rendered thread item. */
 export type MessageState = "typing" | "sending" | "sent" | "edited" | "deleted";
 
-/** Whether a thread item is a regular message or an app/system card. */
+/** Whether a thread item is a regular message or a system/notice line. */
 export type MessageVariant = "message" | "system";
-
-/** A system/app card payload (e.g. "Pull request opened" + action buttons). */
-export interface SystemCard {
-  /** Named card variant the skin renders, e.g. `"pr-opened"`. */
-  card?: string;
-  actions?: {
-    label: string;
-    href?: string;
-    variant?: "primary" | "secondary";
-  }[];
-}
 
 /** A reaction currently shown on a message. */
 export interface RenderedReaction {
@@ -59,8 +48,6 @@ export interface RenderedMessage {
   isGrouped: boolean;
   /** Display time in ms from timeline start. */
   atMs: number;
-  /** Present when `variant === "system"`. */
-  system?: SystemCard;
 }
 
 /** A typing indicator currently shown. */

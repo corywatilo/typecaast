@@ -59,8 +59,9 @@ export function TypecaastStage({
   const { Frame, Message, SystemMessage, TypingIndicator, Composer } =
     skin.components;
   const tokens = skin.tokens?.[theme];
-  // `always` keeps the reply box mounted even when idle (falls back to the self
-  // participant so a placeholder shows); `auto` only shows it while composing.
+  // `always` keeps the reply box mounted even when idle (the self participant,
+  // if any, is just whose placeholder it is — `author` is optional, so the box
+  // shows even with no self); `auto` only shows it while someone is composing.
   const selfParticipant = useMemo(
     () => participants.find((p) => p.isSelf),
     [participants],
@@ -70,7 +71,9 @@ export function TypecaastStage({
     : composer === "always"
       ? selfParticipant
       : undefined;
-  const showComposer = composer !== "never" && composerAuthor !== undefined;
+  const showComposer =
+    composer !== "never" &&
+    (composer === "always" || state.composer.from !== undefined);
 
   // "X is typing…" indicators, minus the viewer's own (you never see yourself
   // typing — that's what the composer shows). Placement is skin-driven: inline

@@ -7,6 +7,8 @@ export interface SlackColors {
   text: string;
   subtle: string;
   border: string;
+  /** Row background when a message is hovered. */
+  hoverBg: string;
   headerBg: string;
   link: string;
   mentionText: string;
@@ -24,6 +26,8 @@ export interface SlackColors {
   primaryText: string;
   buttonBorder: string;
   buttonText: string;
+  /** Danger button accent (outlined red), e.g. a "Delete"/"Dismiss" action. */
+  danger: string;
   appBadgeBg: string;
   appBadgeText: string;
   cardBar: string;
@@ -36,6 +40,7 @@ export const SLACK_COLORS: Record<ResolvedTheme, SlackColors> = {
     text: "#1d1c1d",
     subtle: "#616061",
     border: "#e2e2e2",
+    hoverBg: "#f8f8f8",
     headerBg: "#ffffff",
     link: "#1264a3",
     mentionText: "#1264a3",
@@ -53,6 +58,7 @@ export const SLACK_COLORS: Record<ResolvedTheme, SlackColors> = {
     primaryText: "#ffffff",
     buttonBorder: "#d1d1d1",
     buttonText: "#1d1c1d",
+    danger: "#e01e5a",
     appBadgeBg: "#e8e8e8",
     appBadgeText: "#616061",
     cardBar: "#dddddd",
@@ -63,6 +69,7 @@ export const SLACK_COLORS: Record<ResolvedTheme, SlackColors> = {
     text: "#d1d2d3",
     subtle: "#ababad",
     border: "#35373b",
+    hoverBg: "#222529",
     headerBg: "#1a1d21",
     link: "#1d9bd1",
     mentionText: "#1d9bd1",
@@ -80,6 +87,7 @@ export const SLACK_COLORS: Record<ResolvedTheme, SlackColors> = {
     primaryText: "#ffffff",
     buttonBorder: "#565856",
     buttonText: "#d1d2d3",
+    danger: "#e8607f",
     appBadgeBg: "#35373b",
     appBadgeText: "#ababad",
     cardBar: "#35373b",

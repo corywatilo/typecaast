@@ -280,9 +280,6 @@ export function compile(config: Config): CompiledTimeline {
           revealMs: reveal,
           atMs: appearAt,
           reactions: [],
-          ...(step.type === "system"
-            ? { system: { card: step.card, actions: step.actions } }
-            : {}),
         };
         messages.push(msg);
         byId.set(id, msg);

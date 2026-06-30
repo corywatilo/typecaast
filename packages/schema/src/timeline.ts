@@ -107,28 +107,16 @@ export const readReceiptStepSchema = z.object({
   ...stepBaseShape,
 });
 
-/** An app/system card (e.g. "Pull request opened" with action buttons). */
+/**
+ * A system / notice line — not a chat message. Skins render it distinctly: a
+ * centered muted notice (iMessage/WhatsApp/Slack "X joined #channel"), an agent
+ * tool-output line (Cursor/Claude Code `⎿ …`), a CI notice (Discord), etc. App
+ * "cards" are NOT system steps — model those as a `message` from an `app`
+ * participant carrying Block Kit content (header/section/context/actions/…).
+ */
 export const systemStepSchema = z.object({
   type: z.literal("system"),
   from: z.string().optional(),
-  /** Named card variant the skin renders, e.g. `"pr-opened"`. */
-  card: z.string().optional(),
-  /**
-   * Buttons rendered alongside the system message. When `href` is set the
-   * skin should render the button as a link that opens in a new tab; when
-   * absent it should be visibly inert (e.g. `cursor: not-allowed`). `variant`
-   * controls visual emphasis; if omitted the first action defaults to
-   * `"primary"` and the rest to `"secondary"`.
-   */
-  actions: z
-    .array(
-      z.object({
-        label: z.string(),
-        href: z.string().optional(),
-        variant: z.enum(["primary", "secondary"]).optional(),
-      }),
-    )
-    .optional(),
   ...bodyShape,
   ...stepBaseShape,
 });

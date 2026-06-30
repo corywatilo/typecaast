@@ -56,6 +56,13 @@ a React Server Component (Next.js App Router); no `"use client"` needed. (Using 
 **custom** skin? Pass it explicitly — `<Typecaast config={config} skin={mySkin} />`
 — inside a `"use client"` module.)
 
+**Message content.** Bodies accept Slack-style mrkdwn (`*bold*`, `_italic_`,
+`` `code` ``, links, `@mentions`) and images. An **app message** — a `message`
+from an `app` participant — can carry **Slack Block Kit** content (header,
+section, context, divider, buttons, image, and a colored-bar attachment),
+rendered full-fidelity by the Slack skin. See
+[`docs/message-content.md`](./docs/message-content.md).
+
 ### Props
 
 `<Typecaast>` also takes (all optional):

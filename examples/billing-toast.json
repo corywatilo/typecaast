@@ -55,12 +55,24 @@
       ]
     },
     {
-      "type": "system",
+      "type": "message",
       "id": "s1",
       "from": "posthog-bot",
-      "card": "pr-opened",
-      "text": "Pull request opened.",
-      "actions": [{ "label": "View PR" }, { "label": "Open in PostHog Code" }]
+      "content": [
+        {
+          "type": "attachment",
+          "content": [
+            { "type": "section", "text": "Pull request opened." },
+            {
+              "type": "actions",
+              "elements": [
+                { "type": "button", "label": "View PR", "style": "primary" },
+                { "type": "button", "label": "Open in PostHog Code" }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "composerType",

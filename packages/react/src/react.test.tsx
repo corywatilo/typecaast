@@ -111,8 +111,25 @@ describe("useTypecaast (real engine)", () => {
 });
 
 describe("TypecaastStage", () => {
-  it("renders messages, a system card, and the composer from state", () => {
-    const state = buildMockBillingToastState(9800, "dark");
+  it("dispatches messages, a system notice, and the composer from state", () => {
+    const base = buildMockBillingToastState(9800, "dark");
+    // The mock has no system step (app cards are messages now), so add a system
+    // notice to exercise the SystemMessage dispatch path.
+    const notice: RenderedMessage = {
+      id: "sys1",
+      from: "posthog-bot",
+      variant: "system",
+      content: [
+        { type: "text", spans: [{ type: "text", value: "Cory joined" }] },
+      ],
+      revealProgress: 1,
+      state: "sent",
+      reactions: [],
+      isSelf: false,
+      isGrouped: false,
+      atMs: 9000,
+    };
+    const state = { ...base, messages: [...base.messages, notice] };
     render(
       <TypecaastStage
         state={state}
@@ -137,6 +154,20 @@ describe("TypecaastStage", () => {
       />,
     );
     expect(screen.getByTestId("typing").textContent).toContain("Paul");
+  });
+
+  it("keeps the composer mounted in 'always' mode with no self participant", () => {
+    // An app-only thread (no one marked self): "always" should still show the
+    // idle reply box — the composer author is optional.
+    render(
+      <TypecaastStage
+        state={buildMockBillingToastState(0)}
+        skin={testSkin}
+        participants={[{ id: "bot", name: "Bot", kind: "app" }]}
+        composer="always"
+      />,
+    );
+    expect(screen.getByTestId("composer")).toBeTruthy();
   });
 });
 

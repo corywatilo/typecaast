@@ -405,78 +405,32 @@ const Message: FC<MessageProps> = ({ theme, message, author }) => {
   );
 };
 
-/** A bot card: an incoming bubble plus an inline keyboard (Telegram bot UI). */
-const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
+// A centered system/notice pill ("X joined the group", a date marker). App
+// "cards" are app-sender messages with Block Kit content, not system steps.
+const SystemMessage: FC<SystemProps> = ({ theme, message }) => {
   const c = TELEGRAM_COLORS[theme];
-  const actions = message.system?.actions ?? [];
   return (
     <div
       style={{
         display: "flex",
-        alignItems: "flex-end",
-        gap: 8,
-        padding: "3px 12px 1px",
+        justifyContent: "center",
+        padding: "6px 12px",
         ...fadeSlideIn(message.revealProgress),
       }}
     >
-      <div style={{ width: AVATAR_SIZE, flex: "0 0 auto" }}>
-        {author ? <Avatar theme={theme} participant={author} /> : null}
-      </div>
       <div
-        style={{ maxWidth: "78%", display: "flex", flexDirection: "column" }}
+        style={{
+          background: c.systemBg,
+          color: c.systemText,
+          borderRadius: 12,
+          padding: "3px 10px",
+          fontSize: 13,
+          lineHeight: 1.3,
+          textAlign: "center",
+          maxWidth: "80%",
+        }}
       >
-        <div
-          style={{
-            background: c.incomingBg,
-            color: c.incomingText,
-            borderRadius: `${BUBBLE_RADIUS}px ${BUBBLE_RADIUS}px ${BUBBLE_RADIUS}px ${TAIL_RADIUS}px`,
-            padding: "6px 10px 7px",
-            boxShadow: c.shadow,
-            fontSize: 15,
-            lineHeight: 1.35,
-          }}
-        >
-          <div
-            style={{
-              color: author?.color ?? c.nameColor,
-              fontWeight: 600,
-              fontSize: 13.5,
-              marginBottom: 2,
-            }}
-          >
-            {author?.name ?? "Bot"}
-          </div>
-          <MessageContent nodes={message.content} styles={markStyles(c)} />
-          <Meta c={c} atMs={message.atMs} outgoing={false} />
-        </div>
-        {actions.length > 0 ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 3,
-              marginTop: 4,
-            }}
-          >
-            {actions.map((a, i) => (
-              <div
-                key={i}
-                style={{
-                  background: c.buttonBg,
-                  color: c.buttonText,
-                  borderRadius: 8,
-                  padding: "9px 12px",
-                  textAlign: "center",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "default",
-                }}
-              >
-                {a.label}
-              </div>
-            ))}
-          </div>
-        ) : null}
+        <MessageContent nodes={message.content} styles={markStyles(c)} />
       </div>
     </div>
   );

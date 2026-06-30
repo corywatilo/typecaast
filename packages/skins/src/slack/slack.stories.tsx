@@ -31,11 +31,23 @@ const config: Config = configSchema.parse({
       text: "@PostHog the billing/spend API call shouldn't show an error toast to the user…",
     },
     {
-      type: "system",
+      type: "message",
       from: "posthog-bot",
-      card: "pr-opened",
-      text: "Pull request opened.",
-      actions: [{ label: "View PR" }, { label: "Open in PostHog Code" }],
+      content: [
+        {
+          type: "attachment",
+          content: [
+            { type: "section", text: "Pull request opened." },
+            {
+              type: "actions",
+              elements: [
+                { type: "button", label: "View PR", style: "primary" },
+                { type: "button", label: "Open in PostHog Code" },
+              ],
+            },
+          ],
+        },
+      ],
     },
     {
       type: "composerType",
@@ -43,6 +55,108 @@ const config: Config = configSchema.parse({
       text: "Let me check how exceptions are captured in the frontend.",
     },
     { type: "send" },
+  ],
+});
+
+/**
+ * A PostHog "Signals" app thread built purely from Block Kit blocks — a header,
+ * grey context lines (emoji + mentions), a section body, and an action row, with
+ * two follow-up app messages (rendered inline in the channel, no thread panel).
+ */
+const signalsConfig: Config = configSchema.parse({
+  version: 1,
+  meta: {
+    canvas: { width: 480, height: 760 },
+    skin: { id: "slack", options: { channel: "#signals" } },
+    composer: "always",
+  },
+  participants: [
+    { id: "posthog", name: "PostHog", kind: "app" },
+    { id: "joe", name: "Joe Saunderson" },
+    { id: "cory", name: "Cory Watilo" },
+  ],
+  timeline: [
+    {
+      type: "message",
+      from: "posthog",
+      instant: true,
+      content: [
+        {
+          type: "header",
+          text: "perf(inbox): Fix 26s admin inbox load from unbounded contact scan",
+        },
+        {
+          type: "context",
+          elements: [
+            {
+              type: "text",
+              text: "🟠 *P2* · Session replay · rvenvy/rvenvy-ai",
+            },
+          ],
+        },
+        {
+          type: "section",
+          text: "Sales reps and admins hit prolonged loading spinners that block content from appearing, with the worst case taking 26 seconds before the CRM inbox rendered.",
+        },
+        {
+          type: "context",
+          elements: [
+            {
+              type: "text",
+              text: "2 signals · 👤 Suggested reviewers: <@joe> <@cory>",
+            },
+          ],
+        },
+        {
+          type: "actions",
+          elements: [
+            { type: "button", label: "Review PR", href: "https://example.com" },
+            { type: "button", label: "Open in PostHog" },
+            { type: "button", label: "Dismiss", style: "danger" },
+          ],
+        },
+      ],
+    },
+    {
+      type: "message",
+      from: "posthog",
+      content: [
+        {
+          type: "context",
+          elements: [
+            { type: "text", text: "*Session replay* · Session problem" },
+          ],
+        },
+        {
+          type: "section",
+          text: 'The user searched for "Travel trailers with front living" floorplans, browsed results, then clicked a listing which resulted in a prolonged loading state with a skeleton screen.',
+        },
+        {
+          type: "context",
+          elements: [{ type: "text", text: "Problem: blocking exception" }],
+        },
+      ],
+    },
+    {
+      type: "message",
+      from: "posthog",
+      content: [
+        {
+          type: "context",
+          elements: [
+            { type: "text", text: "*Session replay* · Session problem" },
+          ],
+        },
+        {
+          type: "section",
+          text: "While attempting to navigate from an inventory listing to its photos and then to the Inbox, the user encountered prolonged loading screens that prevented content from appearing.",
+        },
+        {
+          type: "context",
+          elements: [{ type: "text", text: "Problem: blocking exception" }],
+        },
+      ],
+    },
   ],
 });
 
@@ -75,16 +189,25 @@ function Window({
 }
 
 /** A deterministic frame from the REAL engine at a fraction of the duration. */
-function Frozen({ frac, theme }: { frac: number; theme: ResolvedTheme }) {
-  const engine = createEngine(config, theme, slack.meta.capabilities);
+function Frozen({
+  frac,
+  theme,
+  cfg = config,
+}: {
+  frac: number;
+  theme: ResolvedTheme;
+  cfg?: Config;
+}) {
+  const engine = createEngine(cfg, theme, slack.meta.capabilities);
   const state = engine.getStateAt(engine.durationMs * frac);
   return (
     <Window theme={theme}>
       <TypecaastStage
         state={state}
         skin={slack}
-        participants={config.participants}
-        options={config.meta.skin.options}
+        participants={cfg.participants}
+        options={cfg.meta.skin.options}
+        composer={cfg.meta.composer}
       />
     </Window>
   );
@@ -112,4 +235,14 @@ export const MidThread: Story = {
 export const DarkMidThread: Story = {
   name: "Dark · Mid-thread",
   render: () => <Frozen frac={0.55} theme="dark" />,
+};
+
+export const BlockKitLight: Story = {
+  name: "Block Kit · Light",
+  render: () => <Frozen frac={1} theme="light" cfg={signalsConfig} />,
+};
+
+export const BlockKitDark: Story = {
+  name: "Block Kit · Dark",
+  render: () => <Frozen frac={1} theme="dark" cfg={signalsConfig} />,
 };

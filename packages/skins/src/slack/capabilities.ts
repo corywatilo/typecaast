@@ -11,12 +11,19 @@ export const slackCapabilities: Capabilities = {
     edit: "native",
     delete: "native",
     readReceipt: "unsupported", // Slack has no per-message read receipts in threads
-    system: "native", // app/PR cards
+    system: "native", // tool-output / system-notice lines
     delay: "native",
   },
   content: {
     text: true,
     image: true,
+    // Block Kit blocks — app messages compose these.
+    header: true,
+    section: true,
+    context: true,
+    divider: true,
+    actions: true,
+    attachment: true,
   },
   reactions: true,
   threads: true,

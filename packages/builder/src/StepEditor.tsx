@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import type { ConfigInput, StepType } from "@typecaast/schema";
 import type { Skin } from "@typecaast/skin-kit";
-import { Badge, Button, Field, IconButton, Input, Select } from "@typecaast/ui";
+import { Badge, Field, Input, Select } from "@typecaast/ui";
 import { STEP_GROUPS } from "./steps.js";
-import { InfoTip, Tooltip } from "./Tooltip.js";
-import { IconTrash } from "./icons.js";
+import { BlockEditor } from "./BlockEditor.js";
+import { InfoTip } from "./Tooltip.js";
 import { stepCapability } from "./lint.js";
 
 /**
@@ -24,11 +24,6 @@ function L({ children, tip }: { children: ReactNode; tip: string }) {
 
 type Step = ConfigInput["timeline"][number];
 type Participants = ConfigInput["participants"];
-type SystemAction = {
-  label: string;
-  href?: string;
-  variant?: "primary" | "secondary";
-};
 
 function get(step: Step, key: string): unknown {
   return (step as Record<string, unknown>)[key];
@@ -86,84 +81,6 @@ function NumberField({
           onChange(v === "" ? undefined : Number(v));
         }}
       />
-    </Field>
-  );
-}
-
-function ActionsEditor({
-  actions,
-  onChange,
-}: {
-  actions: SystemAction[];
-  onChange: (actions: SystemAction[]) => void;
-}) {
-  const update = (i: number, patch: Partial<SystemAction>) => {
-    onChange(actions.map((a, j) => (i === j ? { ...a, ...patch } : a)));
-  };
-  const remove = (i: number) => onChange(actions.filter((_, j) => j !== i));
-  const add = () => onChange([...actions, { label: "" }]);
-
-  return (
-    <Field
-      label={
-        <L tip="Buttons rendered alongside the system message. Add a URL to make a button open in a new tab; without one it shows a 'not-allowed' cursor. Variant controls visual emphasis.">
-          Actions
-        </L>
-      }
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {actions.map((a, i) => (
-          <div
-            key={i}
-            style={{
-              // Two rows; URL spans the full label+variant span on row 2 so it
-              // has room to breathe. Trash column lines up across both rows
-              // and is visually empty on the URL row.
-              display: "grid",
-              gridTemplateColumns: "1fr 110px auto",
-              rowGap: 4,
-              columnGap: 6,
-              alignItems: "center",
-            }}
-          >
-            <Input
-              placeholder="Label"
-              value={a.label}
-              onChange={(e) => update(i, { label: e.currentTarget.value })}
-            />
-            <Select
-              value={a.variant ?? (i === 0 ? "primary" : "secondary")}
-              onChange={(e) =>
-                update(i, {
-                  variant: e.currentTarget.value as "primary" | "secondary",
-                })
-              }
-            >
-              <option value="primary">Primary</option>
-              <option value="secondary">Secondary</option>
-            </Select>
-            <Tooltip text="Remove action">
-              <IconButton aria-label="Remove action" onClick={() => remove(i)}>
-                <IconTrash size={14} />
-              </IconButton>
-            </Tooltip>
-            <div style={{ gridColumn: "1 / span 2" }}>
-              <Input
-                placeholder="https://… (optional, opens in a new tab)"
-                value={a.href ?? ""}
-                onChange={(e) =>
-                  update(i, { href: e.currentTarget.value || undefined })
-                }
-              />
-            </div>
-          </div>
-        ))}
-        <div>
-          <Button size="sm" variant="outline" onClick={add}>
-            + Add action
-          </Button>
-        </div>
-      </div>
     </Field>
   );
 }
@@ -301,12 +218,30 @@ export function StepEditor({
               type === "edit"
                 ? "New text…"
                 : type === "system"
-                  ? "System card text…"
+                  ? "Notice text (e.g. “Cory joined #alerts”)…"
                   : type === "composerType"
                     ? "Type into the composer…"
                     : "Type a message…"
             }
             onChange={(v) => onChange({ text: v })}
+          />
+        </Field>
+      ) : null}
+
+      {type === "message" ? (
+        <Field
+          label={
+            <L tip="Block Kit blocks for an app message (header, text, context, buttons, …). If present, they render instead of Text. Slack renders the full set; other skins show the text and skip the rest.">
+              Blocks
+            </L>
+          }
+        >
+          <BlockEditor
+            content={
+              get(step, "content") as Record<string, unknown>[] | undefined
+            }
+            participants={participants}
+            onChange={(content) => onChange({ content })}
           />
         </Field>
       ) : null}
@@ -336,31 +271,6 @@ export function StepEditor({
             onChange={(e) => onChange({ emoji: e.currentTarget.value })}
           />
         </Field>
-      ) : null}
-
-      {type === "system" ? (
-        <Field
-          label={
-            <L tip="System card id provided by the skin (e.g. pr-opened, deploy-success).">
-              Card
-            </L>
-          }
-        >
-          <Input
-            value={(get(step, "card") as string) ?? ""}
-            placeholder="e.g. pr-opened"
-            onChange={(e) => onChange({ card: e.currentTarget.value })}
-          />
-        </Field>
-      ) : null}
-
-      {type === "system" ? (
-        <ActionsEditor
-          actions={(get(step, "actions") as SystemAction[] | undefined) ?? []}
-          onChange={(actions) =>
-            onChange({ actions: actions.length > 0 ? actions : undefined })
-          }
-        />
       ) : null}
 
       {type === "delay" ? (

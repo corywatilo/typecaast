@@ -40,12 +40,6 @@ interface MockMessageEvent {
   from: string;
   start: number;
   content: ReturnType<typeof toContentNodes>;
-  card?: string;
-  actions?: {
-    label: string;
-    href?: string;
-    variant?: "primary" | "secondary";
-  }[];
 }
 
 interface MockReactionEvent {
@@ -98,13 +92,29 @@ const messageEvents: MockMessageEvent[] = [
     }),
   },
   {
-    kind: "system",
+    // The app card is a regular app message whose body is a Block Kit
+    // attachment (colored bar) wrapping a section + an action row.
+    kind: "message",
     id: "s1",
     from: "posthog-bot",
     start: 7500,
-    content: toContentNodes({ text: "Pull request opened." }),
-    card: "pr-opened",
-    actions: [{ label: "View PR" }, { label: "Open in PostHog Code" }],
+    content: toContentNodes({
+      content: [
+        {
+          type: "attachment",
+          content: [
+            { type: "section", text: "Pull request opened." },
+            {
+              type: "actions",
+              elements: [
+                { type: "button", label: "View PR", style: "primary" },
+                { type: "button", label: "Open in PostHog Code" },
+              ],
+            },
+          ],
+        },
+      ],
+    }),
   },
   {
     kind: "message",
@@ -193,9 +203,6 @@ export function buildMockBillingToastState(
       isSelf: e.from === "cory",
       isGrouped: previous !== undefined && previous.from === e.from,
       atMs: e.start,
-      ...(e.kind === "system"
-        ? { system: { card: e.card, actions: e.actions } }
-        : {}),
     };
   });
 
@@ -247,7 +254,7 @@ export const mockBillingToastSnapshots = {
   empty: buildMockBillingToastState(0),
   firstMessage: buildMockBillingToastState(900),
   paulTyping: buildMockBillingToastState(3000),
-  withSystemCard: buildMockBillingToastState(7800),
+  withAppCard: buildMockBillingToastState(7800),
   composerTyping: buildMockBillingToastState(9800),
   complete: buildMockBillingToastState(MOCK_BILLING_TOAST_DURATION_MS),
 } satisfies Record<string, SimState>;

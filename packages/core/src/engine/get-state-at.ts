@@ -65,7 +65,6 @@ export function sampleState(
       isSelf: m.isSelf,
       isGrouped: previous !== undefined && previous.from === m.from,
       atMs: m.atMs,
-      ...(m.system ? { system: m.system } : {}),
     });
 
     if (m.appearMs > lastAppear) lastAppear = m.appearMs;

@@ -1,5 +1,5 @@
 import type { ContentNode } from "@typecaast/schema";
-import type { MessageVariant, SystemCard } from "../sim-state.js";
+import type { MessageVariant } from "../sim-state.js";
 
 /** A reaction baked onto a message with absolute timing. */
 export interface CompiledReaction {
@@ -13,7 +13,7 @@ export interface CompiledReaction {
   popMs: number;
 }
 
-/** A thread item (message or system card) with absolute timing. */
+/** A thread item (message or system/notice line) with absolute timing. */
 export interface CompiledMessage {
   id: string;
   from: string;
@@ -28,7 +28,6 @@ export interface CompiledMessage {
   /** Display timestamp (= appearMs). */
   atMs: number;
   reactions: CompiledReaction[];
-  system?: SystemCard;
   /** Set if an edit replaces the content at/after this time. */
   editedAtMs?: number;
   editedContent?: ContentNode[];

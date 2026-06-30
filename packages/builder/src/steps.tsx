@@ -26,11 +26,11 @@ interface StepMeta {
 export const STEP_META: Record<StepType, StepMeta> = {
   message: {
     description:
-      "A chat message from a participant. Self messages auto-render via the composer.",
+      "A chat message from a participant. App senders can add Block Kit blocks; self messages auto-render via the composer.",
     group: "Messages",
   },
   system: {
-    description: "An app or bot card (e.g. a PR opened).",
+    description: "A system / notice line (e.g. “X joined”, agent tool output).",
     group: "Messages",
   },
   typing: {

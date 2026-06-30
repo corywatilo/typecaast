@@ -11,14 +11,38 @@ function truncate(text: string, max = 96): string {
   return t.length > max ? `${t.slice(0, max - 1)}…` : t;
 }
 
+/** Best-effort one-line summary of Block Kit content (header/section text). */
+function contentSummary(content: unknown): string | undefined {
+  if (!Array.isArray(content)) return undefined;
+  for (const node of content) {
+    if (!node || typeof node !== "object") continue;
+    const n = node as {
+      type?: string;
+      text?: string;
+      spans?: { value?: string }[];
+      content?: unknown;
+    };
+    const spans = () =>
+      Array.isArray(n.spans) ? n.spans.map((s) => s.value ?? "").join("") : "";
+    if (n.type === "header" && n.text) return n.text;
+    if (n.type === "section" || n.type === "text") return n.text || spans();
+    if (n.type === "attachment") {
+      const inner = contentSummary(n.content);
+      if (inner) return inner;
+    }
+  }
+  return undefined;
+}
+
 /** A short human label for a timeline step, for the track chips. */
 export function stepLabel(step: TimelineStepInput): string {
   switch (step.type) {
     case "message":
+      return truncate(step.text || contentSummary(step.content) || "(no text)");
     case "composerType":
       return truncate(step.text || "(no text)");
     case "system":
-      return truncate(step.text || step.card || "card");
+      return truncate(step.text || contentSummary(step.content) || "notice");
     case "reaction":
       return step.emoji;
     case "typing":

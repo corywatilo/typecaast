@@ -12,9 +12,20 @@ import type {
   FrameProps,
   MessageProps,
   ReactionProps,
+  ResolvedTheme,
   SystemProps,
   TypingProps,
 } from "@typecaast/core";
+import type {
+  ActionsNode,
+  AttachmentNode,
+  ButtonElement,
+  ContentNode,
+  ContextNode,
+  HeaderNode,
+  InlineNode,
+  SectionNode,
+} from "@typecaast/schema";
 import {
   fadeSlideIn,
   MessageContent,
@@ -61,7 +72,6 @@ function markStyles(c: SlackColors): ContentStyles {
       background: c.mentionBg,
       borderRadius: 3,
       padding: "0 2px",
-      fontWeight: 600,
     },
     code: {
       color: c.codeText,
@@ -72,8 +82,23 @@ function markStyles(c: SlackColors): ContentStyles {
       fontFamily: "Menlo, Monaco, Consolas, monospace",
       fontSize: "0.85em",
     },
+    bold: { fontWeight: 700 },
+    italic: { fontStyle: "italic" },
+    strike: { textDecoration: "line-through" },
   };
 }
+
+/** In-message image styling shared by message bodies and image blocks. */
+function imageStyle(c: SlackColors): CSSProperties {
+  return {
+    borderRadius: 8,
+    border: `1px solid ${c.border}`,
+    maxWidth: 360,
+  };
+}
+
+/** Vertical gap between blocks within a message (Slack's block rhythm). */
+const BLOCK_GAP = 8;
 
 const AppBadge: FC<{ c: SlackColors }> = ({ c }) => (
   <span
@@ -337,7 +362,7 @@ const Composer: FC<ComposerProps> = ({ theme, composer }) => {
 
 function buttonStyle(
   c: SlackColors,
-  primary: boolean,
+  style: ButtonElement["style"],
   linked: boolean,
 ): CSSProperties {
   const base: CSSProperties = {
@@ -357,95 +382,294 @@ function buttonStyle(
     // Keep each button's label on one line; the row wraps buttons instead.
     whiteSpace: "nowrap",
   };
-  return primary
-    ? { ...base, background: c.primary, color: c.primaryText, border: "none" }
-    : {
-        ...base,
-        background: "transparent",
-        color: c.buttonText,
-        border: `1px solid ${c.buttonBorder}`,
-      };
+  if (style === "primary") {
+    return {
+      ...base,
+      background: c.primary,
+      color: c.primaryText,
+      border: "none",
+    };
+  }
+  if (style === "danger") {
+    // Slack's danger style is an outlined red button (fills on hover in the
+    // real client; we keep it inert/outlined).
+    return {
+      ...base,
+      background: "transparent",
+      color: c.danger,
+      border: `1px solid ${c.danger}`,
+    };
+  }
+  return {
+    ...base,
+    background: "transparent",
+    color: c.buttonText,
+    border: `1px solid ${c.buttonBorder}`,
+  };
 }
 
-const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
-  const c = SLACK_COLORS[theme];
-  const actions = message.system?.actions ?? [];
+/** A wrapping row of Block Kit buttons (an `actions` block or a card footer). */
+const SlackButtons: FC<{
+  c: SlackColors;
+  buttons: ButtonElement[];
+  marginTop?: number;
+}> = ({ c, buttons, marginTop = 8 }) => {
+  if (buttons.length === 0) return null;
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 8,
-        padding: "8px 16px 2px",
-        ...fadeSlideIn(message.revealProgress),
-      }}
-    >
-      <div style={{ flex: "0 0 36px", width: 36 }}>
-        {author ? (
-          <Avatar theme={theme} participant={author} size={36} />
-        ) : null}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontWeight: 700, color: c.text }}>
-            {author?.name ?? "App"}
-          </span>
-          <AppBadge c={c} />
-          <span style={{ fontSize: 12, color: c.subtle }}>
-            {formatTime(message.atMs)}
-          </span>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop }}>
+      {buttons.map((b, i) => {
+        const style = buttonStyle(c, b.style, !!b.href);
+        return b.href ? (
+          <a
+            key={i}
+            href={b.href}
+            target="_blank"
+            rel="noreferrer noopener"
+            style={style}
+          >
+            {b.label}
+          </a>
+        ) : (
+          <button
+            key={i}
+            type="button"
+            aria-disabled
+            style={style}
+            onClick={(e) => e.preventDefault()}
+          >
+            {b.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+/** Render a span list through the shared content renderer, Slack-themed. */
+function Spans({
+  c,
+  spans,
+}: {
+  c: SlackColors;
+  spans: InlineNode[];
+}): ReactNode {
+  return (
+    <MessageContent nodes={[{ type: "text", spans }]} styles={markStyles(c)} />
+  );
+}
+
+/**
+ * Render one Block Kit content node, Slack-styled. Top-level blocks render
+ * full-width (no border); the colored left bar is an `attachment` block only.
+ * Unknown nodes are skipped.
+ */
+const Block: FC<{ theme: ResolvedTheme; node: ContentNode }> = ({
+  theme,
+  node,
+}) => {
+  const c = SLACK_COLORS[theme];
+  switch (node.type) {
+    case "text":
+      return (
+        <div style={{ color: c.text, wordBreak: "break-word" }}>
+          <MessageContent
+            nodes={[node]}
+            styles={markStyles(c)}
+            imageStyle={imageStyle(c)}
+          />
         </div>
+      );
+    case "image":
+      return (
+        <MessageContent
+          nodes={[node]}
+          styles={markStyles(c)}
+          imageStyle={imageStyle(c)}
+        />
+      );
+    case "header":
+      return (
         <div
           style={{
-            marginTop: 4,
-            borderLeft: `4px solid ${c.cardBar}`,
-            borderRadius: 2,
-            paddingLeft: 12,
+            fontWeight: 700,
+            fontSize: 18,
+            lineHeight: 1.3,
+            color: c.text,
           }}
         >
-          <div style={{ color: c.text }}>
-            <MessageContent nodes={message.content} styles={markStyles(c)} />
-          </div>
-          {actions.length > 0 ? (
+          {(node as HeaderNode).text}
+        </div>
+      );
+    case "section": {
+      const s = node as SectionNode;
+      const body = (
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            color: c.text,
+            wordBreak: "break-word",
+          }}
+        >
+          <Spans c={c} spans={s.spans ?? []} />
+          {s.fields && s.fields.length > 0 ? (
             <div
               style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 8,
-                marginTop: 8,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "4px 16px",
+                marginTop: 6,
               }}
             >
-              {actions.map((a, i) => {
-                // First action defaults to primary unless explicitly overridden.
-                const primary =
-                  (a.variant ?? (i === 0 ? "primary" : "secondary")) ===
-                  "primary";
-                const style = buttonStyle(c, primary, !!a.href);
-                return a.href ? (
-                  <a
-                    key={i}
-                    href={a.href}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    style={style}
-                  >
-                    {a.label}
-                  </a>
-                ) : (
-                  <button
-                    key={i}
-                    type="button"
-                    aria-disabled
-                    style={style}
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    {a.label}
-                  </button>
-                );
-              })}
+              {s.fields.map((f, i) => (
+                <div key={i} style={{ fontSize: 13.5 }}>
+                  <Spans c={c} spans={f.spans ?? []} />
+                </div>
+              ))}
             </div>
           ) : null}
         </div>
-      </div>
+      );
+      if (!s.accessory) return body;
+      const accessory =
+        s.accessory.type === "button" ? (
+          <SlackButtons c={c} buttons={[s.accessory]} marginTop={0} />
+        ) : (
+          <img
+            src={s.accessory.src}
+            alt={s.accessory.alt ?? ""}
+            style={{
+              width: 88,
+              height: 88,
+              borderRadius: 8,
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        );
+      return (
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            alignItems: "flex-start",
+          }}
+        >
+          {body}
+          <div style={{ flex: "0 0 auto" }}>{accessory}</div>
+        </div>
+      );
+    }
+    case "context":
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 6,
+            color: c.subtle,
+            fontSize: 13.5,
+            lineHeight: 1.4,
+          }}
+        >
+          {(node as ContextNode).elements.map((el, i) =>
+            el.type === "image" ? (
+              <img
+                key={i}
+                src={el.src}
+                alt={el.alt ?? ""}
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: 3,
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            ) : (
+              <span key={i} style={{ color: c.subtle }}>
+                <Spans c={c} spans={el.spans ?? []} />
+              </span>
+            ),
+          )}
+        </div>
+      );
+    case "divider":
+      return <div style={{ height: 1, background: c.border }} />;
+    case "actions":
+      return (
+        <SlackButtons
+          c={c}
+          buttons={(node as ActionsNode).elements}
+          marginTop={0}
+        />
+      );
+    case "attachment": {
+      const a = node as AttachmentNode;
+      return (
+        <div
+          style={{
+            borderLeft: `4px solid ${a.color ?? c.cardBar}`,
+            borderRadius: 2,
+            paddingLeft: 12,
+            display: "flex",
+            flexDirection: "column",
+            gap: BLOCK_GAP,
+          }}
+        >
+          {a.content.map((n, i) => (
+            <Block key={i} theme={theme} node={n} />
+          ))}
+        </div>
+      );
+    }
+    default:
+      return null; // unknown node type — skipped
+  }
+};
+
+/** Render a message body as a sequence of Block Kit blocks (uniform gap). */
+const Blocks: FC<{ theme: ResolvedTheme; nodes: ContentNode[] }> = ({
+  theme,
+  nodes,
+}) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: BLOCK_GAP,
+      marginTop: 2,
+    }}
+  >
+    {nodes.map((node, i) => (
+      <Block key={i} theme={theme} node={node} />
+    ))}
+  </div>
+);
+
+// A system/notice line ("X joined #channel", a date marker, etc.) — a small
+// muted line indented to align with the message text column. App "cards" are
+// NOT system messages: they're app-sender messages carrying Block Kit content.
+const SystemMessage: FC<SystemProps> = ({ theme, message }) => {
+  const c = SLACK_COLORS[theme];
+  const [hover, setHover] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        // 60px = avatar (36) + gap (8) + row padding (16), so the notice lines
+        // up under the message text column.
+        padding: "4px 16px 4px 60px",
+        background: hover ? c.hoverBg : "transparent",
+        color: c.subtle,
+        fontSize: 13,
+        lineHeight: 1.4,
+        ...fadeSlideIn(message.revealProgress),
+      }}
+    >
+      <MessageContent nodes={message.content} styles={markStyles(c)} />
     </div>
   );
 };
@@ -453,58 +677,76 @@ const SystemMessage: FC<SystemProps> = ({ theme, message, author }) => {
 const Message: FC<MessageProps> = ({ theme, message, author }) => {
   const c = SLACK_COLORS[theme];
   const grouped = message.isGrouped;
+  const [hover, setHover] = useState(false);
+  // Slack reveals a small gutter timestamp (no AM/PM) when hovering a grouped
+  // message — un-grouped ones already show the time next to the name.
+  const gutterTime = formatTime(message.atMs).replace(/\s[AP]M$/, "");
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 8,
-        padding: grouped ? "2px 16px" : "8px 16px 2px",
-        ...fadeSlideIn(message.revealProgress),
-      }}
-    >
-      <div style={{ flex: "0 0 36px", width: 36 }}>
-        {grouped ? null : (
-          <Avatar theme={theme} participant={author} size={36} />
-        )}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {grouped ? null : (
-          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-            <span style={{ fontWeight: 700, color: c.text }}>
-              {author.name}
-            </span>
-            {author.kind === "app" ? <AppBadge c={c} /> : null}
-            <span style={{ fontSize: 12, color: c.subtle, marginLeft: 2 }}>
-              {formatTime(message.atMs)}
-            </span>
-          </div>
-        )}
-        <div style={{ color: c.text, wordBreak: "break-word" }}>
-          <MessageContent
-            nodes={message.content}
-            styles={markStyles(c)}
-            imageStyle={{
-              borderRadius: 8,
-              marginTop: 4,
-              border: `1px solid ${c.border}`,
-              maxWidth: 360,
-            }}
-          />
+    // Outer carries the inter-message gap as margin so the hover background (on
+    // the inner row) stays snug around the message and never fills the gap.
+    <div style={{ marginTop: grouped ? 8 : 10 }}>
+      <div
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={{
+          display: "flex",
+          gap: 8,
+          padding: "4px 16px 2px",
+          background: hover ? c.hoverBg : "transparent",
+          ...fadeSlideIn(message.revealProgress),
+        }}
+      >
+        <div style={{ flex: "0 0 36px", width: 36 }}>
+          {grouped ? (
+            hover ? (
+              <span
+                style={{
+                  display: "block",
+                  textAlign: "right",
+                  paddingTop: 3,
+                  paddingRight: 4,
+                  fontSize: 10.5,
+                  lineHeight: 1.5,
+                  color: c.subtle,
+                  fontVariantNumeric: "tabular-nums",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {gutterTime}
+              </span>
+            ) : null
+          ) : (
+            <Avatar theme={theme} participant={author} size={36} />
+          )}
         </div>
-        {message.reactions.length > 0 ? (
-          <div
-            style={{
-              display: "flex",
-              gap: 4,
-              marginTop: 4,
-              flexWrap: "wrap",
-            }}
-          >
-            {message.reactions.map((r, i) => (
-              <Reaction key={i} theme={theme} reaction={r} />
-            ))}
-          </div>
-        ) : null}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {grouped ? null : (
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+              <span style={{ fontWeight: 700, color: c.text }}>
+                {author.name}
+              </span>
+              {author.kind === "app" ? <AppBadge c={c} /> : null}
+              <span style={{ fontSize: 12, color: c.subtle, marginLeft: 2 }}>
+                {formatTime(message.atMs)}
+              </span>
+            </div>
+          )}
+          <Blocks theme={theme} nodes={message.content} />
+          {message.reactions.length > 0 ? (
+            <div
+              style={{
+                display: "flex",
+                gap: 4,
+                marginTop: 4,
+                flexWrap: "wrap",
+              }}
+            >
+              {message.reactions.map((r, i) => (
+                <Reaction key={i} theme={theme} reaction={r} />
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

@@ -510,34 +510,6 @@
               "from": {
                 "type": "string"
               },
-              "card": {
-                "type": "string"
-              },
-              "actions": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "label": {
-                      "type": "string"
-                    },
-                    "href": {
-                      "type": "string"
-                    },
-                    "variant": {
-                      "type": "string",
-                      "enum": [
-                        "primary",
-                        "secondary"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "label"
-                  ],
-                  "additionalProperties": false
-                }
-              },
               "text": {
                 "type": "string"
               },

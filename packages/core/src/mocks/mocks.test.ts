@@ -21,7 +21,7 @@ describe("buildMockBillingToastState", () => {
     expect(empty.composer.text).toBe("");
 
     const end = buildMockBillingToastState(MOCK_BILLING_TOAST_DURATION_MS);
-    // m1, m2, m3, system card, m4
+    // m1, m2, m3, the app card (s1), m4
     expect(end.messages).toHaveLength(5);
     expect(end.messages.at(-1)?.id).toBe("m4");
   });
@@ -92,7 +92,8 @@ describe("createMockPlayer", () => {
     player.on("seek", onSeek);
     player.seek(7800);
     expect(player.currentMs).toBe(7800);
-    expect(player.state.messages.some((m) => m.variant === "system")).toBe(
+    // The PostHog app card (s1) is visible by 7800.
+    expect(player.state.messages.some((m) => m.from === "posthog-bot")).toBe(
       true,
     );
     expect(onTick).toHaveBeenCalledOnce();

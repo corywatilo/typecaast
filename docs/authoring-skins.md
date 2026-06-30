@@ -47,8 +47,8 @@ export const mySkin = defineSkin({
   },
   components: {
     Frame, // chrome: header/window; wraps the thread + composer
-    Message, // a message row/bubble
-    SystemMessage, // app/system cards
+    Message, // a message row/bubble (incl. app messages with Block Kit blocks)
+    SystemMessage, // system / notice lines ("X joined", agent tool output)
     TypingIndicator, // "X is typing…" / dots / spinner
     Reaction, // a single reaction pill/badge
     Composer, // the input area (typed text + caret)
@@ -71,7 +71,7 @@ come from `@typecaast/core`:
 | ----------------- | ----------------------------------------------------------------------------- |
 | `Frame`           | `theme`, `options` (your `meta.skin.options`), `children` (thread + composer) |
 | `Message`         | `theme`, `message: RenderedMessage`, `author: Participant`, `previousAuthor?` |
-| `SystemMessage`   | `theme`, `message` (with `message.system` = `{ card?, actions? }`), `author?` |
+| `SystemMessage`   | `theme`, `message: RenderedMessage` (a system/notice line), `author?`         |
 | `TypingIndicator` | `theme`, `typing: { from, progress }`, `author`                               |
 | `Reaction`        | `theme`, `reaction: { emoji, count, by, progress }`                           |
 | `Composer`        | `theme`, `composer: { from?, text, caret, sending }`, `author?`               |
@@ -91,15 +91,20 @@ interface RenderedMessage {
   isSelf: boolean; // the viewer — render on the "self" side
   isGrouped: boolean; // grouped with the previous (same author, close in time)
   atMs: number; // timeline timestamp (fabricate a clock time from it)
-  system?: { card?: string; actions?: { label: string; href?: string }[] };
 }
 ```
+
+App "cards" are not a separate variant: an app message is a normal `message`
+from a participant with `kind: "app"` whose `content` carries Block Kit blocks
+(`header`, `section`, `context`, `divider`, `actions`, `image`, `attachment`).
+`variant: "system"` is for non-message notice lines (joins, agent tool output)
+and renders distinctly per skin.
 
 ### Rendering message content
 
 Don't walk `content` by hand — use the shared renderer, which handles text with
-inline marks (`@mention`, link, `code`, emoji) and in-message images, and skips
-unknown future node types:
+inline marks (`@mention`, link, `code`, `bold`, `italic`, `strike`, emoji) and
+in-message images, and skips node types it doesn't recognize:
 
 ```tsx
 import { MessageContent } from "@typecaast/skin-kit";
@@ -110,6 +115,13 @@ import { MessageContent } from "@typecaast/skin-kit";
   imageStyle={{ borderRadius: 8, maxWidth: 320 }}
 />;
 ```
+
+`MessageContent` renders `text`/`image` nodes and the inline marks; the
+**Block Kit** block nodes (`header`, `section`, `context`, `divider`, `actions`,
+`attachment`) are a Slack-leaning idiom that the Slack skin renders itself (see
+`packages/skins/src/slack/components.tsx`). Other skins skip them, so a Slack
+app-message config still degrades to its plain text elsewhere. Declare the block
+node types you render in `capabilities.content` (e.g. `section: true`).
 
 ### Animate from progress, never from CSS transitions
 
