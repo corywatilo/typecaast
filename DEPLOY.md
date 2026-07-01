@@ -58,14 +58,17 @@ Packages: `core`, `schema`, `react`, `remotion`, `skins`, `skin-kit`,
 > can't create a package that doesn't exist yet: the OIDC publish 404s
 > (`PUT https://registry.npmjs.org/@typecaast%2f<name> — Not found`), because
 > there's no trusted publisher to authorize against. Publish the first version
-> once by hand, then add its trusted publisher so every later release goes via
-> OIDC. This is how the original 0.1.0 packages were bootstrapped, and how
-> `@typecaast/mcp@0.1.0` was published:
+> once by hand **with pnpm** — `pnpm publish` rewrites the `workspace:`
+> protocol to a real version range, whereas plain **`npm publish` ships
+> `"@typecaast/schema": "workspace:*"` verbatim** and the package then fails to
+> install (`EUNSUPPORTEDPROTOCOL`). That mistake broke the first
+> `@typecaast/mcp@0.1.0`. Then add its trusted publisher so every later release
+> goes via OIDC:
 >
 > ```
 > git pull && pnpm install
 > pnpm --filter @typecaast/mcp build
-> cd packages/mcp && npm publish --access public   # logged in, with 2FA OTP
+> pnpm --filter @typecaast/mcp publish --access public --no-git-checks
 > ```
 >
 > Then npm → `@typecaast/mcp` → Settings → Trusted Publishing → Add GitHub
