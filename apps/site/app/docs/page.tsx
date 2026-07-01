@@ -160,6 +160,28 @@ typecaast render billing-toast.json --aspect 9:16 --scale 2 --theme dark`}</Code
         </p>
 
         <Heading level={2} style={{ marginTop: 28 }}>
+          MCP server (editors &amp; agents)
+        </Heading>
+        <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
+          Run <code>@typecaast/mcp</code> in your own editor or agent to
+          assemble and validate configs without leaving your codebase — for
+          example, turning a screenshot into a working config. It exposes{" "}
+          <code>validate_config</code>, <code>get_json_schema</code>,{" "}
+          <code>list_skins</code>, <code>scaffold_config</code>, and{" "}
+          <code>get_docs</code> (the guides are also exposed as resources).
+        </p>
+        <Code>{`claude mcp add typecaast -- npx -y @typecaast/mcp`}</Code>
+        <p className="tc-muted" style={{ fontSize: 14, lineHeight: 1.7 }}>
+          Setup for other MCP clients and the full tool list:{" "}
+          <Link
+            style={{ color: "var(--tc-accent)" }}
+            href={`${REPO}/packages/mcp/README.md`}
+          >
+            @typecaast/mcp readme →
+          </Link>
+        </p>
+
+        <Heading level={2} style={{ marginTop: 28 }}>
           More guides
         </Heading>
         <ul style={{ fontSize: 14.5, lineHeight: 2 }}>
