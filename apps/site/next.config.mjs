@@ -26,6 +26,12 @@ const nextConfig = {
     "@typecaast/skins",
     "@typecaast/skin-kit",
   ],
+  // Import the repo's /docs/*.md guides as raw strings, bundled into the build
+  // (no generated content dir, no runtime fs). See app/docs/_docs.ts.
+  webpack(config) {
+    config.module.rules.push({ test: /\.md$/, type: "asset/source" });
+    return config;
+  },
   async rewrites() {
     return [
       {

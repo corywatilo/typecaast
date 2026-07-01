@@ -5,9 +5,8 @@
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "scripts": {
-    "sync-docs": "node scripts/sync-docs.mjs",
-    "dev": "node scripts/sync-docs.mjs && next dev",
-    "build": "node scripts/sync-docs.mjs && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint app components",

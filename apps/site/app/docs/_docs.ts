@@ -1,14 +1,17 @@
-// Shared metadata + reader for the on-site authoring guides. These three are
+// Shared metadata + text for the on-site authoring guides. These three are
 // rendered as pages on typecaast.com; the rest of /docs stays GitHub-linked.
-// Source markdown is synced into content/docs by scripts/sync-docs.mjs — keep
-// the slug list here in sync with that script's DOCS array.
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+// The markdown is imported straight from the repo's /docs and bundled into the
+// build (webpack `asset/source` — see next.config.mjs), so there's no generated
+// dir and no runtime fs. Keep this list in step with what @typecaast/mcp bundles.
+import authoringConfigs from "../../../../docs/authoring-configs.md";
+import pacing from "../../../../docs/pacing.md";
+import messageContent from "../../../../docs/message-content.md";
 
 export interface SiteDoc {
   slug: string;
   title: string;
   blurb: string;
+  text: string;
 }
 
 export const SITE_DOCS: SiteDoc[] = [
@@ -17,40 +20,36 @@ export const SITE_DOCS: SiteDoc[] = [
     title: "Authoring configs by hand",
     blurb:
       "Every top-level field and timeline step type — write or edit the JSON config without the playground.",
+    text: authoringConfigs,
   },
   {
     slug: "pacing",
     title: "Pacing & timing",
     blurb:
       "Gaps, delays, and typing speed — including how to get ~1–2s between messages.",
+    text: pacing,
   },
   {
     slug: "message-content",
     title: "Message content",
     blurb: "Message bodies: Slack-style mrkdwn and Block Kit content nodes.",
+    text: messageContent,
   },
 ];
 
-const SLUGS = new Set(SITE_DOCS.map((d) => d.slug));
+const BY_SLUG = new Map(SITE_DOCS.map((d) => [d.slug, d]));
 
 export function isSiteDoc(slug: string): boolean {
-  return SLUGS.has(slug);
+  return BY_SLUG.has(slug);
 }
 
 export function docMeta(slug: string): SiteDoc | undefined {
-  return SITE_DOCS.find((d) => d.slug === slug);
+  return BY_SLUG.get(slug);
 }
 
-const DOCS_DIR = join(process.cwd(), "content", "docs");
-
-/** Read a synced doc's markdown, or null if it isn't an on-site doc / is missing. */
+/** The doc's markdown, or null if it isn't an on-site doc. */
 export function readDoc(slug: string): string | null {
-  if (!SLUGS.has(slug)) return null;
-  try {
-    return readFileSync(join(DOCS_DIR, `${slug}.md`), "utf8");
-  } catch {
-    return null;
-  }
+  return BY_SLUG.get(slug)?.text ?? null;
 }
 
 export const REPO = "https://github.com/corywatilo/typecaast/blob/master";

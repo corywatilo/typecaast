@@ -10,7 +10,6 @@ pnpm-lock.yaml
 
 # Generated artifacts
 **/typecaast.schema.json
-apps/site/content/**
 
 # Source-of-truth planning docs — kept verbatim
 PLAN.md

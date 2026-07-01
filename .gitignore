@@ -12,9 +12,6 @@ node_modules
 .next
 out
 
-# generated: docs synced into the site from /docs by apps/site/scripts/sync-docs.mjs
-apps/site/content
-
 # production
 /build
 dist
