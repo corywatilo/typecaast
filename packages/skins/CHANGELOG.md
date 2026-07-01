@@ -1,5 +1,14 @@
 # @typecaast/skins
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [b9e02ff]
+  - @typecaast/schema@0.4.1
+  - @typecaast/core@0.6.1
+  - @typecaast/skin-kit@0.6.1
+
 ## 0.5.0
 
 ### Minor Changes

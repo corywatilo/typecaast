@@ -1,5 +1,19 @@
 # @typecaast/cli
 
+## 0.1.15
+
+### Patch Changes
+
+- b9e02ff: Add package READMEs that point to the new authoring guides
+  (typecaast.com/docs/authoring-configs, /docs/pacing), the served JSON Schema, the
+  `/llms.txt` index, and the `@typecaast/mcp` server — so the npm pages and LLMs in
+  a consumer project can find how to author/edit configs by hand. Docs/metadata
+  only; no code changes.
+- Updated dependencies [b9e02ff]
+  - @typecaast/schema@0.4.1
+  - @typecaast/capture@0.1.4
+  - @typecaast/remotion@0.1.15
+
 ## 0.1.14
 
 ### Patch Changes
